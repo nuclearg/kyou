@@ -18,7 +18,7 @@ import net.nuclearg.kyou.dom.KyouField;
 import net.nuclearg.kyou.dom.KyouItem;
 import net.nuclearg.kyou.dom.KyouStruct;
 import net.nuclearg.kyou.dom.visitor.KyouDomVisitor;
-import net.nuclearg.kyou.util.KyouByteUtils;
+import net.nuclearg.kyou.util.ByteUtils;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
@@ -39,7 +39,7 @@ import org.xml.sax.helpers.XMLReaderFactory;
  * 
  * @author ng
  */
-public class XmlDomSerializer implements DomSerializer {
+public class XmlDomSerializer implements KyouDomSerializer {
 
     @Override
     public void serialize(KyouDocument doc, OutputStream os) {
@@ -48,11 +48,30 @@ public class XmlDomSerializer implements DomSerializer {
         if (os == null)
             throw new KyouException("output is null");
 
+        String xml = this.serialize(doc);
+        try {
+            os.write(xml.getBytes(ByteUtils.UTF8));
+        } catch (Exception ex) {
+            throw new KyouException("serialize fail. doc: " + doc, ex);
+        }
+    }
+
+    /**
+     * 将报文数据序列化为xml
+     * 
+     * @param doc
+     *            报文数据
+     * @return 报文数据对应的xml
+     */
+    public String serialize(KyouDocument doc) {
+        if (doc == null)
+            throw new KyouException("doc is null");
+
         final StringBuilder buffer = new StringBuilder();
         try {
             doc.foreach(new SerializerVisitor(buffer));
 
-            os.write(buffer.toString().getBytes(KyouByteUtils.UTF8));
+            return buffer.toString();
         } catch (Exception ex) {
             throw new KyouException("serialize fail. doc: " + doc, ex);
         }
@@ -136,12 +155,21 @@ public class XmlDomSerializer implements DomSerializer {
 
     @Override
     public KyouDocument deserialize(InputStream is) {
-        if (is == null)
-            throw new KyouException("input is null");
+        return this.deserialize(new InputSource(is));
+    }
+
+    /**
+     * 将xml解析为报文数据
+     * 
+     * @param in
+     *            xml
+     * @return 解析好的报文数据
+     */
+    public KyouDocument deserialize(InputSource in) {
+        if (in == null)
+            throw new KyouException("in is null");
 
         try {
-            InputSource source = new InputSource(is);
-
             final KyouDomBuilder builder = new KyouDomBuilder();
 
             // 使用SAX进行解析
@@ -232,9 +260,9 @@ public class XmlDomSerializer implements DomSerializer {
                 }
             });
             reader.setErrorHandler((ErrorHandler) reader.getContentHandler());
-            reader.parse(source);
+            reader.parse(in);
 
-            // 返回解析好的KyouDocument
+            // 返回解析好的报文数据
             return builder.endDocument();
         } catch (Exception ex) {
             throw new KyouException("parse xml fail", ex);

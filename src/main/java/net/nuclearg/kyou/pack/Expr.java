@@ -8,8 +8,8 @@ import java.lang.annotation.Target;
 import net.nuclearg.kyou.KyouException;
 import net.nuclearg.kyou.pack.expr.EXPR_CLASSES;
 import net.nuclearg.kyou.pack.expr.IntegerExpr;
-import net.nuclearg.kyou.util.value.KyouValue;
-import net.nuclearg.kyou.util.value.KyouValueType;
+import net.nuclearg.kyou.util.value.Value;
+import net.nuclearg.kyou.util.value.ValueType;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
@@ -22,9 +22,9 @@ import org.apache.commons.lang.math.NumberUtils;
  * 各种表达式可以在保证类型正确的前提下自由组合，组合方法是将表达式前后并列，以空格分隔。<br/>
  * 此时后面的表达式的计算结果将会传给前面的表达式。即计算顺序是从后往前的。<br/>
  * 表达式有各自的输入类型和输出类型，需要确保前后相邻的表达式的输出类型和输入类型匹配。<br/>
- * <li>需要确保整个表达式链的最初始的表达式的输入类型是{@link KyouValueType#Dom}</li>
- * <li>需要确保整个表达式链的最终结的表达式的输出类型是{@link KyouValueType#Bytes}或{@link KyouValueType#Backspace}</li>
- * <li>特别的，可以使用整数字面量。整数字面量将作为一个输入类型为{@link KyouValueType#Dom}，输出类型为{@link KyouValueType#Integer}的表达式参与运算</li>
+ * <li>需要确保整个表达式链的最初始的表达式的输入类型是{@link ValueType#Dom}</li>
+ * <li>需要确保整个表达式链的最终结的表达式的输出类型是{@link ValueType#Bytes}或{@link ValueType#Backspace}</li>
+ * <li>特别的，可以使用整数字面量。整数字面量将作为一个输入类型为{@link ValueType#Dom}，输出类型为{@link ValueType#Integer}的表达式参与运算</li>
  * </p>
  * <p>
  * 例：
@@ -55,7 +55,7 @@ public abstract class Expr {
      *            组包上下文
      * @return 表达式的计算结果
      */
-    protected abstract KyouValue eval(KyouValue input, PackContext context);
+    protected abstract Value eval(Value input, PackContext context);
 
     /**
      * 检查当前表达式是否存在问题，以及和前一个表达式之间的衔接是否有问题
@@ -90,7 +90,7 @@ public abstract class Expr {
 
         // 检查和前一环节的表达式之间的衔接是否有问题
         if (prev == null) {
-            if (annotation.typeIn() != KyouValueType.Dom)
+            if (annotation.typeIn() != ValueType.Dom)
                 throw new KyouException("expr requires input. expr: " + this);
         } else {
             if (annotation.typeIn() != prev.getClass().getAnnotation(ExprDescription.class).typeOut())
@@ -136,12 +136,12 @@ public abstract class Expr {
         /**
          * 输入的类型
          */
-        KyouValueType typeIn();
+        ValueType typeIn();
 
         /**
          * 输出的类型
          */
-        KyouValueType typeOut();
+        ValueType typeOut();
 
         /**
          * 定义了参数的后缀类型

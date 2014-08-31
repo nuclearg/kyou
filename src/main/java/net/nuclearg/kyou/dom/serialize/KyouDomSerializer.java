@@ -11,7 +11,7 @@ import net.nuclearg.kyou.dom.KyouDocument;
  * @author ng
  * 
  */
-public interface DomSerializer {
+public interface KyouDomSerializer {
     /**
      * 序列化
      * 

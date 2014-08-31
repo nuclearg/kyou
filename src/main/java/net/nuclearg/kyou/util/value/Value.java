@@ -8,19 +8,19 @@ import net.nuclearg.kyou.dom.KyouItem;
  * @author ng
  * 
  */
-public class KyouValue {
+public class Value {
     /**
      * 类型
      */
-    public final KyouValueType type;
+    public final ValueType type;
 
     public final KyouItem domValue;
     public final int intValue;
     public final String strValue;
     public final byte[] bytesValue;
 
-    public KyouValue(KyouItem item) {
-        this.type = KyouValueType.Dom;
+    public Value(KyouItem item) {
+        this.type = ValueType.Dom;
 
         this.domValue = item;
         this.intValue = 0;
@@ -28,8 +28,8 @@ public class KyouValue {
         this.bytesValue = null;
     }
 
-    public KyouValue(int intValue) {
-        this.type = KyouValueType.Integer;
+    public Value(int intValue) {
+        this.type = ValueType.Integer;
 
         this.domValue = null;
         this.intValue = intValue;
@@ -37,8 +37,8 @@ public class KyouValue {
         this.bytesValue = null;
     }
 
-    public KyouValue(String strValue) {
-        this.type = KyouValueType.String;
+    public Value(String strValue) {
+        this.type = ValueType.String;
 
         this.domValue = null;
         this.intValue = 0;
@@ -46,8 +46,8 @@ public class KyouValue {
         this.bytesValue = null;
     }
 
-    public KyouValue(byte[] bytesValue) {
-        this.type = KyouValueType.Bytes;
+    public Value(byte[] bytesValue) {
+        this.type = ValueType.Bytes;
 
         this.domValue = null;
         this.intValue = 0;
@@ -55,7 +55,7 @@ public class KyouValue {
         this.bytesValue = bytesValue;
     }
 
-    public KyouValue(KyouValue value) {
+    public Value(Value value) {
         this.type = value.type;
 
         this.domValue = value.domValue;

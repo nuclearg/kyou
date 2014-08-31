@@ -8,7 +8,7 @@ import java.nio.charset.Charset;
  * @author ng
  * 
  */
-public class KyouByteUtils {
+public class ByteUtils {
     public static final Charset UTF8 = Charset.forName("utf8");
     public static final Charset GB2312 = Charset.forName("gb2312");
     public static final Charset GBK = Charset.forName("gbk");

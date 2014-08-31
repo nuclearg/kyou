@@ -5,7 +5,7 @@ import java.util.TreeMap;
 
 import net.nuclearg.kyou.KyouException;
 import net.nuclearg.kyou.dom.visitor.KyouDomVisitor;
-import net.nuclearg.kyou.util.KyouFunction;
+import net.nuclearg.kyou.util.Function;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
@@ -82,7 +82,7 @@ public abstract class KyouItem {
      * @param handler
      *            追溯到每个父节点时采取的动作
      */
-    protected void traceAncestor(KyouFunction<KyouContainer> handler) {
+    protected void traceAncestor(Function<KyouContainer> handler) {
         KyouContainer parent = this.parent;
         while (parent != null && parent != parent.parent()) {
             handler.action(parent);
@@ -102,7 +102,7 @@ public abstract class KyouItem {
 
         final KyouItem _this = this;
 
-        this.traceAncestor(new KyouFunction<KyouContainer>() {
+        this.traceAncestor(new Function<KyouContainer>() {
 
             @Override
             public void action(KyouContainer container) {
@@ -122,7 +122,7 @@ public abstract class KyouItem {
     public int depth() {
         final int[] depth = { 0 };
 
-        this.traceAncestor(new KyouFunction<KyouContainer>() {
+        this.traceAncestor(new Function<KyouContainer>() {
 
             @Override
             public void action(KyouContainer container) {
@@ -139,11 +139,11 @@ public abstract class KyouItem {
     public String path() {
         final StringBuilder builder = new StringBuilder(this.name);
 
-        this.traceAncestor(new KyouFunction<KyouContainer>() {
+        this.traceAncestor(new Function<KyouContainer>() {
 
             @Override
             public void action(KyouContainer container) {
-                builder.insert(0, ".").insert(0, parent.name());
+                builder.insert(0, ".").insert(0, container.name());
             }
         });
 
@@ -173,8 +173,10 @@ public abstract class KyouItem {
          */
 
         int depth = this.depth();
-
-        return StringUtils.repeat("| ", this.depth() - 1) + (depth > 1 ? "|- " : "");
+        if (depth == 0)
+            return "";
+        else
+            return StringUtils.repeat("| ", this.depth() - 1) + "|-";
     }
 
     /*

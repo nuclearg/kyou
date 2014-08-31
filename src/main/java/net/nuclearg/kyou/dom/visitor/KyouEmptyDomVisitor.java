@@ -5,7 +5,7 @@ import net.nuclearg.kyou.dom.KyouDocument;
 import net.nuclearg.kyou.dom.KyouField;
 import net.nuclearg.kyou.dom.KyouStruct;
 
-public class EmptyDomVisitor implements KyouDomVisitor {
+public class KyouEmptyDomVisitor implements KyouDomVisitor {
 
     @Override
     public void docStart(KyouDocument doc) {

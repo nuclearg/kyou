@@ -6,7 +6,7 @@ package net.nuclearg.kyou.util.value;
  * @author ng
  * 
  */
-public enum KyouValueType {
+public enum ValueType {
     /**
      * 报文文档树的一部分
      */

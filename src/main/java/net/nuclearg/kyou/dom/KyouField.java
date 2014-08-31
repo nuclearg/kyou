@@ -38,7 +38,7 @@ public class KyouField extends KyouItem {
 
     @Override
     public String toString() {
-        return super.buildToStringPrefix() + "- " + this.name + " " + this.attributes + " = " + SystemUtils.LINE_SEPARATOR;
+        return super.buildToStringPrefix() + "- " + this.name + " = " + this.value + " " + this.attributes + SystemUtils.LINE_SEPARATOR;
     }
 
     @Override

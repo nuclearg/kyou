@@ -34,9 +34,13 @@ import org.apache.log4j.Logger;
  * @author ng
  * 
  */
-public class KyouFormatString implements Iterable<byte[]> {
-    private static final Logger logger = Logger.getLogger(KyouFormatString.class);
+public class FormatString implements Iterable<byte[]> {
+    private static final Logger logger = Logger.getLogger(FormatString.class);
 
+    /**
+     * 原始字符串形式
+     */
+    private final String formatStr;
     /**
      * 段列表
      * <p>
@@ -46,11 +50,6 @@ public class KyouFormatString implements Iterable<byte[]> {
     private final List<byte[]> segments;
 
     /**
-     * 字节的编码
-     */
-    private final Charset encoding;
-
-    /**
      * 构造一个格式字符串
      * 
      * @param formatStr
@@ -58,7 +57,7 @@ public class KyouFormatString implements Iterable<byte[]> {
      * @param encoding
      *            编码
      */
-    public KyouFormatString(String formatStr, Charset encoding) {
+    public FormatString(String formatStr, Charset encoding) {
         logger.debug("parse kyou format string, str=" + formatStr + ", encoding=" + encoding);
 
         if (StringUtils.isEmpty(formatStr))
@@ -66,9 +65,10 @@ public class KyouFormatString implements Iterable<byte[]> {
         if (encoding == null)
             throw new KyouException("encoding is null");
 
-        this.encoding = encoding;
+        this.formatStr = formatStr;
+
         List<byte[]> segments = new LinkedList<byte[]>();
-        KyouString s = new KyouString(formatStr);
+        PosString s = new PosString(formatStr);
 
         // 解析FormatString
         try {
@@ -84,40 +84,6 @@ public class KyouFormatString implements Iterable<byte[]> {
     }
 
     /**
-     * 获取此{@link KyouFormatString}实例中的段的数量
-     * 
-     * @return 此{@link KyouFormatString}实例中的段的数量
-     */
-    public int size() {
-        return this.segments.size();
-    }
-
-    /**
-     * 获取指定段的文本
-     * 
-     * @param index
-     *            index 段的下标
-     * @return 该段的内容。如果该段是一个参数段则返回null
-     */
-    public byte[] segment(int index) {
-        return this.segments.get(index);
-    }
-
-    /**
-     * 判断该{@link KyouFormatString}实例是不是简单的
-     * <p>
-     * “简单”是指此实例只表示一个字节数组，具体来说是指
-     * <li>长度为1</li>
-     * <li>这个唯一的段不是参数段</li>
-     * </p>
-     * 
-     * @return
-     */
-    public boolean isSimple() {
-        return this.segments.size() == 1 && this.segments.get(0) != null;
-    }
-
-    /**
      * 遍历每个段，文本段返回对应的字节数组，参数段返回null
      */
     @Override
@@ -127,13 +93,7 @@ public class KyouFormatString implements Iterable<byte[]> {
 
     @Override
     public String toString() {
-        StringBuilder builder = new StringBuilder();
-        for (byte[] segment : this.segments)
-            if (segment != null)
-                builder.append(StringUtils.replace(new String(segment, this.encoding), "%", "\\%"));
-            else
-                builder.append("%");
-        return builder.toString();
+        return this.formatStr;
     }
 
     /**
@@ -145,13 +105,13 @@ public class KyouFormatString implements Iterable<byte[]> {
      *            编码
      * @return 解析出来的段，如果是文本段则返回该段的字面量，如果是参数段则返回null
      */
-    private byte[] parseSegment(KyouString formatStr, Charset encoding) {
+    private byte[] parseSegment(PosString formatStr, Charset encoding) {
         // 首先判断首字母是不是%，这表示一个参数段
         if (formatStr.attempt('%') != null)
             // 如果是参数段，则按照约定返回一个null
             return null;
 
-        KyouByteOutputStream os = new KyouByteOutputStream();
+        ByteOutputStream os = new ByteOutputStream();
         StringBuilder buffer = new StringBuilder();
         int start = formatStr.pos();
 
@@ -210,7 +170,7 @@ public class KyouFormatString implements Iterable<byte[]> {
      *            编码
      * @return 转义符表示的字节
      */
-    private byte parseEscape(KyouString formatStr, Charset encoding) {
+    private byte parseEscape(PosString formatStr, Charset encoding) {
         if (!formatStr.hasRemaining())
             throw new KyouException("format syntax error. eol: " + formatStr.pos());
 

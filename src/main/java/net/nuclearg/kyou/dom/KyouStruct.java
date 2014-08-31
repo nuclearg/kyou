@@ -162,7 +162,7 @@ public class KyouStruct extends KyouContainer {
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append(super.buildToStringPrefix()).append("+ ").append(this.attributes).append(SystemUtils.LINE_SEPARATOR);
+        builder.append(super.buildToStringPrefix()).append("+ ").append(this.name).append(" ").append(this.attributes).append(SystemUtils.LINE_SEPARATOR);
 
         for (KyouItem item : this)
             builder.append(item.toString());

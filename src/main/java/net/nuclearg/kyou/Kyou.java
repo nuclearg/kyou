@@ -2,19 +2,22 @@ package net.nuclearg.kyou;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.StringReader;
 
 import net.nuclearg.kyou.dom.KyouDocument;
 import net.nuclearg.kyou.dom.serialize.XmlDomSerializer;
+import net.nuclearg.kyou.pack.KyouPackStyle;
 import net.nuclearg.kyou.pack.Packer;
-import net.nuclearg.kyou.pack.StyleSpecification;
+
+import org.xml.sax.InputSource;
 
 /**
  * kyou的入口类，提供kyou的基本功能
  * <p>
  * 本类是Kyou的入口，可以实现kyou的主要功能：
  * <li>读取/保存{@link KyouDocument}</li>
- * <li>读取{@link StyleSpecification}</li>
- * <li>kyou最根本的存在价值：使用{@link KyouDocument}和{@link StyleSpecification}执行报文组包过程</li>
+ * <li>读取{@link KyouPackStyle}</li>
+ * <li>kyou最根本的存在价值：使用{@link KyouDocument}和{@link KyouPackStyle}执行报文组包过程</li>
  * </p>
  * <p>
  * 在load/save系列方法中默认使用{@link XmlDomSerializer}作为序列化/反序列化实现。<br/>
@@ -30,10 +33,21 @@ public class Kyou {
      * 
      * @param is
      *            输入
-     * @return 加载好的报文
+     * @return 加载好的报文数据
      */
-    public KyouDocument loadDocument(InputStream is) {
+    public static KyouDocument loadDocument(InputStream is) {
         return new XmlDomSerializer().deserialize(is);
+    }
+
+    /**
+     * 加载一篇报文数据
+     * 
+     * @param xml
+     *            xml
+     * @return 加载好的报文数据
+     */
+    public static KyouDocument loadDocument(String xml) {
+        return new XmlDomSerializer().deserialize(new InputSource(new StringReader(xml)));
     }
 
     /**
@@ -42,19 +56,30 @@ public class Kyou {
      * @param doc
      * @param os
      */
-    public void saveDocument(KyouDocument doc, OutputStream os) {
+    public static void saveDocument(KyouDocument doc, OutputStream os) {
 
     }
 
     /**
-     * 加载一篇报文样式定义
+     * 加载一篇报文组包样式
      * 
      * @param is
      *            输入
-     * @return 加载好的报文样式定义
+     * @return 加载好的报文组包样式
      */
-    public StyleSpecification loadStyleSpecification(InputStream is) {
-        return new StyleSpecification(is);
+    public KyouPackStyle loadPackStyle(InputStream is) {
+        return new KyouPackStyle(new InputSource(is));
+    }
+
+    /**
+     * 加载一篇报文组包样式
+     * 
+     * @param xml
+     *            xml文本
+     * @return 加载好的报文组包样式
+     */
+    public static KyouPackStyle loadPackStyle(String xml) {
+        return new KyouPackStyle(new InputSource(new StringReader(xml)));
     }
 
     /**
@@ -62,16 +87,16 @@ public class Kyou {
      * 
      * @param doc
      *            报文定义
-     * @param spec
+     * @param style
      *            组包样式定义
      * @return 组包好的报文
      */
-    public byte[] pack(KyouDocument doc, StyleSpecification spec) {
+    public static byte[] pack(KyouDocument doc, KyouPackStyle style) {
         if (doc == null)
             throw new KyouException("doc is null");
-        if (spec == null)
-            throw new KyouException("spec is null");
+        if (style == null)
+            throw new KyouException("style is null");
 
-        return new Packer().packDocument(doc, spec);
+        return new Packer().packDocument(doc, style);
     }
 }

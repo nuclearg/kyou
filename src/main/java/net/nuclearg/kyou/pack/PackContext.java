@@ -14,18 +14,18 @@ public class PackContext {
     public final KyouItem item;
 
     /**
-     * 组包样式定义
+     * 组包样式
      */
-    public final StyleSpecification spec;
+    public final KyouPackStyle style;
 
     /**
      * 组包核心
      */
     public final Packer packer;
 
-    PackContext(KyouItem item, StyleSpecification spec, Packer packer) {
+    PackContext(KyouItem item, KyouPackStyle style, Packer packer) {
         this.item = item;
-        this.spec = spec;
+        this.style = style;
         this.packer = packer;
     }
 

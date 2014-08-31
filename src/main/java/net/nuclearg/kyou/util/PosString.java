@@ -5,11 +5,11 @@ import net.nuclearg.kyou.KyouException;
 import org.apache.commons.lang.ArrayUtils;
 
 /**
- * 向普通的字符串上加一个pos，主要用于各种解析过程。支持基于各种条件的“读取下一个字符”操作
+ * 向普通的字符串上加一个pos，主要用于各种解析过程
  * 
  * @author ng
  */
-class KyouString {
+class PosString {
     /**
      * 字符数组
      */
@@ -19,7 +19,7 @@ class KyouString {
      */
     private int pos;
 
-    public KyouString(String str) {
+    public PosString(String str) {
         if (str == null)
             throw new KyouException("str is null");
 
@@ -27,7 +27,7 @@ class KyouString {
     }
 
     /**
-     * 从{@link KyouString}中获取当前位置的字符，并将pos向前推进一格
+     * 从{@link PosString}中获取当前位置的字符，并将pos向前推进一格
      * 
      * @return 当前位置的字符
      */
@@ -36,7 +36,7 @@ class KyouString {
     }
 
     /**
-     * 向{@link KyouString}中推回一个位置的字符
+     * 向{@link PosString}中推回一个位置的字符
      */
     public void pushback() {
         this.pos--;
@@ -73,19 +73,19 @@ class KyouString {
     }
 
     /**
-     * 判断该{@link KyouString}的pos是否小于length
+     * 判断该{@link PosString}的pos是否小于length
      * <p>
      * 这通常表示是否还可以进行get()操作
      * </p>
      * 
-     * @return 该{@link KyouString}的pos是否小于length
+     * @return 该{@link PosString}的pos是否小于length
      */
     public boolean hasRemaining() {
         return this.pos < this.chars.length;
     }
 
     /**
-     * 判断{@link KyouString}的pos位置处的字符是不是给定字符中的一个，如果是则取出该字符
+     * 判断{@link PosString}的pos位置处的字符是不是给定字符中的一个，如果是则取出该字符
      * 
      * @param options
      *            所有可能的字符列表

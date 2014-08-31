@@ -4,7 +4,7 @@ import net.nuclearg.kyou.KyouException;
 import net.nuclearg.kyou.dom.KyouContainer;
 import net.nuclearg.kyou.dom.KyouDocument;
 import net.nuclearg.kyou.dom.KyouItem;
-import net.nuclearg.kyou.util.KyouByteOutputStream;
+import net.nuclearg.kyou.util.ByteOutputStream;
 
 /**
  * 组包核心类 提供kyou的通用组包服务
@@ -21,13 +21,13 @@ public class Packer {
      * 
      * @param doc
      *            报文数据
-     * @param spec
-     *            组包样式定义
+     * @param style
+     *            组包样式
      * @return 组包好的报文
      */
-    public byte[] packDocument(KyouDocument doc, StyleSpecification spec) {
-        PackContext context = new PackContext(doc, spec, this);
-        KyouByteOutputStream os = new KyouByteOutputStream();
+    public byte[] packDocument(KyouDocument doc, KyouPackStyle style) {
+        PackContext context = new PackContext(doc, style, this);
+        ByteOutputStream os = new ByteOutputStream();
         this.packItem(context, os);
         return os.export();
     }
@@ -38,10 +38,10 @@ public class Packer {
      * @param context
      *            组包上下文
      */
-    public void packItem(PackContext context, KyouByteOutputStream os) {
+    public void packItem(PackContext context, ByteOutputStream os) {
         StyleItem style = selectStyle(context);
 
-        for (PackSegment segment : style.segments)
+        for (Segment segment : style.segments)
             segment.export(context, os);
     }
 
@@ -58,16 +58,16 @@ public class Packer {
      *            组包上下文
      */
     public byte[] packMember(KyouContainer container, PackContext context) {
-        KyouByteOutputStream os = new KyouByteOutputStream();
+        ByteOutputStream os = new ByteOutputStream();
 
         for (KyouItem item : container)
-            this.packItem(new PackContext(item, context.spec, this), os);
+            this.packItem(new PackContext(item, context.style, this), os);
 
         return os.export();
     }
 
     /**
-     * 从组包样式定义中选择出一个与当前的组包上下文相配套的样式单元
+     * 从组包样式中选择出一个与当前的组包上下文相配套的样式单元
      * 
      * @param context
      *            组包上下文
@@ -76,10 +76,10 @@ public class Packer {
     private static StyleItem selectStyle(PackContext context) {
         String path = context.item.path();
 
-        for (StyleItem style : context.spec.styles)
+        for (StyleItem style : context.style.styles)
             if (style.target.matches(path))
                 return style;
 
-        throw new KyouException("no style suitable. path: " + path);
+        throw new KyouException("no style suitable. path: " + path + ",item: " + context.item);
     }
 }

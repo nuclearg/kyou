@@ -2,12 +2,12 @@ package net.nuclearg.kyou.pack.expr;
 
 import net.nuclearg.kyou.KyouException;
 import net.nuclearg.kyou.dom.KyouField;
+import net.nuclearg.kyou.pack.Expr;
 import net.nuclearg.kyou.pack.Expr.ExprDescription;
 import net.nuclearg.kyou.pack.Expr.ExprDescription.ExprPostfix;
-import net.nuclearg.kyou.pack.Expr;
 import net.nuclearg.kyou.pack.PackContext;
-import net.nuclearg.kyou.util.value.KyouValue;
-import net.nuclearg.kyou.util.value.KyouValueType;
+import net.nuclearg.kyou.util.value.Value;
+import net.nuclearg.kyou.util.value.ValueType;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -17,13 +17,13 @@ import org.apache.commons.lang.StringUtils;
  * @author ng
  * 
  */
-@ExprDescription(name = "v", postfix = ExprPostfix.None, typeIn = KyouValueType.Dom, typeOut = KyouValueType.String)
+@ExprDescription(name = "v", postfix = ExprPostfix.None, typeIn = ValueType.Dom, typeOut = ValueType.String)
 public class ValueExpr extends Expr {
 
     @Override
-    protected KyouValue eval(KyouValue input, PackContext context) {
+    protected Value eval(Value input, PackContext context) {
         if (!(input.domValue instanceof KyouField))
-            throw new KyouException("KyouField expected");
+            throw new KyouException("KyouField expected. path: " + input.domValue.path());
 
         KyouField field = (KyouField) input.domValue;
 
@@ -31,7 +31,7 @@ public class ValueExpr extends Expr {
         if (value == null)
             value = StringUtils.EMPTY;
 
-        return new KyouValue(value);
+        return new Value(value);
     }
 
 }

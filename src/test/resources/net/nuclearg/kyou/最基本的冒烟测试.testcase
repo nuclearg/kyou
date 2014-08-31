@@ -1,5 +1,14 @@
+[[DOC]]
 <?xml version="1.0"?>
-<spec>
+<document>
+    <field name="aaa">1</field>
+    <field name="bbb">2</field>
+</document>
+
+
+[[STYLE]]
+<?xml version="1.0"?>
+<pack>
     <config>
         <encoding>utf8</encoding>
     </config>
@@ -20,4 +29,9 @@
         <param>s2b n</param>
         <param>s2b v</param>
     </style>
-</spec>
+</pack>
+
+
+
+[[EXPECTED]]
+{"aaa":"1","bbb":"2"}

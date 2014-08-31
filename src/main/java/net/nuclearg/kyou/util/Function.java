@@ -8,6 +8,6 @@ package net.nuclearg.kyou.util;
  * @param <T>
  *            参数类型
  */
-public interface KyouFunction<T> {
+public interface Function<T> {
     public void action(T arg);
 }

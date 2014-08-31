@@ -7,23 +7,23 @@ import java.util.List;
 
 import net.nuclearg.kyou.KyouException;
 import net.nuclearg.kyou.pack.Expr.ExprDescription;
-import net.nuclearg.kyou.util.KyouByteOutputStream;
-import net.nuclearg.kyou.util.KyouFormatString;
-import net.nuclearg.kyou.util.value.KyouValue;
-import net.nuclearg.kyou.util.value.KyouValueType;
+import net.nuclearg.kyou.util.ByteOutputStream;
+import net.nuclearg.kyou.util.FormatString;
+import net.nuclearg.kyou.util.value.Value;
+import net.nuclearg.kyou.util.value.ValueType;
 
 import org.apache.commons.lang.StringUtils;
 
 /**
- * 组包片段，对应格式字符串{@link KyouFormatString}中的一段
+ * 组包片段，对应格式字符串{@link FormatString}中的一段
  * <p>
- * 存在{@link BytesSegment}和{@link ParamSegment}两个子类，分别对应{@link KyouFormatString}中的字符串部分和参数部分
+ * 存在{@link BytesSegment}和{@link ParamSegment}两个子类，分别对应{@link FormatString}中的字符串部分和参数部分
  * </p>
  * 
  * @author ng
  * 
  */
-abstract class PackSegment {
+abstract class Segment {
     /**
      * 将对应的字节输出到输出流中
      * 
@@ -32,7 +32,7 @@ abstract class PackSegment {
      * @param os
      *            输出流
      */
-    abstract void export(PackContext context, KyouByteOutputStream os);
+    abstract void export(PackContext context, ByteOutputStream os);
 
     /**
      * 将格式字符串解析为多个组包段
@@ -45,10 +45,10 @@ abstract class PackSegment {
      *            参数列表
      * @return 这个格式字符串表示的多个组包段
      */
-    static List<PackSegment> parseFormatString(String formatStr, Charset encoding, List<String> params) {
-        KyouFormatString format = new KyouFormatString(formatStr, encoding);
+    static List<Segment> parseFormatString(String formatStr, Charset encoding, List<String> params) {
+        FormatString format = new FormatString(formatStr, encoding);
 
-        List<PackSegment> segments = new ArrayList<PackSegment>();
+        List<Segment> segments = new ArrayList<Segment>();
         int paramId = 0;
         for (byte[] bytes : format)
             // 判断这个段的类型
@@ -78,7 +78,7 @@ abstract class PackSegment {
      * @author ng
      * 
      */
-    private static class BytesSegment extends PackSegment {
+    private static class BytesSegment extends Segment {
         private final byte[] text;
 
         BytesSegment(byte[] text) {
@@ -86,7 +86,7 @@ abstract class PackSegment {
         }
 
         @Override
-        void export(PackContext context, KyouByteOutputStream os) {
+        void export(PackContext context, ByteOutputStream os) {
             os.write(this.text);
         }
     }
@@ -97,7 +97,7 @@ abstract class PackSegment {
      * @author ng
      * 
      */
-    private static class ParamSegment extends PackSegment {
+    private static class ParamSegment extends Segment {
 
         private final List<Expr> exprChain;
 
@@ -125,17 +125,17 @@ abstract class PackSegment {
             }
             // 检查最后一个表达式的输出是不是字节数组或Backspace
             Expr last = exprChain.get(exprChain.size() - 1);
-            KyouValueType lastOutput = last.getClass().getAnnotation(ExprDescription.class).typeOut();
-            if (lastOutput != KyouValueType.Bytes && lastOutput != KyouValueType.Backspace)
+            ValueType lastOutput = last.getClass().getAnnotation(ExprDescription.class).typeOut();
+            if (lastOutput != ValueType.Bytes && lastOutput != ValueType.Backspace)
                 throw new KyouException("last expr must return Bytes or Backspace but " + lastOutput);
 
             this.exprChain = Collections.unmodifiableList(exprChain);
         }
 
         @Override
-        void export(PackContext context, KyouByteOutputStream os) {
+        void export(PackContext context, ByteOutputStream os) {
             // 向表达式链输入的最初的值是正被组包的当前报文节点
-            KyouValue value = new KyouValue(context.item);
+            Value value = new Value(context.item);
 
             // 沿着表达式链一直计算，最开始的输入为空，
             for (Expr expr : this.exprChain)

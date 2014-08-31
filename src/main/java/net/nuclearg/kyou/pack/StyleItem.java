@@ -4,7 +4,7 @@ import java.util.List;
 
 import net.nuclearg.kyou.KyouException;
 import net.nuclearg.kyou.dom.query.KyouQuery;
-import net.nuclearg.kyou.util.KyouXmlUtils;
+import net.nuclearg.kyou.util.XmlUtils;
 
 import org.apache.commons.lang.StringUtils;
 import org.w3c.dom.Element;
@@ -19,9 +19,9 @@ import org.w3c.dom.Element;
  */
 class StyleItem {
     /**
-     * 该组包样式单元隶属于的组包样式定义
+     * 该组包样式单元隶属于的组包样式
      */
-    public final StyleSpecification spec;
+    public final KyouPackStyle style;
 
     /**
      * 该组包样式单元适用于的元素
@@ -30,18 +30,10 @@ class StyleItem {
     /**
      * 段列表
      */
-    final List<PackSegment> segments;
+    final List<Segment> segments;
 
-    /**
-     * 从XML中初始化一个StyleItem实例
-     * 
-     * @param e
-     *            XML节点
-     * @param spec
-     *            该组包样式单元隶属于的组包样式定义
-     */
-    StyleItem(Element e, StyleSpecification spec) {
-        this.spec = spec;
+    StyleItem(Element e, KyouPackStyle style) {
+        this.style = style;
 
         /*
          * <pre>
@@ -55,20 +47,20 @@ class StyleItem {
          */
 
         // 初始化target
-        String target = KyouXmlUtils.selectText(e, "@target");
+        String target = XmlUtils.selectText(e, "@target");
         if (StringUtils.isEmpty(target))
             throw new KyouException("targat is empty");
         this.target = new KyouQuery(target);
 
         // 读取format
-        String format = KyouXmlUtils.selectText(e, "format");
+        String format = XmlUtils.selectText(e, "format");
         if (StringUtils.isEmpty(format))
             throw new KyouException("format is empty. target: " + target);
 
         // 读取用户定义的参数
-        List<String> params = KyouXmlUtils.selectTextList(e, "param");
+        List<String> params = XmlUtils.selectTextList(e, "param");
 
         // 初始化segments
-        this.segments = PackSegment.parseFormatString(format, spec.config.encoding, params);
+        this.segments = Segment.parseFormatString(format, style.config.encoding, params);
     }
 }

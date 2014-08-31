@@ -9,8 +9,8 @@ import net.nuclearg.kyou.KyouException;
 import net.nuclearg.kyou.pack.Expr.ExprDescription;
 import net.nuclearg.kyou.util.KyouByteOutputStream;
 import net.nuclearg.kyou.util.KyouFormatString;
-import net.nuclearg.kyou.util.KyouValue;
-import net.nuclearg.kyou.util.KyouValueType;
+import net.nuclearg.kyou.util.value.KyouValue;
+import net.nuclearg.kyou.util.value.KyouValueType;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -57,7 +57,7 @@ abstract class PackSegment {
                 segments.add(new BytesSegment(bytes));
             else {
                 // 如果为null表示这是一个参数
-                if (params.size() >= paramId)
+                if (params.size() <= paramId)
                     throw new KyouException("insufficent params. format: " + formatStr + ", paramId: " + paramId);
 
                 String param = params.get(paramId);
@@ -65,7 +65,7 @@ abstract class PackSegment {
                     segments.add(new ParamSegment(param));
                     paramId++;
                 } catch (Exception ex) {
-                    throw new KyouException("parse param fail. format: " + formatStr + ", paramId: " + paramId + ", param: " + param);
+                    throw new KyouException("parse param fail. format: " + formatStr + ", paramId: " + paramId + ", param: " + param, ex);
                 }
             }
 
@@ -126,7 +126,7 @@ abstract class PackSegment {
             // 检查最后一个表达式的输出是不是字节数组或Backspace
             Expr last = exprChain.get(exprChain.size() - 1);
             KyouValueType lastOutput = last.getClass().getAnnotation(ExprDescription.class).typeOut();
-            if (lastOutput != KyouValueType.Bytes || lastOutput != KyouValueType.Backspace)
+            if (lastOutput != KyouValueType.Bytes && lastOutput != KyouValueType.Backspace)
                 throw new KyouException("last expr must return Bytes or Backspace but " + lastOutput);
 
             this.exprChain = Collections.unmodifiableList(exprChain);

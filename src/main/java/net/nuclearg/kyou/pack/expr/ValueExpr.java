@@ -2,12 +2,12 @@ package net.nuclearg.kyou.pack.expr;
 
 import net.nuclearg.kyou.KyouException;
 import net.nuclearg.kyou.dom.KyouField;
-import net.nuclearg.kyou.pack.Expr;
 import net.nuclearg.kyou.pack.Expr.ExprDescription;
 import net.nuclearg.kyou.pack.Expr.ExprDescription.ExprPostfix;
+import net.nuclearg.kyou.pack.Expr;
 import net.nuclearg.kyou.pack.PackContext;
-import net.nuclearg.kyou.util.KyouValue;
-import net.nuclearg.kyou.util.KyouValueType;
+import net.nuclearg.kyou.util.value.KyouValue;
+import net.nuclearg.kyou.util.value.KyouValueType;
 
 import org.apache.commons.lang.StringUtils;
 

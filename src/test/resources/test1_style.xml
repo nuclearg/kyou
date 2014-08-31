@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<spec>
+    <config>
+        <encoding>utf8</encoding>
+    </config>
+
+    <style target="#">
+        <format>{%}</format>
+        <param>m</param>
+    </style>
+
+    <style target="#.aaa">
+        <format>"%":"%",</format>
+        <param>s2b n</param>
+        <param>s2b v</param>
+    </style>
+
+    <style target="#.bbb">
+        <format>"%":"%"</format>
+        <param>s2b n</param>
+        <param>s2b v</param>
+    </style>
+</spec>

@@ -18,15 +18,15 @@ import org.xml.sax.InputSource;
 /**
  * 报文样式定义
  * <p>
- * StyleSpecification定义了将数据变成实际的二进制的报文的过程。其中定义了若干个StyleItem(组包样式单元)， 每个StyleItem描述了针对某些报文元素采用的组包过程。<br/>
- * 需要定义一个针对根元素("#")的StyleItem，该StyleItem是整个组包过程的入口点。<br/>
+ * {@link StyleSpecification}定义了将数据变成实际的二进制的报文的过程。其中定义了若干个{@link StyleItem}(组包样式单元)，描述了针对某些报文元素采用的组包过程。<br/>
+ * 需要定义一个针对根元素("#")的{@link StyleItem}，该{@link StyleItem}是整个组包过程的入口点。<br/>
  * 实际的组包过程大致如下：<br/>
  * <li>1. 先找到报文中的根节点</li>
- * <li>2. 由上至下遍历StyleSpecification，找到第一个与之匹配的StyleItem</li>
- * <li>3. 使用这个StyleItem中定义的格式对报文数据进行组包。如果这个StyleItem引用了其它元素（例如m参数，其表示对自身的各个子节点进行组包）则拿到这些元素，递归重复2和3。</li>
+ * <li>2. 由上至下遍历{@link StyleSpecification}，找到第一个与之匹配的{@link StyleItem}</li>
+ * <li>3. 使用这个{@link StyleItem}中定义的格式对报文数据进行组包。如果这个{@link StyleItem}引用了其它元素（例如m参数，其表示对自身的各个子节点进行组包）则拿到这些元素，递归重复2和3。</li>
  * </p>
  * 
- * @author nuclearg
+ * @author ng
  */
 public class StyleSpecification {
     /**
@@ -45,15 +45,15 @@ public class StyleSpecification {
     /**
      * XML的输入流初始化一个StyleSpecification实例
      * 
-     * @param in
+     * @param is
      *            包含XML的输入流
      */
-    public StyleSpecification(InputStream in) {
+    public StyleSpecification(InputStream is) {
         try {
-            if (in == null)
+            if (is == null)
                 throw new KyouException("in is null");
 
-            Document doc = KyouXmlUtils.load(new InputSource(in));
+            Document doc = KyouXmlUtils.load(new InputSource(is));
 
             // 初始化config
             Element config = KyouXmlUtils.selectElement(doc, "/spec/config");
@@ -80,7 +80,7 @@ public class StyleSpecification {
     /**
      * StyleSpecification的全局配置类
      * 
-     * @author nuclearg
+     * @author ng
      */
     public static class StyleSpecificationConfig {
         /**

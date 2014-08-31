@@ -1,19 +1,20 @@
 package net.nuclearg.kyou.dom.query;
 
 /**
+ * 查询，用来选择某种满足条件的报文节点
  * 
  * @author ng
  * 
  */
 public class KyouQuery {
+    private String query;
 
-    public KyouQuery(String target) {
-        // TODO Auto-generated constructor stub
+    public KyouQuery(String query) {
+        this.query = query;
     }
 
     public boolean matches(String path) {
-        // TODO Auto-generated method stub
-        return false;
+        return this.query.equals(path);
     }
 
 }

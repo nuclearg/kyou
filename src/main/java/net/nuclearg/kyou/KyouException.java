@@ -35,4 +35,5 @@ public class KyouException extends RuntimeException {
     public KyouException(Throwable cause) {
         super(cause);
     }
+
 }

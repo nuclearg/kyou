@@ -7,8 +7,8 @@ import net.nuclearg.kyou.pack.Expr;
 import net.nuclearg.kyou.pack.Expr.ExprDescription;
 import net.nuclearg.kyou.pack.Expr.ExprDescription.ExprPostfix;
 import net.nuclearg.kyou.pack.PackContext;
-import net.nuclearg.kyou.util.KyouValue;
-import net.nuclearg.kyou.util.KyouValueType;
+import net.nuclearg.kyou.util.value.KyouValue;
+import net.nuclearg.kyou.util.value.KyouValueType;
 
 /**
  * 将字符串转为字节数组的表达式
@@ -19,7 +19,7 @@ import net.nuclearg.kyou.util.KyouValueType;
  * @author ng
  */
 @ExprDescription(name = "s2b", postfix = ExprPostfix.NoneOrString, typeIn = KyouValueType.String, typeOut = KyouValueType.Bytes)
-class ConvertS2BExpr extends Expr {
+public class ConvertS2BExpr extends Expr {
     /**
      * 转换时使用的编码
      */

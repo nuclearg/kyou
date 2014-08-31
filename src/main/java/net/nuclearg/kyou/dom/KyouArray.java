@@ -160,6 +160,9 @@ public class KyouArray extends KyouContainer {
 
     @Override
     public void foreach(KyouDomVisitor visitor) {
+        if (visitor == null)
+            throw new KyouException("foreach visitor is null");
+
         visitor.arrayStart(this);
 
         for (KyouItem item : this)

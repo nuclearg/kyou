@@ -6,8 +6,13 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import net.nuclearg.kyou.KyouException;
-import net.nuclearg.kyou.util.KyouValue;
-import net.nuclearg.kyou.util.KyouValueType;
+import net.nuclearg.kyou.pack.expr.EXPR_CLASSES;
+import net.nuclearg.kyou.pack.expr.IntegerExpr;
+import net.nuclearg.kyou.util.value.KyouValue;
+import net.nuclearg.kyou.util.value.KyouValueType;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
 
 /**
  * 表示在参数中可以定义的表达式
@@ -84,10 +89,13 @@ public abstract class Expr {
         }
 
         // 检查和前一环节的表达式之间的衔接是否有问题
-        if (prev == null && annotation.typeIn() != KyouValueType.Dom)
-            throw new KyouException("expr requires input. expr: " + this);
-        if (annotation.typeIn() != prev.getClass().getAnnotation(ExprDescription.class).typeOut())
-            throw new KyouException("expr input type mismatch. expr: " + this + ", prev: " + prev);
+        if (prev == null) {
+            if (annotation.typeIn() != KyouValueType.Dom)
+                throw new KyouException("expr requires input. expr: " + this);
+        } else {
+            if (annotation.typeIn() != prev.getClass().getAnnotation(ExprDescription.class).typeOut())
+                throw new KyouException("expr input type mismatch. expr: " + this + ", prev: " + prev);
+        }
     }
 
     /**
@@ -167,27 +175,6 @@ public abstract class Expr {
     }
 
     /**
-     * 将表达式字符串解析为body和postfix两部分
-     * 
-     * @param expr
-     *            表达式字符串
-     * @return 一个包含两项的数组，第0项表示body，第1项表示postfix。如果没有postfix则第1项为null
-     */
-    static String[] parseBodyPostfix(String expr) {
-        String[] parts = new String[2];
-        if (expr.contains(".")) {
-            int pos = expr.indexOf('.');
-            parts[0] = expr.substring(0, pos);
-            parts[1] = expr.substring(pos + 1);
-        } else {
-            parts[0] = expr;
-            parts[1] = null;
-        }
-
-        return parts;
-    }
-
-    /**
      * 将一个字符串解析为表达式
      * 
      * @param exprStr
@@ -195,7 +182,42 @@ public abstract class Expr {
      * @return 表达式
      */
     static Expr parseExpr(String exprStr) {
+        // 如果是整数字面量则直接处理掉
+        if (StringUtils.isNumeric(exprStr)) {
+            IntegerExpr expr = new IntegerExpr();
+            expr.postfix = exprStr;
+            expr.postfixi = NumberUtils.toInt(exprStr);
+            return expr;
+        }
 
-        return null;
+        // 解析body和postfix
+        String body;
+        String postfix;
+
+        if (exprStr.contains(".")) {
+            int pos = exprStr.indexOf('.');
+            body = exprStr.substring(0, pos);
+            postfix = exprStr.substring(pos + 1);
+        } else {
+            body = exprStr;
+            postfix = null;
+        }
+
+        // 根据body找到对应的类型
+        Class<? extends Expr> exprClass = EXPR_CLASSES.classes.get(body);
+        if (exprClass == null)
+            throw new KyouException("expression unsupported. expr: " + exprStr);
+
+        // 创建expr实例
+        Expr expr;
+        try {
+            expr = exprClass.newInstance();
+            expr.postfix = postfix;
+            expr.postfixi = NumberUtils.toInt(postfix, -1);
+
+            return expr;
+        } catch (Exception ex) {
+            throw new KyouException("init expression fail. expr: " + exprStr, ex);
+        }
     }
 }

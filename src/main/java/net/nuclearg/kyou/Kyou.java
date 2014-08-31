@@ -1,7 +1,11 @@
 package net.nuclearg.kyou;
 
+import java.io.InputStream;
+import java.io.OutputStream;
+
 import net.nuclearg.kyou.dom.KyouDocument;
 import net.nuclearg.kyou.dom.serialize.XmlDomSerializer;
+import net.nuclearg.kyou.pack.Packer;
 import net.nuclearg.kyou.pack.StyleSpecification;
 
 /**
@@ -21,4 +25,53 @@ import net.nuclearg.kyou.pack.StyleSpecification;
  */
 public class Kyou {
 
+    /**
+     * 加载一篇报文数据
+     * 
+     * @param is
+     *            输入
+     * @return 加载好的报文
+     */
+    public KyouDocument loadDocument(InputStream is) {
+        return new XmlDomSerializer().deserialize(is);
+    }
+
+    /**
+     * 保存一篇报文数据
+     * 
+     * @param doc
+     * @param os
+     */
+    public void saveDocument(KyouDocument doc, OutputStream os) {
+
+    }
+
+    /**
+     * 加载一篇报文样式定义
+     * 
+     * @param is
+     *            输入
+     * @return 加载好的报文样式定义
+     */
+    public StyleSpecification loadStyleSpecification(InputStream is) {
+        return new StyleSpecification(is);
+    }
+
+    /**
+     * 执行组包过程
+     * 
+     * @param doc
+     *            报文定义
+     * @param spec
+     *            组包样式定义
+     * @return 组包好的报文
+     */
+    public byte[] pack(KyouDocument doc, StyleSpecification spec) {
+        if (doc == null)
+            throw new KyouException("doc is null");
+        if (spec == null)
+            throw new KyouException("spec is null");
+
+        return new Packer().packDocument(doc, spec);
+    }
 }

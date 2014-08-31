@@ -2,6 +2,7 @@ package net.nuclearg.kyou.pack;
 
 import net.nuclearg.kyou.KyouException;
 import net.nuclearg.kyou.dom.KyouContainer;
+import net.nuclearg.kyou.dom.KyouDocument;
 import net.nuclearg.kyou.dom.KyouItem;
 import net.nuclearg.kyou.util.KyouByteOutputStream;
 
@@ -14,6 +15,23 @@ import net.nuclearg.kyou.util.KyouByteOutputStream;
  * @author ng
  */
 public class Packer {
+
+    /**
+     * 对整篇报文执行组包过程
+     * 
+     * @param doc
+     *            报文数据
+     * @param spec
+     *            组包样式定义
+     * @return 组包好的报文
+     */
+    public byte[] packDocument(KyouDocument doc, StyleSpecification spec) {
+        PackContext context = new PackContext(doc, spec, this);
+        KyouByteOutputStream os = new KyouByteOutputStream();
+        this.packItem(context, os);
+        return os.export();
+    }
+
     /**
      * 对某个指定的报文元素执行组包过程
      * 

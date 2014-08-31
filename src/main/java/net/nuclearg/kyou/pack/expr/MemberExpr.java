@@ -7,8 +7,8 @@ import net.nuclearg.kyou.pack.Expr;
 import net.nuclearg.kyou.pack.Expr.ExprDescription;
 import net.nuclearg.kyou.pack.Expr.ExprDescription.ExprPostfix;
 import net.nuclearg.kyou.pack.PackContext;
-import net.nuclearg.kyou.util.KyouValue;
-import net.nuclearg.kyou.util.KyouValueType;
+import net.nuclearg.kyou.util.value.KyouValue;
+import net.nuclearg.kyou.util.value.KyouValueType;
 
 /**
  * 计算当前报文元素的所有子元素组包的结果
@@ -16,13 +16,13 @@ import net.nuclearg.kyou.util.KyouValueType;
  * @author ng
  */
 @ExprDescription(name = "m", postfix = ExprPostfix.None, typeIn = KyouValueType.Dom, typeOut = KyouValueType.Bytes)
-class MemberExpr extends Expr {
+public class MemberExpr extends Expr {
 
     @Override
     protected KyouValue eval(KyouValue input, PackContext context) {
         KyouItem item = input.domValue;
-        if (item instanceof KyouContainer)
-            throw new KyouException("KyouContainer expected");
+        if (!(item instanceof KyouContainer))
+            throw new KyouException("KyouContainer expected. path: " + item.path());
 
         KyouContainer container = (KyouContainer) item;
 

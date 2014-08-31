@@ -2,28 +2,45 @@ package net.nuclearg.kyou.dom.serialize;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.charset.Charset;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import net.nuclearg.kyou.KyouException;
 import net.nuclearg.kyou.dom.KyouArray;
 import net.nuclearg.kyou.dom.KyouDocument;
+import net.nuclearg.kyou.dom.KyouDomBuilder;
 import net.nuclearg.kyou.dom.KyouField;
 import net.nuclearg.kyou.dom.KyouItem;
 import net.nuclearg.kyou.dom.KyouStruct;
 import net.nuclearg.kyou.dom.visitor.KyouDomVisitor;
+import net.nuclearg.kyou.util.KyouByteUtils;
 
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.StringUtils;
+import org.xml.sax.Attributes;
+import org.xml.sax.ErrorHandler;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
+import org.xml.sax.XMLReader;
+import org.xml.sax.helpers.DefaultHandler;
+import org.xml.sax.helpers.XMLReaderFactory;
 
 /**
  * XML序列化/反序列化实现类
  * <p>
- * 这个类是kyou中对KyouDocument和DataDocument的序列化/反序列化的默认实现
+ * 这个类是kyou中对{@link KyouDocument}的序列化/反序列化的默认实现
  * </p>
  * 
- * @author nuclearg
+ * @author ng
  */
 public class XmlDomSerializer implements DomSerializer {
+
     @Override
     public void serialize(KyouDocument doc, OutputStream os) {
         if (doc == null)
@@ -35,7 +52,7 @@ public class XmlDomSerializer implements DomSerializer {
         try {
             doc.foreach(new SerializerVisitor(buffer));
 
-            os.write(buffer.toString().getBytes(Charset.forName("utf8")));
+            os.write(buffer.toString().getBytes(KyouByteUtils.UTF8));
         } catch (Exception ex) {
             throw new KyouException("serialize fail. doc: " + doc, ex);
         }
@@ -51,7 +68,7 @@ public class XmlDomSerializer implements DomSerializer {
         @Override
         public void docStart(KyouDocument doc) {
             builder.append("<?xml version=\"1.0\" encoding=\"utf-8\"?><document");
-            this.writeAttributes(doc);
+            this.appendAttributes(builder, doc);
             builder.append(">");
         }
 
@@ -63,8 +80,7 @@ public class XmlDomSerializer implements DomSerializer {
         @Override
         public void struStart(KyouStruct stru) {
             builder.append("<struct name=\"").append(stru.name()).append("\"");
-            if (!(stru.parent() instanceof KyouArray))
-                this.writeAttributes(stru);
+            this.appendAttributes(builder, stru);
             builder.append(">");
         }
 
@@ -76,7 +92,7 @@ public class XmlDomSerializer implements DomSerializer {
         @Override
         public void arrayStart(KyouArray array) {
             builder.append("<array name=\"").append(array.name()).append("\"");
-            this.writeAttributes(array);
+            this.appendAttributes(builder, array);
             builder.append(">");
 
             builder.append("<prototype>");
@@ -93,7 +109,7 @@ public class XmlDomSerializer implements DomSerializer {
         @Override
         public void field(KyouField field) {
             builder.append("<field");
-            this.writeAttributes(field);
+            this.appendAttributes(builder, field);
             builder.append(">");
 
             builder.append(StringEscapeUtils.escapeXml(field.value()));
@@ -101,14 +117,21 @@ public class XmlDomSerializer implements DomSerializer {
             builder.append("</field>");
         }
 
-        private void writeAttributes(KyouItem item) {
-            if (item.attributes().size() == 0)
-                return;
+        private void appendAttributes(StringBuilder builder, KyouItem item) {
+            builder.append(" attributes=\"");
 
             for (Entry<String, String> attr : item.attributes().entrySet())
-                builder.append(" ").append(attr.getKey()).append("=\"").append(StringEscapeUtils.escapeXml(attr.getValue())).append("\"");
-        }
+                try {
+                    String k = URLEncoder.encode(attr.getKey(), "utf8");
+                    String v = URLEncoder.encode(attr.getValue(), "utf8");
 
+                    builder.append(k).append("=").append(v).append("&");
+                } catch (Exception ex) {
+                    throw new KyouException(ex);
+                }
+
+            builder.append("\"");
+        }
     }
 
     @Override
@@ -116,60 +139,105 @@ public class XmlDomSerializer implements DomSerializer {
         if (is == null)
             throw new KyouException("input is null");
 
-        return null;
+        try {
+            InputSource source = new InputSource(is);
 
-        // try {
-        // InputSource source = new InputSource(is);
-        //
-        // final KyouDomBuilder builder = new KyouDomBuilder();
-        //
-        // // 使用SAX进行解析
-        // XMLReader reader = XMLReaderFactory.createXMLReader();
-        //
-        // // 进行解析
-        // reader.setContentHandler(new DefaultHandler() {
-        // private Map<String, String> atts = new LinkedHashMap<String, String>();
-        //
-        // @Override
-        // public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
-        // this.fillAttributes(attributes);
-        //
-        // if (localName.equals("document"))
-        // ;
-        // else if (localName.equals("struct"))
-        // builder.beginStruct(this.atts);
-        // else if (localName.equals("array"))
-        // ;
-        // else if (localName.equals("field"))
-        // builder.field(this.atts);
-        // else
-        // throw new KyouException(KyouErr.Kyou.Serialization.InvalidKyouXmlTag, localName);
-        // }
-        //
-        // @Override
-        // public void endElement(String uri, String localName, String qName) throws SAXException {
-        // if (localName.equals("struct"))
-        // builder.endStruct();
-        // }
-        //
-        // @Override
-        // public void fatalError(SAXParseException ex) throws SAXException {
-        // throw new KyouException(KyouErr.Base.Xml.SaxFail, "[" + ex.getLineNumber() + ":" + ex.getColumnNumber() + "] " + ex.getMessage());
-        // }
-        //
-        // private void fillAttributes(Attributes attributes) {
-        // atts.clear();
-        // for (int i = 0; i < attributes.getLength(); i++)
-        // atts.put(attributes.getLocalName(i), attributes.getValue(i));
-        // }
-        // });
-        // reader.setErrorHandler((ErrorHandler) reader.getContentHandler());
-        // reader.parse(source);
-        //
-        // // 返回解析好的KyouDocument
-        // return builder.result();
-        // } catch (Exception ex) {
-        // throw new KyouException(KyouErr.Kyou.Serialization.XmlDeserializeKyouFail, ex);
-        // }
+            final KyouDomBuilder builder = new KyouDomBuilder();
+
+            // 使用SAX进行解析
+            XMLReader reader = XMLReaderFactory.createXMLReader();
+
+            // 进行解析
+            reader.setContentHandler(new DefaultHandler() {
+                private final StringBuilder text = new StringBuilder();
+
+                @Override
+                public void startElement(String uri, String localName, String qName, Attributes xmlAttributes) throws SAXException {
+                    String name = xmlAttributes.getValue("name");
+                    if (StringUtils.isBlank(name) && !localName.equals("document"))
+                        throw new KyouException("name is blank");
+
+                    String attributeStr = xmlAttributes.getValue("attributes");
+                    Map<String, String> attributes = this.parseAttributes(attributeStr);
+
+                    if (localName.equals("document"))
+                        builder.beginDocument(attributes);
+                    else if (localName.equals("struct"))
+                        builder.beginStruct(name, attributes);
+                    else if (localName.equals("array"))
+                        ;
+                    else if (localName.equals("prototype"))
+                        ;
+                    else if (localName.equals("field")) {
+                        builder.beginField(name, attributes);
+                        this.text.delete(0, this.text.length());
+                    }
+                    else
+                        throw new KyouException("unsupported xml tag: " + localName);
+                }
+
+                @Override
+                public void endElement(String uri, String localName, String qName) throws SAXException {
+                    if (localName.equals("document"))
+                        ;
+                    else if (localName.equals("struct"))
+                        builder.endStruct();
+                    else if (localName.equals("array"))
+                        ;
+                    else if (localName.equals("prototype"))
+                        ;
+                    else if (localName.equals("field")) {
+                        String text = StringEscapeUtils.unescapeXml(this.text.toString());
+                        builder.endField(text);
+                    } else
+                        throw new KyouException("unsupported xml tag: " + localName);
+                }
+
+                @Override
+                public void characters(char[] ch, int start, int length) throws SAXException {
+                    text.append(new String(ch, start, length));
+                }
+
+                @Override
+                public void fatalError(SAXParseException ex) throws SAXException {
+                    throw new KyouException("parse xml fail. ln: " + ex.getLineNumber() + ", col:" + ex.getColumnNumber() + ", msg: " + ex.getMessage(), ex);
+                }
+
+                private Map<String, String> parseAttributes(String attributeStr) {
+                    if (StringUtils.isBlank(attributeStr))
+                        return Collections.emptyMap();
+
+                    Map<String, String> attributes = new HashMap<String, String>();
+                    for (String attribute : StringUtils.split(attributeStr, '&'))
+                        try {
+                            String[] kv = StringUtils.split(attribute, '=');
+                            if (kv.length != 2)
+                                throw new KyouException("attribute syntax error");
+
+                            String k = URLDecoder.decode(kv[0], "utf8");
+                            String v = URLDecoder.decode(kv[1], "utf8");
+
+                            if (StringUtils.isBlank(k))
+                                throw new KyouException("attribute name is blank");
+
+                            if (attributes.containsKey(k))
+                                throw new KyouException("atribute name duplicate. name: " + k);
+
+                            attributes.put(k, v);
+                        } catch (UnsupportedEncodingException ex) {
+                            throw new KyouException(ex);
+                        }
+
+                    return attributes;
+                }
+            });
+            reader.setErrorHandler((ErrorHandler) reader.getContentHandler());
+            reader.parse(source);
+
+            // 返回解析好的KyouDocument
+            return builder.endDocument();
+        } catch (Exception ex) {
+            throw new KyouException("parse xml fail", ex);
+        }
     }
 }

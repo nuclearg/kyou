@@ -1,4 +1,4 @@
-package net.nuclearg.kyou.util;
+package net.nuclearg.kyou.util.value;
 
 /**
  * Kyou在执行组包过程时支持的数据类型

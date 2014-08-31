@@ -1,5 +1,6 @@
 package net.nuclearg.kyou.dom;
 
+import net.nuclearg.kyou.KyouException;
 import net.nuclearg.kyou.dom.visitor.KyouDomVisitor;
 
 import org.apache.commons.lang.SystemUtils;
@@ -23,11 +24,15 @@ public class KyouField extends KyouItem {
 
     /** 该报文字段的值 */
     public void value(String value) {
+        if (value == null)
+            throw new KyouException("value is null");
         this.value = value;
     }
 
     @Override
     public void foreach(KyouDomVisitor visitor) {
+        if (visitor == null)
+            throw new KyouException("foreach visitor is null");
         visitor.field(this);
     }
 

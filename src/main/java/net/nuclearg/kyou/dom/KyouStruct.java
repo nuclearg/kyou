@@ -36,8 +36,8 @@ public class KyouStruct extends KyouContainer {
      *            新元素
      */
     public void add(String name, KyouItem item) {
-        if (StringUtils.isEmpty(name))
-            throw new KyouException("name is empty");
+        if (StringUtils.isBlank(name))
+            throw new KyouException("name is blank");
         if (!StringUtils.containsOnly(name, "_1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
                 || "1234567890".indexOf(name.charAt(0)) != -1)
             throw new KyouException("name illegal");
@@ -48,7 +48,7 @@ public class KyouStruct extends KyouContainer {
         if (item.isAncestorOf(this))
             throw new KyouException("try add ancestor as child");
         if (this.nameList.contains(name))
-            throw new KyouException("child name duplicate");
+            throw new KyouException("children name duplicate. name: " + name);
 
         item.name = name;
         item.parent = this;
@@ -148,6 +148,9 @@ public class KyouStruct extends KyouContainer {
 
     @Override
     public void foreach(KyouDomVisitor visitor) {
+        if (visitor == null)
+            throw new KyouException("foreach visitor is null");
+
         visitor.struStart(this);
 
         for (KyouItem item : this)

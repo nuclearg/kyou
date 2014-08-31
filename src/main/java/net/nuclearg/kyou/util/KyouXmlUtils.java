@@ -127,7 +127,7 @@ public class KyouXmlUtils {
      */
     public static String selectText(Node base, String xpath) {
         if (base == null)
-            throw new KyouException("empty xml node");
+            throw new KyouException("empty xml node. xpath: " + xpath);
         if (StringUtils.isEmpty(xpath))
             throw new KyouException("xpath is empty");
 

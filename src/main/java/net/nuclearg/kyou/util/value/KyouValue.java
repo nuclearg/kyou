@@ -1,4 +1,4 @@
-package net.nuclearg.kyou.util;
+package net.nuclearg.kyou.util.value;
 
 import net.nuclearg.kyou.dom.KyouItem;
 

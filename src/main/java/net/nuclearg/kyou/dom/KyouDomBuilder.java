@@ -14,26 +14,24 @@ public class KyouDomBuilder {
     /**
      * 当前正被构造的{@link KyouDocument}对象
      */
-    private KyouDocument doc = new KyouDocument();
+    private KyouDocument doc;
     /**
      * 当前构建栈
      */
     private Stack<KyouContainer> stack = new Stack<KyouContainer>();
+    /**
+     * 当前构建的域
+     */
+    private KyouField currentField;
 
-    public KyouDomBuilder() {
+    public void beginDocument(Map<String, String> attributes) {
+        this.doc = new KyouDocument();
+        this.doc.clearAndCopyAttributes(attributes);
+
         this.stack.push(this.doc);
     }
 
-    /**
-     * 得到当前结果
-     * <p>
-     * 多次调用此方法得到的将是同一个对象<br/>
-     * 在任何时候调用此方法都将会得到一棵完好的报文结构树，不会存在任何内部状态不一致的现象
-     * </p>
-     * 
-     * @return 当前结果
-     */
-    public KyouDocument result() {
+    public KyouDocument endDocument() {
         return this.doc;
     }
 
@@ -70,14 +68,24 @@ public class KyouDomBuilder {
      * @param attributes
      *            该域元素的属性
      */
-    public void field(String name, Map<String, String> attributes, String value) {
+    public void beginField(String name, Map<String, String> attributes) {
         KyouStruct parent = this.ensureParentStruct();
 
         KyouField field = new KyouField();
         field.clearAndCopyAttributes(attributes);
-        field.value(value);
 
         parent.add(name, field);
+
+        this.currentField = field;
+    }
+
+    /**
+     * 关闭当前的域
+     * 
+     * @param value
+     */
+    public void endField(String value) {
+        this.currentField.value(value);
     }
 
     /**

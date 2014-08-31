@@ -1,0 +1,37 @@
+[[DOC]]
+<?xml version="1.0"?>
+<document>
+    <field name="aaa">1</field>
+    <field name="bbb">2</field>
+</document>
+
+
+[[STYLE]]
+<?xml version="1.0"?>
+<pack>
+    <config>
+        <encoding>utf8</encoding>
+    </config>
+
+    <style target="#">
+        <format>{%}</format>
+        <param>m</param>
+    </style>
+
+    <style target="#.aaa">
+        <format>"%":"%",</format>
+        <param>s2b n</param>
+        <param>s2b v</param>
+    </style>
+
+    <style target="#.bbb">
+        <format>"%":"%"</format>
+        <param>s2b n</param>
+        <param>s2b v</param>
+    </style>
+</pack>
+
+
+
+[[EXPECTED]]
+{"aaa":"1","bbb":"2"}

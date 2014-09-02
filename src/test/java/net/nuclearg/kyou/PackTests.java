@@ -43,7 +43,7 @@ public class PackTests extends ParentRunner<PackTestData> {
 
     @Override
     protected Description describeChild(PackTestData child) {
-        return Description.createTestDescription(this.getClass(), child.name);
+        return Description.createSuiteDescription(child.name);
     }
 
     @Override

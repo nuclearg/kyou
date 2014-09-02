@@ -20,6 +20,7 @@ public class EXPR_CLASSES {
     public static final Map<String, Class<? extends Expr>> classes;
 
     static {
+        @SuppressWarnings("unchecked")
         List<Class<? extends Expr>> exprClasses = Arrays.asList(
                 ConvertB2SExpr.class,
                 ConvertS2BExpr.class,
@@ -27,6 +28,7 @@ public class EXPR_CLASSES {
                 NameExpr.class,
                 ValueExpr.class,
                 BackspaceExpr.class,
+                ParentExpr.class,
 
                 IntegerExpr.class
                 );

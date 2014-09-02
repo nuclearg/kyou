@@ -5,8 +5,10 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -38,7 +40,9 @@ import org.xml.sax.helpers.XMLReaderFactory;
  * 
  * @author ng
  */
-public class XmlDomSerializer implements KyouDomSerializer {
+public class XmlDomSerializer implements KyouDomSerializer, KyouDomDeserializer {
+
+    private static final List<String> NAME_REQUIRED_TAG = Arrays.asList("field", "struct", "array");
 
     @Override
     public void serialize(KyouDocument doc, OutputStream os) {
@@ -169,7 +173,7 @@ public class XmlDomSerializer implements KyouDomSerializer {
             throw new KyouException("in is null");
 
         try {
-            final KyouDomBuilder builder = new KyouDomBuilder();
+            final DomBuilder builder = new DomBuilder();
 
             // 使用SAX进行解析
             XMLReader reader = XMLReaderFactory.createXMLReader();
@@ -181,8 +185,9 @@ public class XmlDomSerializer implements KyouDomSerializer {
                 @Override
                 public void startElement(String uri, String localName, String qName, Attributes xmlAttributes) throws SAXException {
                     String name = xmlAttributes.getValue("name");
-                    if (StringUtils.isBlank(name) && !localName.equals("document"))
-                        throw new KyouException("name is blank");
+
+                    if (NAME_REQUIRED_TAG.contains(localName) && StringUtils.isBlank(name))
+                        throw new KyouException("name is blank. tag: " + localName);
 
                     String attributeStr = xmlAttributes.getValue("attributes");
                     Map<String, String> attributes = this.parseAttributes(attributeStr);

@@ -58,7 +58,7 @@ public class KyouArray extends KyouContainer {
     public KyouItem add() {
         KyouItem item = this.prototype.deepCopyStruct();
 
-        int index = this.children.size() - 1;
+        int index = this.children.size();
         item.name = String.valueOf(index);
         item.parent = this;
 

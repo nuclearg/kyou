@@ -1,15 +1,7 @@
 [[DOC]]
 <?xml version="1.0"?>
 <document>
-    <array name="fields">
-        <prototype>
-            <field name="__prototype" />
-        </prototype>
-        <field name="1">1</field>
-        <field name="2">2</field>
-        <field name="3">3</field>
-    </array>
-    <array name="structs">
+    <array name="stru">
         <prototype>
             <struct name="__prototype">
                 <field name="a"/>
@@ -40,33 +32,31 @@
     </config>
 
     <style target="#">
-        <format>%%</format>
+        <format><![CDATA[<doc>%</doc>]]></format>
         <param>m</param>
-        <param>bk 1</param>
     </style>
 
     <style target="array">
-        <format>"%":[%%],</format>
-        <param>s2b n</param>
+        <format>%</format>
         <param>m</param>
-        <param>bk 1</param>
     </style>
 
     <style target="field">
-        <format>"%":"%",</format>
+        <format><![CDATA[<%>%</%>]]></format>
         <param>s2b n</param>
         <param>s2b v</param>
+        <param>s2b n</param>
     </style>
 
     <style target="struct">
-        <format>"%":{%%},</format>
-        <param>s2b n</param>
+        <format><![CDATA[<%>%</%>]]></format>
+        <param>s2b n p</param>
         <param>m</param>
-        <param>bk 1</param>
+        <param>s2b n p</param>
     </style>
 </pack>
 
 
 
 [[EXPECTED]]
-{"fields":["a","b"],"structs":[{"a":"a1","b":"b1"},{"a":"a2","b":"b2"},{"a":"a3","b":"b3"}]}
+<doc><stru><a>a1</a><b>b1</b></stru><stru><a>a2</a><b>b2</b></stru><stru><a>a3</a><b>b3</b></stru></doc>

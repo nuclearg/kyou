@@ -1,0 +1,51 @@
+[[DOC]]
+<?xml version="1.0"?>
+<document>
+    <array name="array">
+        <prototype>
+            <array name="__prototype">
+                <prototype>
+                    <field name="field" />
+                </prototype>
+            </array>
+        </prototype>
+        <array name="1">
+            <field name="1">1-1</field>
+            <field name="2">1-2</field>
+        </array>
+        <array name="2">
+            <field name="1">2-1</field>
+            <field name="2">2-2</field>
+        </array>
+    </array>
+</document>
+
+
+[[STYLE]]
+<?xml version="1.0"?>
+<pack>
+    <config>
+        <encoding>utf8</encoding>
+    </config>
+
+    <style target="#">
+        <format>%%</format>
+        <param>m</param>
+        <param>bk 1</param>
+    </style>
+
+    <style target="array">
+        <format>%</format>
+        <param>m</param>
+    </style>
+
+    <style target="field">
+        <format>%\20</format>
+        <param>s2b v</param>
+    </style>
+</pack>
+
+
+
+[[EXPECTED]]
+1-1 1-2 2-1 2-2

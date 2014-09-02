@@ -1,0 +1,44 @@
+[[DOC]]
+<?xml version="1.0"?>
+<document>
+    <array name="fields">
+        <prototype>
+            <field name="__prototype" />
+        </prototype>
+        <field name="1">a</field>
+        <field name="2">b</field>
+        <field name="3">c</field>
+    </array>
+</document>
+
+
+[[STYLE]]
+<?xml version="1.0"?>
+<pack>
+    <config>
+        <encoding>utf8</encoding>
+    </config>
+
+    <style target="#">
+        <format>{%%}</format>
+        <param>m</param>
+        <param>bk 1</param>
+    </style>
+
+    <style target="array">
+        <format>"%":[%%],</format>
+        <param>s2b n</param>
+        <param>m</param>
+        <param>bk 1</param>
+    </style>
+
+    <style target="field">
+        <format>"%",</format>
+        <param>s2b v</param>
+    </style>
+</pack>
+
+
+
+[[EXPECTED]]
+{"fields":["a","b","c"]}

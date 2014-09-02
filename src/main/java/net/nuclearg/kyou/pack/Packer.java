@@ -74,12 +74,10 @@ public class Packer {
      * @return 适合当前组包上下文的样式单元
      */
     private static StyleItem selectStyle(PackContext context) {
-        String path = context.item.path();
-
         for (StyleItem style : context.style.styles)
-            if (style.target.matches(path))
+            if (style.target.matches(context.item))
                 return style;
 
-        throw new KyouException("no style suitable. path: " + path + ",item: " + context.item);
+        throw new KyouException("no style suitable. path: " + context.item.path() + ", item: " + context.item);
     }
 }

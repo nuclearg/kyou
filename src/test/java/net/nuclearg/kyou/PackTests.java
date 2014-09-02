@@ -6,6 +6,12 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.nuclearg.kyou.dom.KyouDocument;
+import net.nuclearg.kyou.pack.KyouPackStyle;
+import net.nuclearg.kyou.util.ByteOutputStream;
+import net.nuclearg.kyou.util.FormatString;
+
+import org.apache.commons.lang.StringUtils;
 import org.junit.Assert;
 import org.junit.runner.Description;
 import org.junit.runner.RunWith;
@@ -15,10 +21,10 @@ import org.junit.runners.model.InitializationError;
 import org.junit.runners.model.Statement;
 
 @RunWith(PackTests.class)
-public class PackTests extends ParentRunner<PackTestCase> {
+public class PackTests extends ParentRunner<PackTestData> {
     private static final String POSTFIX = ".testcase";
 
-    private List<PackTestCase> tests;
+    private List<PackTestData> tests;
 
     public PackTests(Class<?> testClass) throws InitializationError {
         super(testClass);
@@ -31,34 +37,64 @@ public class PackTests extends ParentRunner<PackTestCase> {
     }
 
     @Override
-    protected List<PackTestCase> getChildren() {
+    protected List<PackTestData> getChildren() {
         return this.tests;
     }
 
     @Override
-    protected Description describeChild(PackTestCase child) {
+    protected Description describeChild(PackTestData child) {
         return Description.createTestDescription(this.getClass(), child.name);
     }
 
     @Override
-    protected void runChild(final PackTestCase child, RunNotifier notifier) {
+    protected void runChild(final PackTestData child, RunNotifier notifier) {
         Statement statement = new Statement() {
 
             @Override
             public void evaluate() throws Throwable {
-                byte[] output = Kyou.pack(child.doc, child.style);
+                // doc
+                KyouDocument doc = Kyou.loadDocument(child.doc);
+                // style
+                KyouPackStyle style = Kyou.loadPackStyle(child.style);
 
-                if (child.expectedString != null)
-                    Assert.assertEquals(child.expectedString, new String(output, child.style.config.encoding));
+                // expected bytes
+                @SuppressWarnings("resource")
+                ByteOutputStream os = new ByteOutputStream();
+                FormatString expected = new FormatString(child.expected, style.config.encoding);
+                for (byte[] segment : expected)
+                    if (segment == null)
+                        throw new UnsupportedOperationException("result must simple");
+                    else
+                        os.write(segment);
+                byte[] expectedBytes = os.export();
+
+                // expected string
+                String expectedStr = StringUtils.replace(child.expected, "\\\\", "");
+                expectedStr = StringUtils.replace(expectedStr, "\\%", "");
+                if (child.expected.contains("\\"))
+                    expectedStr = null;
                 else
-                    Assert.assertArrayEquals(child.expected, output);
+                    expectedStr = new String(expectedBytes, style.config.encoding);
+
+                /*
+                 * pack
+                 */
+                byte[] output = Kyou.pack(doc, style);
+
+                /*
+                 * compare
+                 */
+                if (expectedStr != null)
+                    Assert.assertEquals(expectedStr, new String(output, style.config.encoding));
+                else
+                    Assert.assertArrayEquals(expectedBytes, output);
             }
         };
 
         runLeaf(statement, describeChild(child), notifier);
     }
 
-    private List<PackTestCase> findTests() throws Exception {
+    private List<PackTestData> findTests() throws Exception {
         File[] files = new File(URI.create(this.getClass().getResource(".").toString())).listFiles(new FilenameFilter() {
 
             @Override
@@ -67,9 +103,9 @@ public class PackTests extends ParentRunner<PackTestCase> {
             }
         });
 
-        List<PackTestCase> tests = new ArrayList<PackTestCase>();
+        List<PackTestData> tests = new ArrayList<PackTestData>();
         for (File file : files)
-            tests.add(new PackTestCase(file));
+            tests.add(new PackTestData(file));
 
         return tests;
     }

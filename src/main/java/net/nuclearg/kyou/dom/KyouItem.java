@@ -193,19 +193,6 @@ public abstract class KyouItem {
      */
     public abstract KyouItem deepCopyStruct();
 
-    /**
-     * 工具方法，将当前的属性全部清除并替换为新的属性列表
-     * 
-     * @param attributes
-     *            新的属性列表
-     */
-    protected void clearAndCopyAttributes(Map<String, String> attributes) {
-        this.attributes.clear();
-
-        if (attributes != null)
-            this.attributes.putAll(attributes);
-    }
-
     /*
      * ==================== 属性相关 ====================
      */

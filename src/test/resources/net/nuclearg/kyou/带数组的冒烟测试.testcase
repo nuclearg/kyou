@@ -1,0 +1,72 @@
+[[DOC]]
+<?xml version="1.0"?>
+<document>
+    <array name="fields">
+        <prototype>
+            <field name="__prototype" />
+        </prototype>
+        <field name="1">1</field>
+        <field name="2">2</field>
+        <field name="3">3</field>
+    </array>
+    <array name="structs">
+        <prototype>
+            <struct name="__prototype">
+                <field name="a"/>
+                <field name="b"/>
+            </struct>
+        </prototype>
+        <struct name="1">
+            <field name="a">a1</field>
+            <field name="b">b1</field>
+        </struct>
+        <struct name="2">
+            <field name="a">a2</field>
+            <field name="b">b2</field>
+        </struct>
+        <struct name="3">
+            <field name="a">a3</field>
+            <field name="b">b3</field>
+        </struct>
+    </array>
+</document>
+
+
+[[STYLE]]
+<?xml version="1.0"?>
+<pack>
+    <config>
+        <encoding>utf8</encoding>
+    </config>
+
+    <style target="#">
+        <format>%%</format>
+        <param>m</param>
+        <param>bk 1</param>
+    </style>
+
+    <style target="array">
+        <format>"%":[%%],</format>
+        <param>s2b n</param>
+        <param>m</param>
+        <param>bk 1</param>
+    </style>
+
+    <style target="field">
+        <format>"%":"%",</format>
+        <param>s2b n</param>
+        <param>s2b v</param>
+    </style>
+
+    <style target="struct">
+        <format>"%":{%%},</format>
+        <param>s2b n</param>
+        <param>m</param>
+        <param>bk 1</param>
+    </style>
+</pack>
+
+
+
+[[EXPECTED]]
+{"fields":["a","b"],"structs":[{"a":"a1","b":"b1"},{"a":"a2","b":"b2"},{"a":"a3","b":"b3"}]}

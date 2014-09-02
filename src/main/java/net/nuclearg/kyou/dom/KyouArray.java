@@ -195,7 +195,7 @@ public class KyouArray extends KyouContainer {
     @Override
     public KyouArray deepCopyStruct() {
         KyouArray copy = new KyouArray(this.prototype.deepCopyStruct());
-        copy.clearAndCopyAttributes(this.attributes);
+        copy.attributes.putAll(this.attributes);
         return copy;
     }
 

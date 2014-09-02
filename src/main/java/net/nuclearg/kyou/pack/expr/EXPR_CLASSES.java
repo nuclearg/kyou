@@ -23,11 +23,12 @@ public class EXPR_CLASSES {
         List<Class<? extends Expr>> exprClasses = Arrays.asList(
                 ConvertB2SExpr.class,
                 ConvertS2BExpr.class,
-                IntegerExpr.class,
                 MemberExpr.class,
                 NameExpr.class,
-                ValueExpr.class
+                ValueExpr.class,
+                BackspaceExpr.class,
 
+                IntegerExpr.class
                 );
 
         Map<String, Class<? extends Expr>> exprClassesMap = new HashMap<String, Class<? extends Expr>>();

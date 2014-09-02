@@ -61,6 +61,10 @@ class StyleItem {
         List<String> params = XmlUtils.selectTextList(e, "param");
 
         // 初始化segments
-        this.segments = Segment.parseFormatString(format, style.config.encoding, params);
+        try {
+            this.segments = Segment.parseFormatString(format, style.config.encoding, params);
+        } catch (Exception ex) {
+            throw new KyouException("expr syntax error.  target: " + target, ex);
+        }
     }
 }

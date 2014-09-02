@@ -13,7 +13,6 @@ import java.util.Map.Entry;
 import net.nuclearg.kyou.KyouException;
 import net.nuclearg.kyou.dom.KyouArray;
 import net.nuclearg.kyou.dom.KyouDocument;
-import net.nuclearg.kyou.dom.KyouDomBuilder;
 import net.nuclearg.kyou.dom.KyouField;
 import net.nuclearg.kyou.dom.KyouItem;
 import net.nuclearg.kyou.dom.KyouStruct;
@@ -193,9 +192,9 @@ public class XmlDomSerializer implements KyouDomSerializer {
                     else if (localName.equals("struct"))
                         builder.beginStruct(name, attributes);
                     else if (localName.equals("array"))
-                        ;
+                        builder.beginArray(name, attributes);
                     else if (localName.equals("prototype"))
-                        ;
+                        builder.beginArrayPrototype();
                     else if (localName.equals("field")) {
                         builder.beginField(name, attributes);
                         this.text.delete(0, this.text.length());
@@ -211,9 +210,9 @@ public class XmlDomSerializer implements KyouDomSerializer {
                     else if (localName.equals("struct"))
                         builder.endStruct();
                     else if (localName.equals("array"))
-                        ;
+                        builder.endArray();
                     else if (localName.equals("prototype"))
-                        ;
+                        builder.endArrayPrototype();
                     else if (localName.equals("field")) {
                         String text = StringEscapeUtils.unescapeXml(this.text.toString());
                         builder.endField(text);

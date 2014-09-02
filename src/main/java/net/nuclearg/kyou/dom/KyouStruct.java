@@ -173,7 +173,7 @@ public class KyouStruct extends KyouContainer {
     @Override
     public KyouStruct deepCopy() {
         KyouStruct copy = new KyouStruct();
-        copy.clearAndCopyAttributes(this.attributes);
+        copy.attributes.putAll(this.attributes);
 
         for (KyouItem child : this)
             copy.add(child.name, child.deepCopy());
@@ -184,7 +184,7 @@ public class KyouStruct extends KyouContainer {
     @Override
     public KyouStruct deepCopyStruct() {
         KyouStruct copy = new KyouStruct();
-        copy.clearAndCopyAttributes(this.attributes);
+        copy.attributes.putAll(this.attributes);
 
         for (KyouItem child : this)
             copy.add(child.name, child.deepCopyStruct());

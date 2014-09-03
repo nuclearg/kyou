@@ -1,4 +1,4 @@
-package net.nuclearg.kyou.pack.match;
+package net.nuclearg.kyou.pack.matcher;
 
 /**
  * 管道匹配器，基于不同的逻辑将两端的匹配器连接起来

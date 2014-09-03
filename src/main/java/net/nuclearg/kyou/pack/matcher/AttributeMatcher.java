@@ -1,10 +1,16 @@
-package net.nuclearg.kyou.pack.match;
+package net.nuclearg.kyou.pack.matcher;
 
 import net.nuclearg.kyou.dom.KyouItem;
 
-public class FilterMatcher extends Matcher {
+/**
+ * 对属性进行判断的匹配器
+ * 
+ * @author ng
+ * 
+ */
+class AttributeMatcher extends Matcher {
 
-    public FilterMatcher(String text) {
+    public AttributeMatcher(String text) {
         // TODO Auto-generated constructor stub
     }
 

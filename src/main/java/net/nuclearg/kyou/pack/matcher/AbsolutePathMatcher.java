@@ -1,9 +1,9 @@
-package net.nuclearg.kyou.pack.match;
+package net.nuclearg.kyou.pack.matcher;
 
 import net.nuclearg.kyou.dom.KyouItem;
 
 /**
- * 基于绝对路径进行查询
+ * 基于绝对路径进行匹配
  * 
  * @author ng
  * 

@@ -1,4 +1,4 @@
-package net.nuclearg.kyou.pack.match;
+package net.nuclearg.kyou.pack.matcher;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

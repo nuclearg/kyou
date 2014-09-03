@@ -4,15 +4,19 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 import net.nuclearg.kyou.KyouException;
-import net.nuclearg.kyou.pack.expr.EXPR_CLASSES;
 import net.nuclearg.kyou.pack.expr.IntegerExpr;
 import net.nuclearg.kyou.util.value.Value;
 import net.nuclearg.kyou.util.value.ValueType;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
+import org.reflections.Reflections;
 
 /**
  * 表示在参数中可以定义的表达式
@@ -37,6 +41,7 @@ import org.apache.commons.lang.math.NumberUtils;
  * @author ng
  */
 public abstract class Expr {
+    private static final Map<String, Class<? extends Expr>> EXPR_CLASSES;
     /**
      * 表达式的后缀 如果未提供后缀则为null
      */
@@ -56,6 +61,29 @@ public abstract class Expr {
      * @return 表达式的计算结果
      */
     protected abstract Value eval(Value input, PackContext context);
+
+    static {
+        Map<String, Class<? extends Expr>> exprClasses = new HashMap<String, Class<? extends Expr>>();
+
+        Set<Class<?>> classes = new Reflections(IntegerExpr.class.getPackage().getName()).getTypesAnnotatedWith(ExprDescription.class);
+        for (Class<?> cls : classes) {
+            if (!Expr.class.isAssignableFrom(cls))
+                continue;
+
+            ExprDescription desc = cls.getAnnotation(ExprDescription.class);
+            if (desc == null)
+                continue;
+
+            String name = desc.name();
+
+            if (exprClasses.containsKey(name))
+                throw new KyouException("expr name duplicated. old: " + exprClasses.get(name) + ", new: " + cls);
+
+            exprClasses.put(name, cls.asSubclass(Expr.class));
+        }
+
+        EXPR_CLASSES = Collections.unmodifiableMap(exprClasses);
+    }
 
     /**
      * 检查当前表达式是否存在问题，以及和前一个表达式之间的衔接是否有问题
@@ -181,7 +209,7 @@ public abstract class Expr {
      *            要解析为表达式的字符串
      * @return 表达式
      */
-    static Expr parseExpr(String exprStr) {
+    public static Expr parseExpr(String exprStr) {
         // 如果是整数字面量则直接处理掉
         if (StringUtils.isNumeric(exprStr)) {
             IntegerExpr expr = new IntegerExpr();
@@ -204,7 +232,7 @@ public abstract class Expr {
         }
 
         // 根据body找到对应的类型
-        Class<? extends Expr> exprClass = EXPR_CLASSES.classes.get(body);
+        Class<? extends Expr> exprClass = EXPR_CLASSES.get(body);
         if (exprClass == null)
             throw new KyouException("expression unsupported. expr: " + exprStr);
 

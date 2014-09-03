@@ -1,10 +1,10 @@
-package net.nuclearg.kyou.pack.match;
+package net.nuclearg.kyou.pack.matcher;
 
 import net.nuclearg.kyou.dom.KyouItem;
 
-public class AttributeMatcher extends Matcher {
+class FilterMatcher extends Matcher {
 
-    public AttributeMatcher(String text) {
+    FilterMatcher(String text) {
         // TODO Auto-generated constructor stub
     }
 

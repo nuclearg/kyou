@@ -3,7 +3,7 @@ package net.nuclearg.kyou.pack;
 import java.util.List;
 
 import net.nuclearg.kyou.KyouException;
-import net.nuclearg.kyou.pack.match.Matcher;
+import net.nuclearg.kyou.pack.matcher.Matcher;
 import net.nuclearg.kyou.util.XmlUtils;
 
 import org.apache.commons.lang.StringUtils;

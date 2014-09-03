@@ -50,7 +50,11 @@ class StyleItem {
         String target = XmlUtils.selectText(e, "@target");
         if (StringUtils.isEmpty(target))
             throw new KyouException("targat is empty");
-        this.target = Matcher.parse(target);
+        try {
+            this.target = Matcher.parse(target);
+        } catch (Exception ex) {
+            throw new KyouException("target syntax error. target: " + target, ex);
+        }
 
         // 读取format
         String format = XmlUtils.selectText(e, "format");

@@ -1,0 +1,49 @@
+[[DOC]]
+<?xml version="1.0"?>
+<document>
+    <field name="aaa">a</field>
+    <field name="bbb">b</field>
+    <struct name="sss">
+    	<field name="s1">111</field>
+    	<field name="s2">222</field>
+    </struct>
+    <struct name="eee">
+    </struct> 
+</document>
+
+
+[[STYLE]]
+<?xml version="1.0"?>
+<pack>
+    <config>
+        <encoding>utf8</encoding>
+    </config>
+
+    <style target="document">
+        <format>{%%}</format>
+        <param>m</param>
+        <param>bk 1</param>
+    </style>
+
+    <style target="field">
+        <format>"%":"%",</format>
+        <param>s2b n</param>
+        <param>s2b v</param>
+    </style>
+    
+    <style target="struct:empty">
+    	<format>ASDFASDFASDF</format>
+    </style>
+
+    <style target="struct">
+    	<format>"%":{%%},</format>
+    	<param>s2b n</param>
+    	<param>m</param>
+    	<param>bk 1</param>
+    </style>
+</pack>
+
+
+
+[[EXPECTED]]
+{"aaa":"a","bbb":"b","sss":{"s1":"111","s2":"222"},ASDFASDFASD}

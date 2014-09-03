@@ -1,0 +1,46 @@
+[[DOC]]
+<?xml version="1.0"?>
+<document>
+    <field name="a">1</field>
+    <field name="b">2</field>
+    <field name="c">3</field>
+    <field name="d">4</field>
+    <field name="e">5</field>
+    <field name="f">6</field>
+</document>
+
+
+[[STYLE]]
+<?xml version="1.0"?>
+<pack>
+    <config>
+        <encoding>utf8</encoding>
+    </config>
+
+    <style target="document">
+        <format>%</format>
+        <param>m</param>
+    </style>
+
+    <style target="field:first">
+        <format>[%</format>
+        <param>s2b v</param>
+    </style>
+    <style target="field:last">
+        <format>%]</format>
+        <param>s2b v</param>
+    </style>
+    <style target="field:odd">
+        <format>/%/</format>
+        <param>s2b v</param>
+    </style>
+    <style target="field:even">
+        <format>_%_</format>
+        <param>s2b v</param>
+    </style>
+</pack>
+
+
+
+[[EXPECTED]]
+[1_2_/3/_4_/5/6]

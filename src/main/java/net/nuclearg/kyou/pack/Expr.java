@@ -11,12 +11,12 @@ import java.util.Set;
 
 import net.nuclearg.kyou.KyouException;
 import net.nuclearg.kyou.pack.expr.IntegerExpr;
+import net.nuclearg.kyou.util.ClassSearchUtils;
 import net.nuclearg.kyou.util.value.Value;
 import net.nuclearg.kyou.util.value.ValueType;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
-import org.reflections.Reflections;
 
 /**
  * 表示在参数中可以定义的表达式
@@ -65,11 +65,8 @@ public abstract class Expr {
     static {
         Map<String, Class<? extends Expr>> exprClasses = new HashMap<String, Class<? extends Expr>>();
 
-        Set<Class<?>> classes = new Reflections(IntegerExpr.class.getPackage().getName()).getTypesAnnotatedWith(ExprDescription.class);
+        Set<Class<?>> classes = ClassSearchUtils.searchClassesWithAnnotation(IntegerExpr.class.getPackage().getName(), ExprDescription.class);
         for (Class<?> cls : classes) {
-            if (!Expr.class.isAssignableFrom(cls))
-                continue;
-
             ExprDescription desc = cls.getAnnotation(ExprDescription.class);
             if (desc == null)
                 continue;

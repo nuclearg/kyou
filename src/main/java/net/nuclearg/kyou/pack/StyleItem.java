@@ -3,7 +3,7 @@ package net.nuclearg.kyou.pack;
 import java.util.List;
 
 import net.nuclearg.kyou.KyouException;
-import net.nuclearg.kyou.dom.query.KyouQuery;
+import net.nuclearg.kyou.pack.match.Matcher;
 import net.nuclearg.kyou.util.XmlUtils;
 
 import org.apache.commons.lang.StringUtils;
@@ -26,7 +26,7 @@ class StyleItem {
     /**
      * 该组包样式单元适用于的元素
      */
-    final KyouQuery target;
+    final Matcher target;
     /**
      * 段列表
      */
@@ -50,7 +50,7 @@ class StyleItem {
         String target = XmlUtils.selectText(e, "@target");
         if (StringUtils.isEmpty(target))
             throw new KyouException("targat is empty");
-        this.target = new KyouQuery(target);
+        this.target = Matcher.parse(target);
 
         // 读取format
         String format = XmlUtils.selectText(e, "format");

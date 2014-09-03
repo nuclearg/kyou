@@ -1,4 +1,4 @@
-package net.nuclearg.kyou.dom.query;
+package net.nuclearg.kyou.pack.match;
 
 import net.nuclearg.kyou.dom.KyouArray;
 import net.nuclearg.kyou.dom.KyouDocument;
@@ -9,20 +9,20 @@ import net.nuclearg.kyou.dom.KyouStruct;
 import org.apache.commons.lang.StringUtils;
 
 /**
- * 基于元素类型进行查询
+ * 匹配元素类型
  * 
  * @author ng
  * 
  */
-class TypeQueryImpl extends QueryImpl {
+class TypeMatcher extends Matcher {
     private final Type type;
 
-    TypeQueryImpl(String type) {
+    TypeMatcher(String type) {
         this.type = Enum.valueOf(Type.class, StringUtils.capitalize(type));
     }
 
     @Override
-    boolean matches(KyouItem item) {
+    public boolean matches(KyouItem item) {
         switch (this.type) {
             case Document:
                 return item instanceof KyouDocument;

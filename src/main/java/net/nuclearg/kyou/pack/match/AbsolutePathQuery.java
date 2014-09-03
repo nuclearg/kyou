@@ -1,4 +1,4 @@
-package net.nuclearg.kyou.dom.query;
+package net.nuclearg.kyou.pack.match;
 
 import net.nuclearg.kyou.dom.KyouItem;
 
@@ -8,15 +8,15 @@ import net.nuclearg.kyou.dom.KyouItem;
  * @author ng
  * 
  */
-class AbsolutePathQueryImpl extends QueryImpl {
+class AbsolutePathQuery extends Matcher {
     private final String path;
 
-    AbsolutePathQueryImpl(String path) {
+    AbsolutePathQuery(String path) {
         this.path = path;
     }
 
     @Override
-    boolean matches(KyouItem item) {
+    public boolean matches(KyouItem item) {
         return this.path.equals(item.path());
     }
 

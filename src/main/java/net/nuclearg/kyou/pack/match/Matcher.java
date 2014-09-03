@@ -1,15 +1,18 @@
-package net.nuclearg.kyou.dom.query;
+package net.nuclearg.kyou.pack.match;
 
 import net.nuclearg.kyou.KyouException;
 import net.nuclearg.kyou.dom.KyouItem;
 
+import org.apache.commons.lang.StringUtils;
+
 /**
- * 查询逻辑实现
+ * 匹配器，用来判断报文节点是否满足某个条件
  * 
  * @author ng
  * 
  */
-abstract class QueryImpl {
+public abstract class Matcher {
+
     /**
      * 检查指定的报文节点是否满足当前查询条件
      * 
@@ -17,29 +20,24 @@ abstract class QueryImpl {
      *            报文节点
      * @return 是否满足查询条件
      */
-    abstract boolean matches(KyouItem item);
+    public abstract boolean matches(KyouItem item);
 
-    @Override
-    public abstract String toString();
+    public static Matcher parse(String queryStr) {
+        if (StringUtils.isBlank(queryStr))
+            throw new KyouException("query is blank");
 
-    /**
-     * 解析查询表达式
-     * 
-     * @param queryStr
-     *            查询表达式
-     * @return 查询逻辑
-     */
-    static QueryImpl parse(String queryStr) {
         // TODO 支持多种查询的组合
-        QueryToken token = QueryToken.tryParse(queryStr, QueryTokenType.AbsolutePath, QueryTokenType.Type);
+        MatchExpressionToken token = MatchExpressionToken.tryParse(queryStr);
         if (token == null || token.length != queryStr.length())
             throw new KyouException("query syntax error. query: " + queryStr);
 
         switch (token.type) {
             case AbsolutePath:
-                return new AbsolutePathQueryImpl(token.value);
+                return new AbsolutePathQuery(token.value);
             case Type:
-                return new TypeQueryImpl(token.value);
+                return new TypeMatcher(token.value);
+            case NodeName:
+                return new NodeNameMatcher(token.value);
             default:
                 throw new UnsupportedOperationException("query token type: " + token.type);
         }

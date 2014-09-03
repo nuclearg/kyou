@@ -1,4 +1,4 @@
-package net.nuclearg.kyou.dom.query;
+package net.nuclearg.kyou.pack.match;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -9,16 +9,22 @@ import java.util.regex.Pattern;
  * @author ng
  * 
  */
-enum QueryTokenType {
+enum MatchExpressionTokenType {
     /**
      * 绝对路径
      */
-    AbsolutePath("^\\#(\\.[0-9a-zA-Z]+)*"),
+    AbsolutePath("^\\#(\\.[0-9a-zA-Z]+)*$"),
 
     /**
      * 类型
      */
     Type("^(document|field|struct|array)"),
+    
+    
+    /**
+     * 节点名称
+     */
+    NodeName("^\\#[0-9a-zA-Z-_]+"),
 
     // AttributeStart,
     // AttributeName,
@@ -34,7 +40,7 @@ enum QueryTokenType {
 
     private final Pattern regex;
 
-    private QueryTokenType(String regex) {
+    private MatchExpressionTokenType(String regex) {
         this.regex = Pattern.compile(regex);
     }
 

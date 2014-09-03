@@ -15,6 +15,9 @@ import org.slf4j.LoggerFactory;
 
 /**
  * 工具类 用于根据需求建造出一棵DOM树
+ * <p>
+ * 结构和域的构建过程非常普通，数组的构建过程比较复杂。数组的prototype是新起了一个DomBuilder来实现的。
+ * </p>
  * 
  * @author ng
  */

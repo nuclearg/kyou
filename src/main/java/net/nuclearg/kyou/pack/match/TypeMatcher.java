@@ -31,7 +31,7 @@ class TypeMatcher extends Matcher {
             case Array:
                 return item instanceof KyouArray;
             case Struct:
-                return item instanceof KyouStruct;
+                return item instanceof KyouStruct && !(item instanceof KyouDocument);
             default:
                 throw new UnsupportedOperationException();
         }

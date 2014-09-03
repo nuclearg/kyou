@@ -8,9 +8,6 @@ import net.nuclearg.kyou.util.ByteOutputStream;
 
 /**
  * 组包核心类 提供kyou的通用组包服务
- * <p>
- * <b>不应在用户代码中手工调用此类中的函数，请使用net.kyou.Kyou中的pack方法。</b>
- * </p>
  * 
  * @author ng
  */
@@ -26,6 +23,7 @@ public class Packer {
      * @return 组包好的报文
      */
     public byte[] packDocument(KyouDocument doc, KyouPackStyle style) {
+        // 将doc作为一个item直接组包
         PackContext context = new PackContext(doc, style, this);
         ByteOutputStream os = new ByteOutputStream();
         this.packItem(context, os);
@@ -39,8 +37,10 @@ public class Packer {
      *            组包上下文
      */
     public void packItem(PackContext context, ByteOutputStream os) {
+        // 选择适合这个报文节点的style
         StyleItem style = selectStyle(context);
 
+        // 处理style中的每一段，将处理结果作为报文体输出
         for (Segment segment : style.segments)
             segment.export(context, os);
     }

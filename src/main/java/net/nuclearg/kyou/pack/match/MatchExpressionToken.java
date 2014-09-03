@@ -1,20 +1,26 @@
 package net.nuclearg.kyou.pack.match;
 
+import net.nuclearg.kyou.KyouException;
+
 /**
- * 组成查询字符串的词
+ * 组成查询字符串的词法元素
  * 
  * @author ng
  * 
  */
 class MatchExpressionToken {
+    /**
+     * 词法元素类型
+     */
     final MatchExpressionTokenType type;
-    final String value;
-    final int length;
+    /**
+     * 对应的文本
+     */
+    final String text;
 
-    MatchExpressionToken(MatchExpressionTokenType type, String value, int length) {
+    MatchExpressionToken(MatchExpressionTokenType type, String text) {
         this.type = type;
-        this.value = value;
-        this.length = length;
+        this.text = text;
     }
 
     /**
@@ -22,7 +28,7 @@ class MatchExpressionToken {
      * 
      * @param str
      *            待解析的字符串
-     * @return 解析出的词，或为null
+     * @return 解析出的词
      */
     static MatchExpressionToken tryParse(String str) {
         for (MatchExpressionTokenType tokenType : MatchExpressionTokenType.values()) {
@@ -31,9 +37,9 @@ class MatchExpressionToken {
             if (length < 0)
                 continue;
 
-            return new MatchExpressionToken(tokenType, str.substring(0, length), length);
+            return new MatchExpressionToken(tokenType, str.substring(0, length));
         }
 
-        return null;
+        throw new KyouException("unrecognizable token. str: " + str);
     }
 }

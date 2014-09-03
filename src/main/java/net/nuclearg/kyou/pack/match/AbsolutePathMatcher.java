@@ -8,10 +8,13 @@ import net.nuclearg.kyou.dom.KyouItem;
  * @author ng
  * 
  */
-class AbsolutePathQuery extends Matcher {
+class AbsolutePathMatcher extends Matcher {
+    /**
+     * 要匹配的绝对路径
+     */
     private final String path;
 
-    AbsolutePathQuery(String path) {
+    AbsolutePathMatcher(String path) {
         this.path = path;
     }
 

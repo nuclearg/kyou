@@ -5,6 +5,14 @@ import java.util.List;
 
 import net.nuclearg.kyou.KyouException;
 import net.nuclearg.kyou.dom.KyouItem;
+import net.nuclearg.kyou.pack.matcher.attribute.AttributeMatcher;
+import net.nuclearg.kyou.pack.matcher.basic.AbsolutePathMatcher;
+import net.nuclearg.kyou.pack.matcher.basic.NodeNameMatcher;
+import net.nuclearg.kyou.pack.matcher.basic.TypeMatcher;
+import net.nuclearg.kyou.pack.matcher.filter.FilterMatcher;
+import net.nuclearg.kyou.pack.matcher.pipe.AndPipeMatcher;
+import net.nuclearg.kyou.pack.matcher.pipe.ParentPipeMatcher;
+import net.nuclearg.kyou.pack.matcher.pipe.PipeMatcher;
 
 import org.apache.commons.lang.StringUtils;
 

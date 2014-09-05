@@ -1,0 +1,57 @@
+[[DOC]]
+<?xml version="1.0"?>
+<document>
+    <field name="a" attributes="a=1">1</field>
+    <field name="b" attributes="b=2">2</field>
+    <field name="c" attributes="head=Head">3</field>
+    <field name="d" attributes="tail=Tail">4</field>
+    <field name="e" attributes="e=5">5</field>
+    <field name="f" attributes="head=xxx">6</field>
+    <field name="g" attributes="tail=xxx">7</field>
+    <field name="h" attributes="e=xxx">8</field>
+</document>
+
+
+[[STYLE]]
+<?xml version="1.0"?>
+<pack>
+    <config>
+        <encoding>utf8</encoding>
+    </config>
+
+    <style target="document">
+        <format>%</format>
+        <param>m</param>
+    </style>
+
+    <style target="[a=1]">
+        <format>a=1</format>
+    </style>
+    
+    <style target="field[b]">
+        <format>b=2</format>
+    </style>
+    
+    <style target="[head^=H]">
+        <format>c=3</format>
+    </style>
+    
+    <style target="[tail$=ail]">
+        <format>d=4</format>
+    </style>
+    
+    <style target="[e!=xxx]">
+        <format>e=5</format>
+    </style>
+    
+    <style target="field">
+    	<format>%%</format>
+    	<param>s2b n</param>
+    	<param>s2b v</param>
+    </style>
+</pack>
+
+
+
+[[EXPECTED]]
+a=1b=2c=3d=4e=5f6g7h8

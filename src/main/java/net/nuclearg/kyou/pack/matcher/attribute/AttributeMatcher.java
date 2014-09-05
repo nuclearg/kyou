@@ -9,6 +9,8 @@ import net.nuclearg.kyou.dom.KyouItem;
 import net.nuclearg.kyou.pack.matcher.Matcher;
 import net.nuclearg.kyou.util.ClassUtils;
 
+import org.apache.commons.lang.StringUtils;
+
 /**
  * 对属性进行判断的匹配器
  * 
@@ -48,12 +50,20 @@ public class AttributeMatcher extends Matcher {
     }
 
     public AttributeMatcher(String text) {
+        // 去掉头尾的中括号
+        text = text.substring(1, text.length() - 1);
+
         for (String op : OPERATOR_CLASSES.keySet())
             if (text.contains(op))
                 try {
                     this.name = text.substring(0, text.indexOf(op));
                     this.op = ClassUtils.newInstance(OPERATOR_CLASSES.get(op));
                     this.value = text.substring(text.indexOf(op) + op.length());
+
+                    if (StringUtils.isEmpty(this.name))
+                        throw new KyouException("attribute name is empty. expr: [" + text + "]");
+                    if (StringUtils.isEmpty(this.value))
+                        throw new KyouException("attribute value is empty. expr: [" + text + "]");
 
                     return;
                 } catch (Exception ex) {

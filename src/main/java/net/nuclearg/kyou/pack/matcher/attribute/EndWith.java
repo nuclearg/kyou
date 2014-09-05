@@ -16,7 +16,7 @@ class EndWith extends AttributeOperator {
         if (StringUtils.isEmpty(attr))
             return false;
 
-        return attr.startsWith(value);
+        return attr.endsWith(value);
     }
 
 }

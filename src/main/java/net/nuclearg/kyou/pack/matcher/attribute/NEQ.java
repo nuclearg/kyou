@@ -11,6 +11,9 @@ class NEQ extends AttributeOperator {
 
     @Override
     boolean matches(String value, String attr) {
+        if (attr == null)
+            return false;
+
         return !value.equals(attr);
     }
 

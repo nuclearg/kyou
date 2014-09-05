@@ -10,8 +10,8 @@ import java.util.Map;
 import java.util.Set;
 
 import net.nuclearg.kyou.KyouException;
-import net.nuclearg.kyou.pack.expr.IntegerExpr;
-import net.nuclearg.kyou.util.ClassSearchUtils;
+import net.nuclearg.kyou.pack.Expr.ExprDescription.ExprPostfix;
+import net.nuclearg.kyou.util.ClassUtils;
 import net.nuclearg.kyou.util.value.Value;
 import net.nuclearg.kyou.util.value.ValueType;
 
@@ -65,7 +65,7 @@ public abstract class Expr {
     static {
         Map<String, Class<? extends Expr>> exprClasses = new HashMap<String, Class<? extends Expr>>();
 
-        Set<Class<?>> classes = ClassSearchUtils.searchClassesWithAnnotation(IntegerExpr.class.getPackage().getName(), ExprDescription.class);
+        Set<Class<?>> classes = ClassUtils.searchClassesWithAnnotation(ExprDescription.class);
         for (Class<?> cls : classes) {
             ExprDescription desc = cls.getAnnotation(ExprDescription.class);
             if (desc == null)
@@ -236,7 +236,7 @@ public abstract class Expr {
         // 创建expr实例
         Expr expr;
         try {
-            expr = exprClass.newInstance();
+            expr = ClassUtils.newInstance(exprClass);
             expr.postfix = postfix;
             expr.postfixi = NumberUtils.toInt(postfix, -1);
 
@@ -245,4 +245,21 @@ public abstract class Expr {
             throw new KyouException("init expression fail. expr: " + exprStr, ex);
         }
     }
+
+    /**
+     * 输出一个立即数
+     * 
+     * @author ng
+     * 
+     */
+    @ExprDescription(name = "", postfix = ExprPostfix.Int, typeIn = ValueType.Dom, typeOut = ValueType.Integer)
+    private static class IntegerExpr extends Expr {
+
+        @Override
+        protected Value eval(Value input, PackContext context) {
+            return new Value(this.postfixi);
+        }
+
+    }
+
 }

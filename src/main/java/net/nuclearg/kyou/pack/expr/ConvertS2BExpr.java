@@ -19,7 +19,7 @@ import net.nuclearg.kyou.util.value.ValueType;
  * @author ng
  */
 @ExprDescription(name = "s2b", postfix = ExprPostfix.NoneOrString, typeIn = ValueType.String, typeOut = ValueType.Bytes)
-public class ConvertS2BExpr extends Expr {
+class ConvertS2BExpr extends Expr {
     /**
      * 转换时使用的编码
      */

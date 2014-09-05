@@ -10,7 +10,7 @@ import net.nuclearg.kyou.dom.KyouItem;
  * 
  */
 @FilterDescription("last")
-class LastFilterMatcher extends FilterMatcherImpl {
+class Last extends Filter {
 
     @Override
     boolean matches(KyouItem item) {

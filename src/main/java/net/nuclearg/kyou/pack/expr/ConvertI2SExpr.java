@@ -18,7 +18,7 @@ import net.nuclearg.kyou.util.value.ValueType;
  * 
  */
 @ExprDescription(name = "i2s", postfix = ExprPostfix.NoneOrInt, typeIn = ValueType.Integer, typeOut = ValueType.String)
-public class ConvertI2SExpr extends Expr {
+class ConvertI2SExpr extends Expr {
     @Override
     protected Value eval(Value input, PackContext context) {
         return new Value(Integer.toString(input.intValue, this.postfixi));

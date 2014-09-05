@@ -14,7 +14,7 @@ import net.nuclearg.kyou.util.value.ValueType;
  * 
  */
 @ExprDescription(name = "bk", postfix = ExprPostfix.None, typeIn = ValueType.Integer, typeOut = ValueType.Bytes)
-public class BackspaceExpr extends Expr {
+class BackspaceExpr extends Expr {
 
     @Override
     protected Value eval(Value input, PackContext context) {

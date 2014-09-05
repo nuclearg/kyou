@@ -14,7 +14,7 @@ import net.nuclearg.kyou.util.value.ValueType;
  * 
  */
 @ExprDescription(name = "a", postfix = ExprPostfix.String, typeIn = ValueType.Dom, typeOut = ValueType.String)
-public class AttributeExpr extends Expr {
+class AttributeExpr extends Expr {
 
     @Override
     protected Value eval(Value input, PackContext context) {

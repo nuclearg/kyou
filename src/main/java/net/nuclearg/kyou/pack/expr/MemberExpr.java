@@ -16,7 +16,7 @@ import net.nuclearg.kyou.util.value.ValueType;
  * @author ng
  */
 @ExprDescription(name = "m", postfix = ExprPostfix.None, typeIn = ValueType.Dom, typeOut = ValueType.Bytes)
-public class MemberExpr extends Expr {
+class MemberExpr extends Expr {
 
     @Override
     protected Value eval(Value input, PackContext context) {

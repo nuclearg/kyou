@@ -4,13 +4,13 @@ import net.nuclearg.kyou.dom.KyouContainer;
 import net.nuclearg.kyou.dom.KyouItem;
 
 /**
- * 匹配位于偶数位置上的节点（这个是按直觉来的，从1开始计数）
+ * 匹配所有兄弟节点中的第一个
  * 
  * @author ng
  * 
  */
-@FilterDescription("even")
-class IndexEvenFilterMatcher extends FilterMatcherImpl {
+@FilterDescription("first")
+class First extends Filter {
 
     @Override
     boolean matches(KyouItem item) {
@@ -18,8 +18,7 @@ class IndexEvenFilterMatcher extends FilterMatcherImpl {
         if (parent == null || parent == item)
             return false;
 
-        // indexOf是从0开始计算的，与直觉（从1开始）不符，所以需要反过来
-        return parent.indexOf(item) % 2 == 1;
+        return parent.indexOf(item) == 0;
     }
 
 }

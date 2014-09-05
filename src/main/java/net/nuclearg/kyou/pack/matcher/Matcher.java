@@ -10,8 +10,6 @@ import net.nuclearg.kyou.pack.matcher.basic.AbsolutePathMatcher;
 import net.nuclearg.kyou.pack.matcher.basic.NodeNameMatcher;
 import net.nuclearg.kyou.pack.matcher.basic.TypeMatcher;
 import net.nuclearg.kyou.pack.matcher.filter.FilterMatcher;
-import net.nuclearg.kyou.pack.matcher.pipe.AndPipeMatcher;
-import net.nuclearg.kyou.pack.matcher.pipe.ParentPipeMatcher;
 import net.nuclearg.kyou.pack.matcher.pipe.PipeMatcher;
 
 import org.apache.commons.lang.StringUtils;
@@ -85,10 +83,7 @@ public abstract class Matcher {
             // 或者当前matcher是管道匹配器，但左右都挂满了
             // 则用一个AndPipeMatcher把这两个连起来并设为当前matcher
             if (currAlone && nextAlone) {
-                AndPipeMatcher pipe = new AndPipeMatcher();
-                pipe.left = current;
-                pipe.right = next;
-                current = pipe;
+                current = PipeMatcher.and(current, next);
                 continue;
             }
 
@@ -133,7 +128,7 @@ public abstract class Matcher {
             case NodeName:
                 return new NodeNameMatcher(token.text);
             case Space:
-                return new ParentPipeMatcher();
+                return PipeMatcher.parent();
             case Type:
                 return new TypeMatcher(token.text);
             default:

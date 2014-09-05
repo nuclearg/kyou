@@ -38,7 +38,7 @@ enum MatchExpressionTokenType {
     /**
      * 属性
      */
-    Attribute("oh fuck 这玩意的正则该怎么写"),
+    Attribute("^\\[.+?\\]"),
 
     ;
 

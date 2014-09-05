@@ -10,7 +10,7 @@ import net.nuclearg.kyou.dom.KyouItem;
  * 
  */
 @FilterDescription("odd")
-class IndexOddFilterMatcher extends FilterMatcherImpl {
+class IndexOdd extends Filter {
 
     @Override
     boolean matches(KyouItem item) {

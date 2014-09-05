@@ -10,7 +10,7 @@ import net.nuclearg.kyou.dom.KyouItem;
  * 
  */
 @FilterDescription("empty")
-class EmptyContainerFilterMatcher extends FilterMatcherImpl {
+class EmptyContainer extends Filter {
 
     @Override
     boolean matches(KyouItem item) {

@@ -5,7 +5,6 @@ import java.util.TreeMap;
 
 import net.nuclearg.kyou.KyouException;
 import net.nuclearg.kyou.dom.visitor.KyouDomVisitor;
-import net.nuclearg.kyou.util.Function;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
@@ -82,12 +81,24 @@ public abstract class KyouItem {
      * @param handler
      *            追溯到每个父节点时采取的动作
      */
-    protected void traceAncestor(Function<KyouContainer> handler) {
+    protected void traceAncestor(AncestorTraceHandler handler) {
         KyouContainer parent = this.parent;
         while (parent != null && parent != parent.parent()) {
-            handler.action(parent);
+            handler.onAncestor(parent);
             parent = parent.parent();
         }
+    }
+
+    /**
+     * 只有一个入参的回调函数
+     * 
+     * @author ng
+     * 
+     * @param <T>
+     *            参数类型
+     */
+    protected static interface AncestorTraceHandler {
+        public void onAncestor(KyouContainer container);
     }
 
     /**
@@ -102,10 +113,10 @@ public abstract class KyouItem {
 
         final KyouItem _this = this;
 
-        this.traceAncestor(new Function<KyouContainer>() {
+        this.traceAncestor(new AncestorTraceHandler() {
 
             @Override
-            public void action(KyouContainer container) {
+            public void onAncestor(KyouContainer container) {
                 if (container == _this)
                     flag[0] = true;
             }
@@ -122,10 +133,10 @@ public abstract class KyouItem {
     public int depth() {
         final int[] depth = { 0 };
 
-        this.traceAncestor(new Function<KyouContainer>() {
+        this.traceAncestor(new AncestorTraceHandler() {
 
             @Override
-            public void action(KyouContainer container) {
+            public void onAncestor(KyouContainer container) {
                 depth[0]++;
             }
         });
@@ -139,10 +150,10 @@ public abstract class KyouItem {
     public String path() {
         final StringBuilder builder = new StringBuilder(this.name);
 
-        this.traceAncestor(new Function<KyouContainer>() {
+        this.traceAncestor(new AncestorTraceHandler() {
 
             @Override
-            public void action(KyouContainer container) {
+            public void onAncestor(KyouContainer container) {
                 builder.insert(0, ".").insert(0, container.name());
             }
         });

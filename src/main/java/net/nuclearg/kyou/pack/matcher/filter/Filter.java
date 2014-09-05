@@ -3,13 +3,12 @@ package net.nuclearg.kyou.pack.matcher.filter;
 import net.nuclearg.kyou.dom.KyouItem;
 
 /**
- * 过滤器实现
+ * 过滤器
  * 
  * @author ng
  * 
  */
-abstract class FilterMatcherImpl {
-
+abstract class Filter {
     /**
      * 判断过滤器与给定的报文节点是否匹配
      * 

@@ -18,7 +18,7 @@ import net.nuclearg.kyou.util.value.ValueType;
  * 
  */
 @ExprDescription(name = "s2i", postfix = ExprPostfix.NoneOrInt, typeIn = ValueType.String, typeOut = ValueType.Integer)
-public class ConvertS2IExpr extends Expr {
+class ConvertS2IExpr extends Expr {
     @Override
     protected Value eval(Value input, PackContext context) {
         return new Value(Integer.parseInt(input.strValue, this.postfixi));

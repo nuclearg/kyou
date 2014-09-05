@@ -1,0 +1,50 @@
+[[DOC]]
+<?xml version="1.0"?>
+<document>
+	<struct name="head">
+		<field name="head1">h1</field>
+		<field name="head2">h2</field>
+	</struct>
+	<struct name="body">
+		<field name="body1">b1</field>
+		<field name="body2">b2</field>
+	</struct>
+</document>
+
+
+[[STYLE]]
+<?xml version="1.0"?>
+<pack>
+    <config>
+        <encoding>utf8</encoding>
+    </config>
+
+    <style target="#">
+        <format>{%%}</format>
+        <param>m</param>
+        <param>bk 1</param>
+    </style>
+
+    <style target="#head">
+        <format>"%":{%%},</format>
+        <param>s2b n</param>
+        <param>m</param>
+        <param>bk 1</param>
+    </style>
+    
+    <style target="#body">
+    	<format>%</format>
+    	<param>m</param>
+    </style>
+
+    <style target="field">
+        <format>"%":"%",</format>
+        <param>s2b n</param>
+        <param>s2b v</param>
+    </style>
+</pack>
+
+
+
+[[EXPECTED]]
+{"head":{"head1":"h1","head2":"h2"},"body1":"b1","body2":"b2"}

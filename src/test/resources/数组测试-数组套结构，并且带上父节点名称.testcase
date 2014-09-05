@@ -1,0 +1,62 @@
+[[DOC]]
+<?xml version="1.0"?>
+<document>
+    <array name="stru">
+        <prototype>
+            <struct name="__prototype">
+                <field name="a"/>
+                <field name="b"/>
+            </struct>
+        </prototype>
+        <struct name="1">
+            <field name="a">a1</field>
+            <field name="b">b1</field>
+        </struct>
+        <struct name="2">
+            <field name="a">a2</field>
+            <field name="b">b2</field>
+        </struct>
+        <struct name="3">
+            <field name="a">a3</field>
+            <field name="b">b3</field>
+        </struct>
+    </array>
+</document>
+
+
+[[STYLE]]
+<?xml version="1.0"?>
+<pack>
+    <config>
+        <encoding>utf8</encoding>
+    </config>
+
+    <style target="#">
+        <format><![CDATA[<doc>%</doc>]]></format>
+        <param>m</param>
+    </style>
+
+    <style target="array">
+        <format>%</format>
+        <param>m</param>
+    </style>
+
+    <style target="field">
+        <format><![CDATA[<%>%</%>]]></format>
+        <param>s2b n</param>
+        <param>s2b v</param>
+        <param>s2b n</param>
+    </style>
+
+    <style target="struct">
+        <format><![CDATA[<%>%</%>]]></format>
+        <param>s2b n p</param>
+        <param>m</param>
+        <param>s2b n p</param>
+    </style>
+</pack>
+
+
+
+[[EXPECTED]]
+<doc><stru><a>a1</a><b>b1</b></stru><stru><a>a2</a><b>b2</b></stru><stru><a>a3</a><b>b3</b></stru></doc>

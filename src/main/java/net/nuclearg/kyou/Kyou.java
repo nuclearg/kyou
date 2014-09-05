@@ -9,6 +9,7 @@ import net.nuclearg.kyou.dom.serialize.XmlDomSerializer;
 import net.nuclearg.kyou.pack.KyouPackStyle;
 import net.nuclearg.kyou.pack.Packer;
 
+import org.apache.commons.lang.StringUtils;
 import org.xml.sax.InputSource;
 
 /**
@@ -36,6 +37,9 @@ public class Kyou {
      * @return 加载好的报文数据
      */
     public static KyouDocument loadDocument(InputStream is) {
+        if (is == null)
+            throw new KyouException("input is null");
+
         return new XmlDomSerializer().deserialize(is);
     }
 
@@ -47,6 +51,9 @@ public class Kyou {
      * @return 加载好的报文数据
      */
     public static KyouDocument loadDocument(String xml) {
+        if (StringUtils.isBlank(xml))
+            throw new KyouException("xml is blank");
+
         return new XmlDomSerializer().deserialize(new InputSource(new StringReader(xml)));
     }
 
@@ -67,7 +74,10 @@ public class Kyou {
      *            输入
      * @return 加载好的报文组包样式
      */
-    public KyouPackStyle loadPackStyle(InputStream is) {
+    public static KyouPackStyle loadPackStyle(InputStream is) {
+        if (is == null)
+            throw new KyouException("input is null");
+
         return new KyouPackStyle(new InputSource(is));
     }
 
@@ -79,6 +89,9 @@ public class Kyou {
      * @return 加载好的报文组包样式
      */
     public static KyouPackStyle loadPackStyle(String xml) {
+        if (StringUtils.isBlank(xml))
+            throw new KyouException("xml is blank");
+
         return new KyouPackStyle(new InputSource(new StringReader(xml)));
     }
 

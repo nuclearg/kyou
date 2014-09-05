@@ -58,7 +58,7 @@ public class KyouArray extends KyouContainer {
     public KyouItem add() {
         KyouItem item = this.prototype.deepCopyStruct();
 
-        int index = this.children.size() - 1;
+        int index = this.children.size();
         item.name = String.valueOf(index);
         item.parent = this;
 
@@ -174,7 +174,7 @@ public class KyouArray extends KyouContainer {
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append(super.buildToStringPrefix()).append("[]").append(this.attributes).append(SystemUtils.LINE_SEPARATOR);
+        builder.append(super.buildToStringPrefix()).append("[]").append(this.name).append(" ").append(this.attributes).append(SystemUtils.LINE_SEPARATOR);
 
         for (KyouItem item : this)
             builder.append(item.toString());
@@ -195,7 +195,7 @@ public class KyouArray extends KyouContainer {
     @Override
     public KyouArray deepCopyStruct() {
         KyouArray copy = new KyouArray(this.prototype.deepCopyStruct());
-        copy.clearAndCopyAttributes(this.attributes);
+        copy.attributes.putAll(this.attributes);
         return copy;
     }
 

@@ -51,7 +51,7 @@ public class KyouField extends KyouItem {
     @Override
     public KyouField deepCopyStruct() {
         KyouField copy = new KyouField();
-        copy.clearAndCopyAttributes(this.attributes);
+        copy.attributes.putAll(this.attributes);
         return copy;
     }
 

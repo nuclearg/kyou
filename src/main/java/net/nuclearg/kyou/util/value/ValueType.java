@@ -11,7 +11,6 @@ public enum ValueType {
      * 报文文档树的一部分
      */
     Dom,
-
     /**
      * 整数
      */

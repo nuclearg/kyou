@@ -1,0 +1,79 @@
+[[DOC]]
+<?xml version="1.0"?>
+<document>
+    <struct name="head">
+        <field name="head1">h1</field>
+        <field name="head2">h2</field>
+    </struct>
+    <array name="stru">
+        <prototype>
+            <struct name="__prototype">
+                <field name="a"/>
+                <field name="b"/>
+            </struct>
+        </prototype>
+        <struct name="1">
+            <field name="a">a1</field>
+            <field name="b">b1</field>
+        </struct>
+        <struct name="2">
+            <field name="a">a2</field>
+            <field name="b">b2</field>
+        </struct>
+        <struct name="3">
+            <field name="a">a3</field>
+            <field name="b">b3</field>
+        </struct>
+    </array>
+</document>
+
+
+[[STYLE]]
+<?xml version="1.0"?>
+<pack>
+    <config>
+        <encoding>utf8</encoding>
+    </config>
+
+    <style target="document">
+        <format>%</format>
+        <param>m</param>
+    </style>
+
+    <style target="struct#head field">
+        <format>%:==%,</format>
+        <param>s2b n</param>
+        <param>s2b v</param>
+    </style>
+    
+    <style target="#head">
+    	<format>%{%%}</format>
+    	<param>s2b n</param>
+    	<param>m</param>
+    	<param>bk 1</param>
+    </style>
+
+    <style target="field">
+        <format>%=%,</format>
+        <param>s2b n</param>
+        <param>s2b v</param>
+    </style>
+
+    <style target="struct">
+        <format>%%{%%}</format>
+        <param>s2b n p</param>
+        <param>s2b n</param>
+        <param>m</param>
+        <param>bk 1</param>
+    </style>
+    
+    <style target="array">
+    	<format>%</format>
+    	<param>m</param>
+    </style>
+</pack>
+
+
+
+[[EXPECTED]]
+head{head1:==h1,head2:==h2}stru0{a=a1,b=b1}stru1{a=a2,b=b2}stru2{a=a3,b=b3}

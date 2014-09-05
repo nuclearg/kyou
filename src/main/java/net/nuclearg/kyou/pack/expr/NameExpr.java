@@ -13,7 +13,7 @@ import net.nuclearg.kyou.util.value.ValueType;
  * @author ng
  */
 @ExprDescription(name = "n", postfix = ExprPostfix.None, typeIn = ValueType.Dom, typeOut = ValueType.String)
-public class NameExpr extends Expr {
+class NameExpr extends Expr {
 
     @Override
     protected Value eval(Value input, PackContext context) {

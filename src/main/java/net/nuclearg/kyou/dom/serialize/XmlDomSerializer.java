@@ -5,15 +5,16 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import net.nuclearg.kyou.KyouException;
 import net.nuclearg.kyou.dom.KyouArray;
 import net.nuclearg.kyou.dom.KyouDocument;
-import net.nuclearg.kyou.dom.KyouDomBuilder;
 import net.nuclearg.kyou.dom.KyouField;
 import net.nuclearg.kyou.dom.KyouItem;
 import net.nuclearg.kyou.dom.KyouStruct;
@@ -39,7 +40,9 @@ import org.xml.sax.helpers.XMLReaderFactory;
  * 
  * @author ng
  */
-public class XmlDomSerializer implements KyouDomSerializer {
+public class XmlDomSerializer implements KyouDomSerializer, KyouDomDeserializer {
+
+    private static final List<String> NAME_REQUIRED_TAG = Arrays.asList("field", "struct", "array");
 
     @Override
     public void serialize(KyouDocument doc, OutputStream os) {
@@ -170,7 +173,7 @@ public class XmlDomSerializer implements KyouDomSerializer {
             throw new KyouException("in is null");
 
         try {
-            final KyouDomBuilder builder = new KyouDomBuilder();
+            final DomBuilder builder = new DomBuilder();
 
             // 使用SAX进行解析
             XMLReader reader = XMLReaderFactory.createXMLReader();
@@ -182,8 +185,9 @@ public class XmlDomSerializer implements KyouDomSerializer {
                 @Override
                 public void startElement(String uri, String localName, String qName, Attributes xmlAttributes) throws SAXException {
                     String name = xmlAttributes.getValue("name");
-                    if (StringUtils.isBlank(name) && !localName.equals("document"))
-                        throw new KyouException("name is blank");
+
+                    if (NAME_REQUIRED_TAG.contains(localName) && StringUtils.isBlank(name))
+                        throw new KyouException("name is blank. tag: " + localName);
 
                     String attributeStr = xmlAttributes.getValue("attributes");
                     Map<String, String> attributes = this.parseAttributes(attributeStr);
@@ -193,9 +197,9 @@ public class XmlDomSerializer implements KyouDomSerializer {
                     else if (localName.equals("struct"))
                         builder.beginStruct(name, attributes);
                     else if (localName.equals("array"))
-                        ;
+                        builder.beginArray(name, attributes);
                     else if (localName.equals("prototype"))
-                        ;
+                        builder.beginArrayPrototype();
                     else if (localName.equals("field")) {
                         builder.beginField(name, attributes);
                         this.text.delete(0, this.text.length());
@@ -211,9 +215,9 @@ public class XmlDomSerializer implements KyouDomSerializer {
                     else if (localName.equals("struct"))
                         builder.endStruct();
                     else if (localName.equals("array"))
-                        ;
+                        builder.endArray();
                     else if (localName.equals("prototype"))
-                        ;
+                        builder.endArrayPrototype();
                     else if (localName.equals("field")) {
                         String text = StringEscapeUtils.unescapeXml(this.text.toString());
                         builder.endField(text);

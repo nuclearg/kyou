@@ -38,8 +38,8 @@ public class KyouStruct extends KyouContainer {
     public void add(String name, KyouItem item) {
         if (StringUtils.isBlank(name))
             throw new KyouException("name is blank");
-        if (!StringUtils.containsOnly(name, "_1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
-                || "1234567890".indexOf(name.charAt(0)) != -1)
+        if (!StringUtils.containsOnly(name, "_-1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+                || "1234567890-".indexOf(name.charAt(0)) != -1)
             throw new KyouException("name illegal");
         if (item == null)
             throw new KyouException("try add null as child");
@@ -173,7 +173,7 @@ public class KyouStruct extends KyouContainer {
     @Override
     public KyouStruct deepCopy() {
         KyouStruct copy = new KyouStruct();
-        copy.clearAndCopyAttributes(this.attributes);
+        copy.attributes.putAll(this.attributes);
 
         for (KyouItem child : this)
             copy.add(child.name, child.deepCopy());
@@ -184,7 +184,7 @@ public class KyouStruct extends KyouContainer {
     @Override
     public KyouStruct deepCopyStruct() {
         KyouStruct copy = new KyouStruct();
-        copy.clearAndCopyAttributes(this.attributes);
+        copy.attributes.putAll(this.attributes);
 
         for (KyouItem child : this)
             copy.add(child.name, child.deepCopyStruct());

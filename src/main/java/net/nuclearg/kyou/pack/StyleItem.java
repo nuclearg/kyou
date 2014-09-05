@@ -3,7 +3,7 @@ package net.nuclearg.kyou.pack;
 import java.util.List;
 
 import net.nuclearg.kyou.KyouException;
-import net.nuclearg.kyou.dom.query.KyouQuery;
+import net.nuclearg.kyou.pack.matcher.Matcher;
 import net.nuclearg.kyou.util.XmlUtils;
 
 import org.apache.commons.lang.StringUtils;
@@ -26,7 +26,7 @@ class StyleItem {
     /**
      * 该组包样式单元适用于的元素
      */
-    final KyouQuery target;
+    final Matcher target;
     /**
      * 段列表
      */
@@ -50,7 +50,11 @@ class StyleItem {
         String target = XmlUtils.selectText(e, "@target");
         if (StringUtils.isEmpty(target))
             throw new KyouException("targat is empty");
-        this.target = new KyouQuery(target);
+        try {
+            this.target = Matcher.parse(target);
+        } catch (Exception ex) {
+            throw new KyouException("target syntax error. target: " + target, ex);
+        }
 
         // 读取format
         String format = XmlUtils.selectText(e, "format");
@@ -61,6 +65,10 @@ class StyleItem {
         List<String> params = XmlUtils.selectTextList(e, "param");
 
         // 初始化segments
-        this.segments = Segment.parseFormatString(format, style.config.encoding, params);
+        try {
+            this.segments = Segment.parseFormatString(format, style.config.encoding, params);
+        } catch (Exception ex) {
+            throw new KyouException("expr syntax error.  target: " + target, ex);
+        }
     }
 }

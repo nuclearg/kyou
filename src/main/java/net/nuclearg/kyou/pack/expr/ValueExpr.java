@@ -18,7 +18,7 @@ import org.apache.commons.lang.StringUtils;
  * 
  */
 @ExprDescription(name = "v", postfix = ExprPostfix.None, typeIn = ValueType.Dom, typeOut = ValueType.String)
-public class ValueExpr extends Expr {
+class ValueExpr extends Expr {
 
     @Override
     protected Value eval(Value input, PackContext context) {

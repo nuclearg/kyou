@@ -19,7 +19,7 @@ import net.nuclearg.kyou.util.value.ValueType;
  * @author ng
  */
 @ExprDescription(name = "b2s", postfix = ExprPostfix.NoneOrString, typeIn = ValueType.Bytes, typeOut = ValueType.String)
-public class ConvertB2SExpr extends Expr {
+class ConvertB2SExpr extends Expr {
     /**
      * 转换时使用的编码
      */

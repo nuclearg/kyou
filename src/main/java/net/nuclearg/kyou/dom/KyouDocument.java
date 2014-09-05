@@ -29,4 +29,27 @@ public class KyouDocument extends KyouStruct {
 
         visitor.docEnd(this);
     }
+
+    @Override
+    public KyouDocument deepCopy() {
+        KyouDocument copy = new KyouDocument();
+        copy.attributes.putAll(this.attributes);
+
+        for (KyouItem child : this)
+            copy.add(child.name, child.deepCopy());
+
+        return copy;
+    }
+
+    @Override
+    public KyouDocument deepCopyStruct() {
+        KyouDocument copy = new KyouDocument();
+        copy.attributes.putAll(this.attributes);
+
+        for (KyouItem child : this)
+            copy.add(child.name, child.deepCopyStruct());
+
+        return copy;
+    }
+
 }

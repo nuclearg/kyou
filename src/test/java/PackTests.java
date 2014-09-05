@@ -1,4 +1,3 @@
-package net.nuclearg.kyou;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -6,6 +5,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.nuclearg.kyou.Kyou;
 import net.nuclearg.kyou.dom.KyouDocument;
 import net.nuclearg.kyou.pack.KyouPackStyle;
 import net.nuclearg.kyou.util.ByteOutputStream;

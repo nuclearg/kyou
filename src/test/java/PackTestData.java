@@ -1,4 +1,4 @@
-package net.nuclearg.kyou;
+
 
 import java.io.BufferedReader;
 import java.io.File;

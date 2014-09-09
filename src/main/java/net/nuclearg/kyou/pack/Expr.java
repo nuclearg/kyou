@@ -50,6 +50,10 @@ public abstract class Expr {
      * 表达式的后缀，整数形式。如果未提供后缀，或后缀不是整形则为-1
      */
     protected int postfixi;
+    /**
+     * 表达式的后缀，如果是{@link ExprPostfix#Complex}类型则将后缀解析为map，否则为null
+     */
+    protected Map<String, Object> postfixMap;
 
     /**
      * 计算该表达式
@@ -159,6 +163,11 @@ public abstract class Expr {
         ExprPostfix postfix();
 
         /**
+         * 复杂参数的字段列表
+         */
+        ComplexPostfixField[] complexPostfixFields() default {};
+
+        /**
          * 输入的类型
          */
         ValueType typeIn();
@@ -196,6 +205,22 @@ public abstract class Expr {
              * 表示参数可以没有后缀，或有一个整数类型的后缀
              */
             NoneOrInt,
+            /**
+             * 复杂类型
+             */
+            Complex,
+        }
+
+        /**
+         * 复杂参数的描述
+         * 
+         * @author ng
+         * 
+         */
+        public static @interface ComplexPostfixField {
+            String name();
+
+            ExprPostfix type();
         }
     }
 

@@ -14,6 +14,9 @@ import org.apache.commons.lang.StringUtils;
 /**
  * 求报文字段的值
  * 
+ * @in 要被获取值的报文字段
+ * @out 报文字段的值。如果输入的报文元素不是一个字段则报错，如果输入的报文字段的值为空则返回一个空字符串
+ * 
  * @author ng
  * 
  */

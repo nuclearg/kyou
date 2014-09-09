@@ -10,7 +10,10 @@ import net.nuclearg.kyou.util.value.Value;
 import net.nuclearg.kyou.util.value.ValueType;
 
 /**
- * 取当前节点的父节点
+ * 求当前节点的父节点
+ * 
+ * @in 要被获取父节点的报文元素
+ * @out 输入节点的父节点。如果该节点没有父节点（报文文档树的树根）则报错
  * 
  * @author ng
  * 

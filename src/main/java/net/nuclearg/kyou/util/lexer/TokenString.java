@@ -78,9 +78,23 @@ public class TokenString {
      * 
      * @param pos
      *            新的位置
+     * @return this
      */
-    public void pos(int pos) {
+    public TokenString pos(int pos) {
         this.pos = pos;
+        return this;
+    }
+
+    /**
+     * 将当前解析位置回退指定的字符数
+     * 
+     * @param bk
+     *            回退的字符数
+     * @return this
+     */
+    public TokenString backspace(int bk) {
+        this.pos -= bk;
+        return this;
     }
 
     @Override

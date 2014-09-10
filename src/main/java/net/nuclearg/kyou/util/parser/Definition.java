@@ -15,32 +15,31 @@ import net.nuclearg.kyou.util.lexer.TokenString;
  * 
  * @param <T>
  */
-public class Definition<T extends Enum<T> & TokenDefinition> implements SyntaxDefinition<T> {
+class Definition<T extends Enum<T> & TokenDefinition> extends SyntaxDefinition<T> {
     private final List<SyntaxDefinition<T>> elements;
 
-    private List<Token<T>> result = new ArrayList<Token<T>>();
-
-    public Definition(SyntaxDefinition<T>... elements) {
+    Definition(SyntaxDefinition<T>... elements) {
         this.elements = Arrays.asList(elements);
     }
 
     @Override
-    public boolean matches(TokenString tokenStr) {
+    int matches(TokenString tokenStr) {
         int pos = tokenStr.pos();
 
         for (SyntaxDefinition<T> element : this.elements)
-            if (element.matches(tokenStr))
-                this.result.addAll(element.tokens());
-            else {
+            if (element.matches(tokenStr) < 0) {
                 tokenStr.pos(pos);
-                return false;
+                return -1;
             }
 
-        return true;
+        return tokenStr.pos() - pos;
     }
 
     @Override
-    public List<Token<T>> tokens() {
-        return this.result;
+    List<Token<T>> tokens(TokenString tokenStr) {
+        List<Token<T>> result = new ArrayList<Token<T>>();
+        for (SyntaxDefinition<T> element : this.elements)
+            result.addAll(element.tokens(tokenStr));
+        return result;
     }
 }

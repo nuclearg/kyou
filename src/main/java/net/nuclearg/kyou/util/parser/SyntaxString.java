@@ -16,8 +16,8 @@ public class SyntaxString<T extends Enum<T> & TokenDefinition> {
 
     public List<Token<T>> parse(SyntaxDefinition<T> syntax) {
         TokenString tokenStr = new TokenString(str);
-        if (syntax.matches(tokenStr))
-            return syntax.tokens();
+        if (syntax.matches(tokenStr) >= 0)
+            return syntax.tokens(tokenStr.pos(0));
 
         throw new KyouException("syntax parse fail. text: " + this.str);
     }

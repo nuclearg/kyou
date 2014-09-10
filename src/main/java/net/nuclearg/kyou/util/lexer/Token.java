@@ -21,4 +21,9 @@ public class Token<T extends Enum<T>> {
         this.type = type;
         this.str = str;
     }
+
+    @Override
+    public String toString() {
+        return "[\"" + this.str + "\": " + this.type + "] ";
+    }
 }

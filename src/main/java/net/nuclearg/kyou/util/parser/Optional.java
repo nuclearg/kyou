@@ -1,5 +1,6 @@
 package net.nuclearg.kyou.util.parser;
 
+import java.util.Collections;
 import java.util.List;
 
 import net.nuclearg.kyou.util.lexer.Token;
@@ -13,24 +14,24 @@ import net.nuclearg.kyou.util.lexer.TokenString;
  * 
  * @param <T>
  */
-public class Optional<T extends Enum<T> & TokenDefinition> implements SyntaxDefinition<T> {
+class Optional<T extends Enum<T> & TokenDefinition> extends SyntaxDefinition<T> {
     private final SyntaxDefinition<T> body;
-    private List<Token<T>> result;
 
-    public Optional(SyntaxDefinition<T> body) {
+    Optional(SyntaxDefinition<T> body) {
         this.body = body;
     }
 
     @Override
-    public boolean matches(TokenString tokenStr) {
-        if (this.body.matches(tokenStr))
-            this.result = this.body.tokens();
-
-        return true;
+    int matches(TokenString tokenStr) {
+        return this.body.matches(tokenStr);
     }
 
     @Override
-    public List<Token<T>> tokens() {
-        return this.result;
+    List<Token<T>> tokens(TokenString tokenStr) {
+        int len;
+        if ((len = this.body.matches(tokenStr)) >= 0)
+            return this.body.tokens(tokenStr.backspace(len));
+        else
+            return Collections.emptyList();
     }
 }

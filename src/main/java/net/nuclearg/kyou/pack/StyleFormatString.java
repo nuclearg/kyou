@@ -1,5 +1,9 @@
 package net.nuclearg.kyou.pack;
 
+import static net.nuclearg.kyou.util.parser.SyntaxDefinition.leaf;
+import static net.nuclearg.kyou.util.parser.SyntaxDefinition.or;
+import static net.nuclearg.kyou.util.parser.SyntaxDefinition.repeat;
+
 import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.Iterator;
@@ -11,7 +15,8 @@ import net.nuclearg.kyou.KyouException;
 import net.nuclearg.kyou.util.ByteOutputStream;
 import net.nuclearg.kyou.util.lexer.Token;
 import net.nuclearg.kyou.util.lexer.TokenDefinition;
-import net.nuclearg.kyou.util.lexer.TokenString;
+import net.nuclearg.kyou.util.parser.SyntaxDefinition;
+import net.nuclearg.kyou.util.parser.SyntaxString;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -59,6 +64,16 @@ class StyleFormatString implements Iterable<byte[]> {
         }
     }
 
+    @SuppressWarnings("unchecked")
+    private static final SyntaxDefinition<FormatStringTokenType> SYNTAX =
+            repeat(
+            or(
+                    leaf(FormatStringTokenType.ParamChar),
+                    leaf(FormatStringTokenType.HexChar),
+                    leaf(FormatStringTokenType.EscapeChar),
+                    leaf(FormatStringTokenType.SimpleChar))
+            );
+
     /**
      * 段列表
      * <p>
@@ -87,21 +102,18 @@ class StyleFormatString implements Iterable<byte[]> {
 
         this.formatStr = formatStr;
 
-        /*
-         * 开始解析
-         */
+        // 解析样式字符串
+        SyntaxString<FormatStringTokenType> syntaxString = new SyntaxString<FormatStringTokenType>(formatStr);
+        List<Token<FormatStringTokenType>> tokens = syntaxString.parse(SYNTAX);
+
+        // 将每个词法元素对应到段上
         List<byte[]> segments = new LinkedList<byte[]>();
 
         ByteOutputStream os = new ByteOutputStream();
         StringBuilder builder = new StringBuilder();
 
-        TokenString tokenStr = new TokenString(formatStr);
-        while (!tokenStr.isEmpty())
-            try {
-                Token<FormatStringTokenType> token = tokenStr.next(FormatStringTokenType.values());
-                if (token == null)
-                    throw new KyouException("format string syntax error. formatStr: " + formatStr + ", pos: " + tokenStr.pos());
-
+        try {
+            for (Token<FormatStringTokenType> token : tokens)
                 switch (token.type) {
                     case ParamChar:
                         // 如果遇到一个参数段，则把之前的东西压成一个段
@@ -147,15 +159,15 @@ class StyleFormatString implements Iterable<byte[]> {
                     default:
                         throw new UnsupportedOperationException("token type = " + token.type);
                 }
-            } catch (Exception ex) {
-                throw new KyouException("parse format string fail. str: " + formatStr, ex);
-            }
 
-        // 把剩余的东西压成一个段
-        pushTextToBytes(builder, os, encoding);
-        pushBytesToSegments(os, segments);
+            // 把剩余的东西压成一个段
+            pushTextToBytes(builder, os, encoding);
+            pushBytesToSegments(os, segments);
 
-        this.segments = Collections.unmodifiableList(segments);
+            this.segments = Collections.unmodifiableList(segments);
+        } catch (Exception ex) {
+            throw new KyouException("format syntax error. format: " + formatStr, ex);
+        }
     }
 
     private static StringBuilder pushTextToBytes(StringBuilder builder, ByteOutputStream os, Charset encoding) {

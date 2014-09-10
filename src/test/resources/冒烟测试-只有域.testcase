@@ -12,12 +12,12 @@
     <config>
         <encoding>utf8</encoding>
     </config>
-
+    
     <style target="#">
         <format>{%}</format>
         <param>m</param>
     </style>
-
+    
     <style target="#.aaa">
         <format>"%":"%",</format>
         <param>s2b n</param>

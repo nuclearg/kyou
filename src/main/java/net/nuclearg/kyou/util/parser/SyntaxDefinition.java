@@ -6,8 +6,28 @@ import net.nuclearg.kyou.util.lexer.Token;
 import net.nuclearg.kyou.util.lexer.TokenDefinition;
 import net.nuclearg.kyou.util.lexer.TokenString;
 
-interface SyntaxDefinition<T extends Enum<T> & TokenDefinition> {
-    public boolean matches(TokenString tokenStr);
+public abstract class SyntaxDefinition<T extends Enum<T> & TokenDefinition> {
+    abstract int matches(TokenString tokenStr);
 
-    public List<Token<T>> tokens();
+    abstract List<Token<T>> tokens(TokenString tokenStr);
+
+    public static <T extends Enum<T> & TokenDefinition> SyntaxDefinition<T> define(SyntaxDefinition<T>... elements) {
+        return new Definition<T>(elements);
+    }
+
+    public static <T extends Enum<T> & TokenDefinition> SyntaxDefinition<T> leaf(T tokenType) {
+        return new Leaf<T>(tokenType);
+    }
+
+    public static <T extends Enum<T> & TokenDefinition> SyntaxDefinition<T> optional(SyntaxDefinition<T> body) {
+        return new Optional<T>(body);
+    }
+
+    public static <T extends Enum<T> & TokenDefinition> SyntaxDefinition<T> or(SyntaxDefinition<T>... conditions) {
+        return new Or<T>(conditions);
+    }
+
+    public static <T extends Enum<T> & TokenDefinition> SyntaxDefinition<T> repeat(SyntaxDefinition<T> body) {
+        return new Repeat<T>(body);
+    }
 }

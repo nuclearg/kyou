@@ -14,25 +14,30 @@ import net.nuclearg.kyou.util.lexer.TokenString;
  * 
  * @param <T>
  */
-public class Repeat<T extends Enum<T> & TokenDefinition> implements SyntaxDefinition<T> {
+class Repeat<T extends Enum<T> & TokenDefinition> extends SyntaxDefinition<T> {
     private final SyntaxDefinition<T> body;
 
-    private List<Token<T>> result = new ArrayList<Token<T>>();
-
-    public Repeat(SyntaxDefinition<T> body) {
+    Repeat(SyntaxDefinition<T> body) {
         this.body = body;
     }
 
     @Override
-    public boolean matches(TokenString tokenStr) {
-        while (this.body.matches(tokenStr))
-            this.result.addAll(this.body.tokens());
-
-        return true;
+    int matches(TokenString tokenStr) {
+        int sum = 0;
+        int len;
+        while ((len = this.body.matches(tokenStr)) >= 0)
+            sum += len;
+        return sum;
     }
 
     @Override
-    public List<Token<T>> tokens() {
-        return this.result;
+    List<Token<T>> tokens(TokenString tokenStr) {
+        List<Token<T>> result = new ArrayList<Token<T>>();
+
+        int len;
+        while ((len = this.body.matches(tokenStr)) >= 0)
+            result.addAll(this.body.tokens(tokenStr.backspace(len)));
+
+        return result;
     }
 }

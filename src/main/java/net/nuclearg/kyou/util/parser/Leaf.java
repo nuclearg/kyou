@@ -14,9 +14,8 @@ import net.nuclearg.kyou.util.lexer.TokenString;
  * 
  * @param <T>
  */
-public class Leaf<T extends Enum<T> & TokenDefinition> implements SyntaxDefinition<T> {
+class Leaf<T extends Enum<T> & TokenDefinition> extends SyntaxDefinition<T> {
     private final T type;
-    private Token<T> result;
 
     public Leaf(T type) {
         this.type = type;
@@ -24,14 +23,20 @@ public class Leaf<T extends Enum<T> & TokenDefinition> implements SyntaxDefiniti
 
     @Override
     @SuppressWarnings("unchecked")
-    public boolean matches(TokenString tokenStr) {
-        this.result = tokenStr.next(this.type);
-        return this.result != null;
+    int matches(TokenString tokenStr) {
+        Token<T> token = tokenStr.next(this.type);
+
+        if (token == null)
+            return -1;
+        else
+            return token.str.length();
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public List<Token<T>> tokens() {
-        return Arrays.asList(this.result);
+    List<Token<T>> tokens(TokenString tokenStr) {
+        Token<T> token = tokenStr.next(this.type);
+        return Arrays.asList(token);
     }
+
 }

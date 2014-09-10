@@ -4,26 +4,29 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import net.nuclearg.kyou.KyouException;
 import net.nuclearg.kyou.pack.Expr.ExprDescription;
 import net.nuclearg.kyou.util.ByteOutputStream;
-import net.nuclearg.kyou.util.FormatString;
+import net.nuclearg.kyou.util.lexer.Token;
+import net.nuclearg.kyou.util.lexer.TokenDefinition;
+import net.nuclearg.kyou.util.lexer.TokenString;
 import net.nuclearg.kyou.util.value.Value;
 import net.nuclearg.kyou.util.value.ValueType;
 
 import org.apache.commons.lang.StringUtils;
 
 /**
- * 组包片段，对应格式字符串{@link FormatString}中的一段
+ * 组包片段，对应格式字符串{@link StyleFormatString}中的一段
  * <p>
- * 存在{@link BytesSegment}和{@link ParamSegment}两个子类，分别对应{@link FormatString}中的字符串部分和参数部分
+ * 存在{@link BytesSegment}和{@link ParamSegment}两个子类，分别对应{@link StyleFormatString}中的字符串部分和参数部分
  * </p>
  * 
  * @author ng
  * 
  */
-abstract class Segment {
+abstract class StyleFormatSegment {
     /**
      * 将对应的字节输出到输出流中
      * 
@@ -45,10 +48,10 @@ abstract class Segment {
      *            参数列表
      * @return 这个格式字符串表示的多个组包段
      */
-    static List<Segment> parseFormatString(String formatStr, Charset encoding, List<String> params) {
-        FormatString format = new FormatString(formatStr, encoding);
+    static List<StyleFormatSegment> parseFormatString(String formatStr, Charset encoding, List<String> params) {
+        StyleFormatString format = new StyleFormatString(formatStr, encoding);
 
-        List<Segment> segments = new ArrayList<Segment>();
+        List<StyleFormatSegment> segments = new ArrayList<StyleFormatSegment>();
         int paramId = 0;
         for (byte[] bytes : format)
             // 判断这个段的类型
@@ -78,7 +81,7 @@ abstract class Segment {
      * @author ng
      * 
      */
-    private static class BytesSegment extends Segment {
+    private static class BytesSegment extends StyleFormatSegment {
         private final byte[] text;
 
         BytesSegment(byte[] text) {
@@ -97,21 +100,82 @@ abstract class Segment {
      * @author ng
      * 
      */
-    private static class ParamSegment extends Segment {
+    private static class ParamSegment extends StyleFormatSegment {
+        private static enum ParamStringToken implements TokenDefinition {
+            Space("\\s+"),
+            Body("[0-9a-z]+|\\d+"),
+            PostfixDelimiter("\\."),
+            SimplePostfix("\\w+"),
+            ComplexPostfixStart("\\["),
+            ComplexPostfixName("[a-zA-Z]+"),
+            ComplexPostfixNVDelimiter("\\["),
+            ComplexPostfixValueStart("\\'"),
+            ComplexPostfixValue("(\\w|\\\\\\')+"), // 所有字母、数字、下划线、汉字，或\'
+            ComplexPostfixValueEnd("\\'"),
+            ComplexPostfixValueDelimiter(","),
+            ComplexPostfixEnd("\\]"),
+
+            ;
+
+            private final Pattern regex;
+
+            private ParamStringToken(String regex) {
+                this.regex = Pattern.compile(regex);
+            }
+
+            @Override
+            public Pattern regex() {
+                return this.regex;
+            }
+        }
 
         private final List<Expr> exprChain;
 
-        ParamSegment(String param) {
-            if (StringUtils.isBlank(param))
+        ParamSegment(String paramStr) {
+            if (StringUtils.isBlank(paramStr))
                 throw new KyouException("param is blank");
 
-            // 将参数分段
-            String[] segments = StringUtils.split(param, ' ');
             List<Expr> exprChain = new ArrayList<Expr>();
 
-            // 创建一系列表达式
-            for (String segment : segments)
-                exprChain.add(Expr.parseExpr(segment));
+            // 解析参数字符串
+            TokenString tokenStr = new TokenString(paramStr);
+            Token<ParamStringToken> token;
+            while (!tokenStr.isEmpty())
+                try {
+                    // 去掉空白
+                    token = tokenStr.next(ParamStringToken.Space);
+                    if (token != null)
+                        continue;
+
+                    // 读取参数本体
+                    token = tokenStr.next(ParamStringToken.Body);
+                    if (token == null)
+                        throw new KyouException("param syntax error. expr expected. pos: " + tokenStr.pos());
+                    String body = token.str;
+
+                    // 读取后缀分隔符
+                    token = tokenStr.next(ParamStringToken.PostfixDelimiter);
+                    if (token == null) {
+                        // 没有后缀
+                        exprChain.add(Expr.buildExpr(body, (String) null));
+                        continue;
+                    }
+
+                    // 解析后缀
+                    token = tokenStr.next(ParamStringToken.SimplePostfix, ParamStringToken.ComplexPostfixStart);
+                    if (token == null)
+                        throw new KyouException("param syntax error. postfix expected. pos: " + tokenStr.pos());
+
+                    // 简单后缀
+                    if (token.type == ParamStringToken.SimplePostfix) {
+                        exprChain.add(Expr.buildExpr(body, token.str));
+                        continue;
+                    }
+
+                    // TODO 复杂后缀
+                } catch (Exception ex) {
+                    throw new KyouException("param syntax error. params: " + paramStr, ex);
+                }
 
             // 因为在实际组包时，是从最后一个表达式开始计算的，为省事现在在这里直接先倒序一下
             Collections.reverse(exprChain);

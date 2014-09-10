@@ -9,7 +9,6 @@ import net.nuclearg.kyou.Kyou;
 import net.nuclearg.kyou.dom.KyouDocument;
 import net.nuclearg.kyou.pack.KyouPackStyle;
 import net.nuclearg.kyou.util.ByteOutputStream;
-import net.nuclearg.kyou.util.FormatString;
 
 import org.apache.commons.lang.StringUtils;
 import org.junit.Assert;
@@ -60,7 +59,7 @@ public class PackTests extends ParentRunner<PackTestData> {
                 // expected bytes
                 @SuppressWarnings("resource")
                 ByteOutputStream os = new ByteOutputStream();
-                FormatString expected = new FormatString(child.expected, style.config.encoding);
+                StyleFormatString expected = new StyleFormatString(child.expected, style.config.encoding);
                 for (byte[] segment : expected)
                     if (segment == null)
                         throw new UnsupportedOperationException("result must simple");
@@ -74,7 +73,7 @@ public class PackTests extends ParentRunner<PackTestData> {
                 if (child.expected.contains("\\"))
                     expectedStr = null;
                 else
-                    expectedStr = new String(expectedBytes, style.config.encoding);
+                    expectedStr = child.expected;
 
                 /*
                  * pack

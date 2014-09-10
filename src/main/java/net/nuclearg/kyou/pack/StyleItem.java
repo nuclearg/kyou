@@ -30,7 +30,7 @@ class StyleItem {
     /**
      * 段列表
      */
-    final List<Segment> segments;
+    final List<StyleFormatSegment> segments;
 
     StyleItem(Element e, KyouPackStyle style) {
         this.style = style;
@@ -66,7 +66,7 @@ class StyleItem {
 
         // 初始化segments
         try {
-            this.segments = Segment.parseFormatString(format, style.config.encoding, params);
+            this.segments = StyleFormatSegment.parseFormatString(format, style.config.encoding, params);
         } catch (Exception ex) {
             throw new KyouException("expr syntax error.  target: " + target, ex);
         }

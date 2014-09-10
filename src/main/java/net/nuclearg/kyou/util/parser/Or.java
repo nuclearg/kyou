@@ -12,6 +12,7 @@ import net.nuclearg.kyou.util.lexer.TokenString;
  * 
  * @author ng
  * 
+ * @param <T>
  */
 class Or<T extends Enum<T> & TokenDefinition> extends SyntaxDefinition<T> {
     private final List<SyntaxDefinition<T>> conditions;

@@ -15,10 +15,10 @@ import net.nuclearg.kyou.util.lexer.TokenString;
  * 
  * @param <T>
  */
-class Definition<T extends Enum<T> & TokenDefinition> extends SyntaxDefinition<T> {
+class Define<T extends Enum<T> & TokenDefinition> extends SyntaxDefinition<T> {
     private final List<SyntaxDefinition<T>> elements;
 
-    Definition(SyntaxDefinition<T>... elements) {
+    Define(SyntaxDefinition<T>... elements) {
         this.elements = Arrays.asList(elements);
     }
 

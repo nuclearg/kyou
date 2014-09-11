@@ -1,9 +1,5 @@
 package net.nuclearg.kyou.pack;
 
-import static net.nuclearg.kyou.util.parser.SyntaxDefinition.leaf;
-import static net.nuclearg.kyou.util.parser.SyntaxDefinition.or;
-import static net.nuclearg.kyou.util.parser.SyntaxDefinition.repeat;
-
 import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.Iterator;
@@ -13,10 +9,9 @@ import java.util.regex.Pattern;
 
 import net.nuclearg.kyou.KyouException;
 import net.nuclearg.kyou.util.ByteOutputStream;
-import net.nuclearg.kyou.util.lexer.Token;
-import net.nuclearg.kyou.util.lexer.TokenDefinition;
-import net.nuclearg.kyou.util.parser.SyntaxDefinition;
-import net.nuclearg.kyou.util.parser.SyntaxString;
+import net.nuclearg.kyou.util.lexer.LexToken;
+import net.nuclearg.kyou.util.lexer.LexTokenDefinition;
+import net.nuclearg.kyou.util.lexer.LexTokenString;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -44,7 +39,13 @@ import org.apache.commons.lang.StringUtils;
  * 
  */
 class StyleFormatString implements Iterable<byte[]> {
-    private static enum FormatStringTokenType implements TokenDefinition {
+    /**
+     * 词法定义
+     * 
+     * @author ng
+     * 
+     */
+    private static enum Lex implements LexTokenDefinition {
         ParamChar("\\%"),
         HexChar("\\\\[0-9a-fA-F]{2}"),
         EscapeChar("\\\\[\\\\%rn]"),
@@ -54,7 +55,7 @@ class StyleFormatString implements Iterable<byte[]> {
 
         private final Pattern regex;
 
-        private FormatStringTokenType(String regex) {
+        private Lex(String regex) {
             this.regex = Pattern.compile(regex);
         }
 
@@ -63,16 +64,6 @@ class StyleFormatString implements Iterable<byte[]> {
             return this.regex;
         }
     }
-
-    @SuppressWarnings("unchecked")
-    private static final SyntaxDefinition<FormatStringTokenType> SYNTAX =
-            repeat(
-            or(
-                    leaf(FormatStringTokenType.ParamChar),
-                    leaf(FormatStringTokenType.HexChar),
-                    leaf(FormatStringTokenType.EscapeChar),
-                    leaf(FormatStringTokenType.SimpleChar))
-            );
 
     /**
      * 段列表
@@ -103,8 +94,7 @@ class StyleFormatString implements Iterable<byte[]> {
         this.formatStr = formatStr;
 
         // 解析样式字符串
-        SyntaxString<FormatStringTokenType> syntaxString = new SyntaxString<FormatStringTokenType>(formatStr);
-        List<Token<FormatStringTokenType>> tokens = syntaxString.parse(SYNTAX);
+        LexTokenString tokenStr = new LexTokenString(formatStr);
 
         // 将每个词法元素对应到段上
         List<byte[]> segments = new LinkedList<byte[]>();
@@ -112,8 +102,9 @@ class StyleFormatString implements Iterable<byte[]> {
         ByteOutputStream os = new ByteOutputStream();
         StringBuilder builder = new StringBuilder();
 
-        try {
-            for (Token<FormatStringTokenType> token : tokens)
+        while (!tokenStr.isEmpty())
+            try {
+                LexToken<Lex> token = tokenStr.next(Lex.values());
                 switch (token.type) {
                     case ParamChar:
                         // 如果遇到一个参数段，则把之前的东西压成一个段
@@ -159,15 +150,15 @@ class StyleFormatString implements Iterable<byte[]> {
                     default:
                         throw new UnsupportedOperationException("token type = " + token.type);
                 }
+            } catch (Exception ex) {
+                throw new KyouException("format syntax error. format: " + formatStr, ex);
+            }
 
-            // 把剩余的东西压成一个段
-            pushTextToBytes(builder, os, encoding);
-            pushBytesToSegments(os, segments);
+        // 把剩余的东西压成一个段
+        pushTextToBytes(builder, os, encoding);
+        pushBytesToSegments(os, segments);
 
-            this.segments = Collections.unmodifiableList(segments);
-        } catch (Exception ex) {
-            throw new KyouException("format syntax error. format: " + formatStr, ex);
-        }
+        this.segments = Collections.unmodifiableList(segments);
     }
 
     private static StringBuilder pushTextToBytes(StringBuilder builder, ByteOutputStream os, Charset encoding) {

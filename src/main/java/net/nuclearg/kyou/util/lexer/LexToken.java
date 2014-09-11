@@ -7,9 +7,9 @@ package net.nuclearg.kyou.util.lexer;
  * 
  * @param <T>
  */
-public class Token<T extends Enum<T>> {
+public class LexToken<T extends LexTokenDefinition> {
     /**
-     * 词法元素的类型，对应于{@link TokenDefinition}中由用户指定的类型
+     * 词法元素的类型，对应于{@link LexTokenDefinition}中由用户指定的类型
      */
     public final T type;
     /**
@@ -17,7 +17,7 @@ public class Token<T extends Enum<T>> {
      */
     public final String str;
 
-    Token(T type, String str) {
+    LexToken(T type, String str) {
         this.type = type;
         this.str = str;
     }

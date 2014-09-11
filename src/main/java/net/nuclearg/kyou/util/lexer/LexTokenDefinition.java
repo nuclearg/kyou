@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
  * @author ng
  * 
  */
-public interface TokenDefinition {
+public interface LexTokenDefinition {
     /**
      * 该词法元素对应的正则表达式
      */

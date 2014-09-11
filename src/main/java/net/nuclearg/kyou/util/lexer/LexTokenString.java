@@ -10,7 +10,7 @@ import net.nuclearg.kyou.KyouException;
  * @author ng
  * 
  */
-public class TokenString {
+public class LexTokenString {
     /**
      * 将被解析词法的字符串
      */
@@ -20,7 +20,7 @@ public class TokenString {
      */
     private int pos;
 
-    public TokenString(String str) {
+    public LexTokenString(String str) {
         if (str == null)
             throw new KyouException("string to parse token is null");
 
@@ -28,30 +28,38 @@ public class TokenString {
     }
 
     /**
+     * 获取由{@link LexTokenDefinition}描述的下一个{@link LexToken}
      * 
-     * 
-     * @param patterns
-     *            定义词法元素的正则表达式
-     * @return 满足这些正则的下一个词法元素，如果字符串从当前位置开始不满足任何一个词法元素的正则，则返回null
-     */
-    /**
-     * 获取由{@link TokenDefinition}描述的下一个{@link Token}
-     * 
-     * @param definitions
-     *            词法定义的列表，如果字符串的当前位置满足任何一个词法元素定义则将返回该词法元素
+     * @param definition
+     *            词法定义，如果字符串的当前位置满足该词法定义则返回该词法元素
      * @return 匹配出来的词法元素，如果无法匹配任何一个给定的词法元素定义则返回null
      */
-    public <T extends Enum<T> & TokenDefinition> Token<T> next(T... definitions) {
-        for (T definition : definitions) {
-            Matcher m = definition.regex().matcher(this.str);
+    public <T extends LexTokenDefinition> LexToken<T> next(T definition) {
+        Matcher m = definition.regex().matcher(this.str);
 
-            if (m.find(this.pos) && m.start() == pos) {
-                pos += m.end() - m.start();
+        if (m.find(this.pos) && m.start() == pos) {
+            pos += m.end() - m.start();
 
-                String str = this.str.substring(m.start(), m.end());
-                return new Token<T>(definition, str);
-            }
+            String str = this.str.substring(m.start(), m.end());
+            return new LexToken<T>(definition, str);
         }
+
+        return null;
+    }
+
+    /**
+     * 获取由{@link LexTokenDefinition}描述的下一个{@link LexToken}
+     * 
+     * @param definitions
+     *            词法定义的列表，如果字符串的当前位置满足任何一个词法定义则将返回该词法元素
+     * @return 匹配出来的词法元素，如果无法匹配任何一个给定的词法元素定义则返回null
+     */
+    public <T extends LexTokenDefinition> LexToken<T> next(T... definitions) {
+        LexToken<T> token;
+        for (T definition : definitions)
+            if ((token = this.next(definition)) != null)
+                return token;
+
         return null;
     }
 
@@ -80,7 +88,7 @@ public class TokenString {
      *            新的位置
      * @return this
      */
-    public TokenString pos(int pos) {
+    public LexTokenString pos(int pos) {
         this.pos = pos;
         return this;
     }
@@ -92,7 +100,7 @@ public class TokenString {
      *            回退的字符数
      * @return this
      */
-    public TokenString backspace(int bk) {
+    public LexTokenString backspace(int bk) {
         this.pos -= bk;
         return this;
     }

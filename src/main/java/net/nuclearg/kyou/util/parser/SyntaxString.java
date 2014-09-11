@@ -1,24 +1,23 @@
 package net.nuclearg.kyou.util.parser;
 
-import java.util.List;
+import net.nuclearg.kyou.util.lexer.LexTokenDefinition;
+import net.nuclearg.kyou.util.lexer.LexTokenString;
 
-import net.nuclearg.kyou.KyouException;
-import net.nuclearg.kyou.util.lexer.Token;
-import net.nuclearg.kyou.util.lexer.TokenDefinition;
-import net.nuclearg.kyou.util.lexer.TokenString;
-
-public class SyntaxString<T extends Enum<T> & TokenDefinition> {
+public class SyntaxString<L extends LexTokenDefinition, S extends SyntaxUnitDefinition<L>> {
     private final String str;
+    private final LexTokenString tokenStr;
 
     public SyntaxString(String str) {
         this.str = str;
+        this.tokenStr = new LexTokenString(str);
     }
 
-    public List<Token<T>> parse(SyntaxDefinition<T> syntax) {
-        TokenString tokenStr = new TokenString(str);
-        if (syntax.matches(tokenStr) >= 0)
-            return syntax.tokens(tokenStr.pos(0));
+    public SyntaxUnit<L, S> parse(S syntax) {
+        return syntax.syntax().match(this.tokenStr);
+    }
 
-        throw new KyouException("syntax parse fail. text: " + this.str);
+    @Override
+    public String toString() {
+        return this.str;
     }
 }

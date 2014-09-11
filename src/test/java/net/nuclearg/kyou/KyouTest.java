@@ -30,11 +30,11 @@ public class KyouTest {
 
         }
     }
-
-    @Test
-    public void testSaveDocument() {
-        fail("Not yet implemented");
-    }
+//
+//    @Test
+//    public void testSaveDocument() {
+//        fail("Not yet implemented");
+//    }
 
     @Test
     public void testLoadPackStyleInputStream() {

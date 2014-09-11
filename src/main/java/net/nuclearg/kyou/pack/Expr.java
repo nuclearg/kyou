@@ -13,6 +13,7 @@ import java.util.regex.Pattern;
 import net.nuclearg.kyou.KyouException;
 import net.nuclearg.kyou.pack.Expr.ExprDescription.ComplexPostfixField;
 import net.nuclearg.kyou.pack.Expr.ExprDescription.ExprPostfix;
+import net.nuclearg.kyou.pack.ParamString.ExprInfo;
 import net.nuclearg.kyou.util.ClassUtils;
 import net.nuclearg.kyou.util.value.Value;
 import net.nuclearg.kyou.util.value.ValueType;
@@ -278,61 +279,24 @@ public abstract class Expr {
     }
 
     /**
-     * 构建表达式
-     * 
-     * @param body
-     *            表达式的本体
-     * @param postfix
-     *            表达式的简单后缀
-     * @return 构建好的表达式实例
-     */
-    public static Expr buildExpr(String body, String postfix) {
-        // 如果是整数字面量则直接处理掉
-        if (StringUtils.isNumeric(body)) {
-            IntegerExpr expr = new IntegerExpr();
-            expr.postfix = body;
-            return expr;
-        }
-
-        Expr expr = buildExpr(body);
-        expr.postfix = postfix;
-        return expr;
-    }
-
-    /**
-     * 构建表达式
-     * 
-     * @param body
-     *            表达式的本体
-     * @param postfixMap
-     *            表达式的复杂后缀
-     * @return 构建好的表达式实例
-     */
-    public static Expr buildExpr(String body, Map<String, String> postfixMap) {
-        // 如果是整数字面量则直接处理掉
-        if (StringUtils.isNumeric(body)) {
-            IntegerExpr expr = new IntegerExpr();
-            expr.postfix = body;
-            return expr;
-        }
-
-        Expr expr = buildExpr(body);
-        expr.postfixMap = new HashMap<String, Object>(postfixMap);
-        return expr;
-    }
-
-    /**
      * 根据本体的字符串形式构建一个表达式实例
      * 
-     * @param body
+     * @param exprInfo
      *            表达式本体
      * @return 表达式实例
      */
-    private static Expr buildExpr(String body) {
+    static Expr buildExpr(ExprInfo exprInfo) {
+        // 判断是否是整数字面量
+        if (StringUtils.isNumeric(exprInfo.body)) {
+            IntegerExpr expr = new IntegerExpr();
+            expr.postfix = exprInfo.body;
+            return expr;
+        }
+
         // 根据body找到对应的类型
-        Class<? extends Expr> exprClass = EXPR_CLASSES.get(body);
+        Class<? extends Expr> exprClass = EXPR_CLASSES.get(exprInfo.body);
         if (exprClass == null)
-            throw new KyouException("expression unsupported. body: " + body);
+            throw new KyouException("expression unsupported. body: " + exprInfo.body);
 
         // 创建expr实例
         Expr expr;
@@ -341,7 +305,7 @@ public abstract class Expr {
 
             return expr;
         } catch (Exception ex) {
-            throw new KyouException("init expression fail. body: " + body, ex);
+            throw new KyouException("init expression fail. body: " + exprInfo.body, ex);
         }
     }
 

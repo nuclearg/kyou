@@ -8,9 +8,9 @@ import java.util.regex.Pattern;
 
 import net.nuclearg.kyou.KyouException;
 import net.nuclearg.kyou.util.ByteOutputStream;
-import net.nuclearg.kyou.util.lexer.Token;
-import net.nuclearg.kyou.util.lexer.TokenDefinition;
-import net.nuclearg.kyou.util.lexer.TokenString;
+import net.nuclearg.kyou.util.lexer.LexToken;
+import net.nuclearg.kyou.util.lexer.LexTokenDefinition;
+import net.nuclearg.kyou.util.lexer.LexTokenString;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -38,7 +38,7 @@ import org.apache.commons.lang.StringUtils;
  * 
  */
 class StyleFormatString implements Iterable<byte[]> {
-    private static enum FormatStringTokenType implements TokenDefinition {
+    private static enum FormatStringTokenType implements LexTokenDefinition {
         PARAM_CHAR("\\%"),
 
         HEX_CHAR("\\\\[0-9]{2}"),
@@ -97,10 +97,10 @@ class StyleFormatString implements Iterable<byte[]> {
         ByteOutputStream os = new ByteOutputStream();
         StringBuilder builder = new StringBuilder();
 
-        TokenString tokenStr = new TokenString(formatStr);
+        LexTokenString tokenStr = new LexTokenString(formatStr);
         while (!tokenStr.isEmpty())
             try {
-                Token<FormatStringTokenType> token = tokenStr.next(FormatStringTokenType.values());
+                LexToken<FormatStringTokenType> token = tokenStr.next(FormatStringTokenType.values());
                 if (token == null)
                     throw new KyouException("format string syntax error. formatStr: " + formatStr + ", pos: " + tokenStr.pos());
 

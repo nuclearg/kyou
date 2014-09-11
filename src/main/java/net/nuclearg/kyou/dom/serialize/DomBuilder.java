@@ -49,7 +49,7 @@ class DomBuilder {
     /**
      * 构建一个{@link KyouDocument}
      * 
-     * @param name
+     * @param body
      * @param attributes
      */
     void beginDocument(Map<String, String> attributes) {

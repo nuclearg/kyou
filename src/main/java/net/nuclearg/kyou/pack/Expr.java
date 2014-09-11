@@ -13,7 +13,7 @@ import java.util.Set;
 import net.nuclearg.kyou.KyouException;
 import net.nuclearg.kyou.pack.Expr.ExprDescription.ComplexPostfixField;
 import net.nuclearg.kyou.pack.Expr.ExprDescription.ExprPostfix;
-import net.nuclearg.kyou.pack.ParamString.ExprInfo;
+import net.nuclearg.kyou.pack.ExprListString.ExprInfo;
 import net.nuclearg.kyou.util.ClassUtils;
 import net.nuclearg.kyou.util.value.Value;
 import net.nuclearg.kyou.util.value.ValueType;
@@ -156,7 +156,11 @@ public abstract class Expr {
             String value = (String) map.get(field.name());
             int valuei = NumberUtils.toInt(value, -1);
 
-            checkValue(value, valuei, field.type());
+            try {
+                checkValue(value, valuei, field.type());
+            } catch (Exception ex) {
+                throw new KyouException("postfix check fail. field: " + field.name() + ", type: " + field.type() + ", value: " + value, ex);
+            }
 
             if (field.type() == ExprPostfix.Int || field.type() == ExprPostfix.NoneOrInt)
                 map.put(field.name(), valuei);

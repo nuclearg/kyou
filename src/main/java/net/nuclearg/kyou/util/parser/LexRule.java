@@ -14,10 +14,10 @@ import net.nuclearg.kyou.util.lexer.LexTokenString;
  * 
  * @param <T>
  */
-class LeafRule<L extends LexTokenDefinition> extends SyntaxRule<L> {
+class LexRule<L extends LexTokenDefinition> extends SyntaxRule<L> {
     private final L tokenType;
 
-    public LeafRule(L tokenType) {
+    public LexRule(L tokenType) {
         this.tokenType = tokenType;
     }
 

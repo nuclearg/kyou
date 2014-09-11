@@ -65,7 +65,7 @@ class AlignStringExpr extends Expr {
     private String alignLeft(String str, String padding, int len) {
         if (str.length() > len)
             // 如果长度超出期望则将右侧截掉
-            return str.substring(len);
+            return str.substring(0, len);
         else
             // 如果长度小于期望则向右边填补
             return StringUtils.rightPad(str, len, padding);
@@ -93,8 +93,8 @@ class AlignStringExpr extends Expr {
         super.check(prev);
 
         String align = (String) this.postfixMap.get("align");
-        if (!align.equals("left") && !align.equals("right"))
-            throw new KyouException("align must be 'left' or 'right'. align: " + align);
+        if (!align.equals("l") && !align.equals("r"))
+            throw new KyouException("align must be 'l' or 'r'. align: " + align);
 
         String padding = (String) this.postfixMap.get("padding");
         if (padding.isEmpty())

@@ -31,7 +31,7 @@ public abstract class SyntaxRule<L extends LexTokenDefinition> {
      * @return 基于词的语法规则
      */
     public static <L extends LexTokenDefinition> SyntaxRule<L> lex(L tokenType) {
-        return new LeafRule<L>(tokenType);
+        return new LexRule<L>(tokenType);
     }
 
     /**

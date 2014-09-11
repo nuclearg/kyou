@@ -20,10 +20,10 @@ import net.nuclearg.kyou.util.parser.SyntaxString;
 import net.nuclearg.kyou.util.parser.SyntaxUnit;
 import net.nuclearg.kyou.util.parser.SyntaxUnitDefinition;
 
-class ParamString {
+class ExprListString {
     private final String str;
 
-    ParamString(String str) {
+    ExprListString(String str) {
         this.str = str;
     }
 
@@ -49,21 +49,24 @@ class ParamString {
                 continue;
             }
 
-            postfixUnit = postfixUnit.children.get(0);
             if (postfixUnit.type == Syntax.SimplePostfix) {
                 // 解析简单后缀
-                String postfix = postfixUnit.tokens.get(0).str;
+                String postfix = postfixUnit.children.get(1).tokens.get(0).str;
 
                 result.add(new ExprInfo(body, postfix));
             } else {
                 // 解析复杂后缀
                 Map<String, String> complexPostfixMap = new HashMap<String, String>();
-                for (SyntaxUnit<Lex, Syntax> postfixFieldUnit : exprUnit.children) {
-                    if (postfixFieldUnit.type != Syntax.ComplexPostfixField)
-                        continue;
 
-                    String k = postfixFieldUnit.tokens.get(0).str;
-                    String v = postfixFieldUnit.tokens.get(3).str;
+                // size小于3表示start和end是紧挨着的，即postfix为空
+                if (postfixUnit.children.size() < 3) {
+                    result.add(new ExprInfo(body, complexPostfixMap));
+                    continue;
+                }
+
+                for (SyntaxUnit<Lex, Syntax> postfixFieldUnit : postfixUnit.children.get(1).children) {
+                    String k = postfixFieldUnit.children.get(1).tokens.get(0).str;
+                    String v = postfixFieldUnit.children.get(6).tokens.get(0).str;
 
                     complexPostfixMap.put(k, v);
                 }
@@ -83,13 +86,13 @@ class ParamString {
     private static enum Lex implements LexTokenDefinition {
         Space("\\s+"),
         Body("[0-9a-z]+|\\d+"),
-        PostfixDelimiter("\\."),
+        SimplePostfixDelimiter("\\."),
         SimplePostfix("\\w+"),
         ComplexPostfixStart("\\["),
-        ComplexPostfixName("[a-zA-Z]+"),
-        ComplexPostfixNVDelimiter("\\["),
+        ComplexPostfixName("[0-9a-zA-Z]+"),
+        ComplexPostfixNVDelimiter("\\="),
         ComplexPostfixValueStart("\\'"),
-        ComplexPostfixValue("(\\w|\\\\\\')+"), // 所有字母、数字、下划线、汉字，或\'
+        ComplexPostfixValue("(\\w|\\s)*"), // TODO 这个正则不正确
         ComplexPostfixValueEnd("\\'"),
         ComplexPostfixDelimiter(","),
         ComplexPostfixEnd("\\]"),
@@ -111,14 +114,21 @@ class ParamString {
     @SuppressWarnings("unchecked")
     private static enum Syntax implements SyntaxUnitDefinition<Lex> {
         ExprBody(lex(Lex.Body)),
-        SimplePostfix(lex(Lex.SimplePostfix)),
+        SimplePostfix(
+                seq(
+                        lex(Lex.SimplePostfixDelimiter),
+                        lex(Lex.SimplePostfix))),
         ComplexPostfixField(
                 seq(
+                        optional(lex(Lex.Space)),
                         lex(Lex.ComplexPostfixName),
+                        optional(lex(Lex.Space)),
                         lex(Lex.ComplexPostfixNVDelimiter),
+                        optional(lex(Lex.Space)),
                         lex(Lex.ComplexPostfixValueStart),
                         lex(Lex.ComplexPostfixValue),
                         lex(Lex.ComplexPostfixValueEnd),
+                        optional(lex(Lex.Space)),
                         optional(lex(Lex.ComplexPostfixDelimiter)),
                         optional(lex(Lex.Space)))),
         ComplexPostfix(
@@ -131,11 +141,8 @@ class ParamString {
                 seq(
                         ref(ExprBody),
                         or(
-                                seq(
-                                        lex(Lex.PostfixDelimiter),
-                                        or(
-                                                ref(ComplexPostfix),
-                                                ref(SimplePostfix))),
+                                ref(SimplePostfix),
+                                ref(ComplexPostfix),
                                 empty(Lex.class)))),
 
         ExprList(

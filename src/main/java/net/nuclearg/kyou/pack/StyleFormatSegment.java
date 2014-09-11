@@ -7,7 +7,7 @@ import java.util.List;
 
 import net.nuclearg.kyou.KyouException;
 import net.nuclearg.kyou.pack.Expr.ExprDescription;
-import net.nuclearg.kyou.pack.ParamString.ExprInfo;
+import net.nuclearg.kyou.pack.ExprListString.ExprInfo;
 import net.nuclearg.kyou.util.ByteOutputStream;
 import net.nuclearg.kyou.util.value.Value;
 import net.nuclearg.kyou.util.value.ValueType;
@@ -107,7 +107,7 @@ abstract class StyleFormatSegment {
             List<Expr> exprChain = new ArrayList<Expr>();
 
             // 解析参数字符串
-            ParamString paramString = new ParamString(paramStr);
+            ExprListString paramString = new ExprListString(paramStr);
             for (ExprInfo exprInfo : paramString.parseExprInfo())
                 exprChain.add(Expr.buildExpr(exprInfo));
             // 因为在实际组包时，是从最后一个表达式开始计算的，为省事现在在这里直接先倒序一下

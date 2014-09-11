@@ -7,23 +7,23 @@ import java.util.List;
 
 import net.nuclearg.kyou.KyouException;
 import net.nuclearg.kyou.pack.Expr.ExprDescription;
+import net.nuclearg.kyou.pack.ExprListString.ExprInfo;
 import net.nuclearg.kyou.util.ByteOutputStream;
-import net.nuclearg.kyou.util.FormatString;
 import net.nuclearg.kyou.util.value.Value;
 import net.nuclearg.kyou.util.value.ValueType;
 
 import org.apache.commons.lang.StringUtils;
 
 /**
- * 组包片段，对应格式字符串{@link FormatString}中的一段
+ * 组包片段，对应格式字符串{@link StyleFormatString}中的一段
  * <p>
- * 存在{@link BytesSegment}和{@link ParamSegment}两个子类，分别对应{@link FormatString}中的字符串部分和参数部分
+ * 存在{@link BytesSegment}和{@link ParamSegment}两个子类，分别对应{@link StyleFormatString}中的字符串部分和参数部分
  * </p>
  * 
  * @author ng
  * 
  */
-abstract class Segment {
+abstract class StyleFormatSegment {
     /**
      * 将对应的字节输出到输出流中
      * 
@@ -45,10 +45,10 @@ abstract class Segment {
      *            参数列表
      * @return 这个格式字符串表示的多个组包段
      */
-    static List<Segment> parseFormatString(String formatStr, Charset encoding, List<String> params) {
-        FormatString format = new FormatString(formatStr, encoding);
+    static List<StyleFormatSegment> parseFormatString(String formatStr, Charset encoding, List<String> params) {
+        StyleFormatString format = new StyleFormatString(formatStr, encoding);
 
-        List<Segment> segments = new ArrayList<Segment>();
+        List<StyleFormatSegment> segments = new ArrayList<StyleFormatSegment>();
         int paramId = 0;
         for (byte[] bytes : format)
             // 判断这个段的类型
@@ -78,7 +78,7 @@ abstract class Segment {
      * @author ng
      * 
      */
-    private static class BytesSegment extends Segment {
+    private static class BytesSegment extends StyleFormatSegment {
         private final byte[] text;
 
         BytesSegment(byte[] text) {
@@ -97,22 +97,19 @@ abstract class Segment {
      * @author ng
      * 
      */
-    private static class ParamSegment extends Segment {
-
+    private static class ParamSegment extends StyleFormatSegment {
         private final List<Expr> exprChain;
 
-        ParamSegment(String param) {
-            if (StringUtils.isBlank(param))
+        ParamSegment(String paramStr) {
+            if (StringUtils.isBlank(paramStr))
                 throw new KyouException("param is blank");
 
-            // 将参数分段
-            String[] segments = StringUtils.split(param, ' ');
             List<Expr> exprChain = new ArrayList<Expr>();
 
-            // 创建一系列表达式
-            for (String segment : segments)
-                exprChain.add(Expr.parseExpr(segment));
-
+            // 解析参数字符串
+            ExprListString paramString = new ExprListString(paramStr);
+            for (ExprInfo exprInfo : paramString.parseExprInfo())
+                exprChain.add(Expr.buildExpr(exprInfo));
             // 因为在实际组包时，是从最后一个表达式开始计算的，为省事现在在这里直接先倒序一下
             Collections.reverse(exprChain);
 

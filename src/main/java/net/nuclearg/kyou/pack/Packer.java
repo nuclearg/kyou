@@ -41,7 +41,7 @@ public class Packer {
         StyleItem style = selectStyle(context);
 
         // 处理style中的每一段，将处理结果作为报文体输出
-        for (Segment segment : style.segments)
+        for (StyleFormatSegment segment : style.segments)
             segment.export(context, os);
     }
 

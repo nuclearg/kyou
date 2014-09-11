@@ -7,10 +7,13 @@ import java.lang.annotation.Target;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import net.nuclearg.kyou.KyouException;
+import net.nuclearg.kyou.pack.Expr.ExprDescription.ComplexPostfixField;
 import net.nuclearg.kyou.pack.Expr.ExprDescription.ExprPostfix;
+import net.nuclearg.kyou.pack.ExprListString.ExprInfo;
 import net.nuclearg.kyou.util.ClassUtils;
 import net.nuclearg.kyou.util.value.Value;
 import net.nuclearg.kyou.util.value.ValueType;
@@ -50,6 +53,10 @@ public abstract class Expr {
      * 表达式的后缀，整数形式。如果未提供后缀，或后缀不是整形则为-1
      */
     protected int postfixi;
+    /**
+     * 表达式的后缀，如果是{@link ExprPostfix#Complex}类型则将后缀解析为map，否则为null
+     */
+    protected Map<String, Object> postfixMap;
 
     /**
      * 计算该表达式
@@ -91,26 +98,14 @@ public abstract class Expr {
     protected void check(Expr prev) {
         ExprDescription annotation = this.getClass().getAnnotation(ExprDescription.class);
 
-        // 检查自身是否有问题
-        switch (annotation.postfix()) {
-            case None:
-                check(this.postfix == null, "postfix must empty");
-                break;
-            case Int:
-                check(this.postfix != null, "postfix must not empty");
-                check(this.postfixi >= 0, "postfix must non negative integer");
-                break;
-            case String:
-                check(this.postfix != null, "postfix must not empty");
-                break;
-            case NoneOrInt:
-                check(this.postfix == null || this.postfixi > 0, "postfix must empty or non negative integer");
-                break;
-            case NoneOrString:
-                // 无需任何判断
-                break;
-            default:
-                throw new UnsupportedOperationException("expr postfix type: " + annotation.postfix());
+        // 检查自身的后缀是否有问题
+        try {
+            if (annotation.postfix() != ExprPostfix.Complex)
+                checkValue(this.postfix, this.postfixi, annotation.postfix());
+            else
+                checkComplexPostfix(this.postfixMap, annotation);
+        } catch (Exception ex) {
+            throw new KyouException("expr postfix syntax error. expr: " + this, ex);
         }
 
         // 检查和前一环节的表达式之间的衔接是否有问题
@@ -124,11 +119,60 @@ public abstract class Expr {
     }
 
     /**
+     * 检查给定的值是否满足类型的要求
+     * 
+     * @param value
+     * @param type
+     * @return 如果给定的值可以转为数字，则返回对应的数字，否则返回-1
+     */
+    private static void checkValue(String value, int valuei, ExprPostfix type) {
+        switch (type) {
+            case None:
+                ensure(value == null, "value must empty");
+                break;
+            case Int:
+                ensure(value != null, "value must not empty");
+                ensure(valuei >= 0, "value must non negative integer");
+                break;
+            case String:
+                ensure(value != null, "value must not empty");
+                break;
+            case NoneOrInt:
+                ensure(value == null || valuei > 0, "value must empty or non negative integer");
+                break;
+            case NoneOrString:
+                // 无需任何判断
+                break;
+            default:
+                throw new UnsupportedOperationException("expr postfix type: " + type);
+        }
+    }
+
+    /**
+     * 检查复杂后缀
+     */
+    private static void checkComplexPostfix(Map<String, Object> map, ExprDescription desc) {
+        for (ComplexPostfixField field : desc.complexPostfixFields()) {
+            String value = (String) map.get(field.name());
+            int valuei = NumberUtils.toInt(value, -1);
+
+            try {
+                checkValue(value, valuei, field.type());
+            } catch (Exception ex) {
+                throw new KyouException("postfix check fail. field: " + field.name() + ", type: " + field.type() + ", value: " + value, ex);
+            }
+
+            if (field.type() == ExprPostfix.Int || field.type() == ExprPostfix.NoneOrInt)
+                map.put(field.name(), valuei);
+        }
+    }
+
+    /**
      * 工具方法，不满足条件就抛异常
      */
-    private void check(boolean result, String err) {
+    private static void ensure(boolean result, String err) {
         if (!result)
-            throw new KyouException(err + " expr: " + this);
+            throw new KyouException(err);
     }
 
     @Override
@@ -157,6 +201,11 @@ public abstract class Expr {
          * 参数需要的后缀类型
          */
         ExprPostfix postfix();
+
+        /**
+         * 复杂参数的字段列表
+         */
+        ComplexPostfixField[] complexPostfixFields() default {};
 
         /**
          * 输入的类型
@@ -196,53 +245,60 @@ public abstract class Expr {
              * 表示参数可以没有后缀，或有一个整数类型的后缀
              */
             NoneOrInt,
+            /**
+             * 复杂类型
+             */
+            Complex,
+        }
+
+        /**
+         * 复杂参数的描述
+         * 
+         * @author ng
+         * 
+         */
+        public static @interface ComplexPostfixField {
+            String name();
+
+            ExprPostfix type();
         }
     }
 
     /**
-     * 将一个字符串解析为表达式
+     * 根据本体的字符串形式构建一个表达式实例
      * 
-     * @param exprStr
-     *            要解析为表达式的字符串
-     * @return 表达式
+     * @param exprInfo
+     *            表达式本体
+     * @return 表达式实例
      */
-    public static Expr parseExpr(String exprStr) {
-        // 如果是整数字面量则直接处理掉
-        if (StringUtils.isNumeric(exprStr)) {
-            IntegerExpr expr = new IntegerExpr();
-            expr.postfix = exprStr;
-            expr.postfixi = NumberUtils.toInt(exprStr);
-            return expr;
-        }
-
-        // 解析body和postfix
-        String body;
-        String postfix;
-
-        if (exprStr.contains(".")) {
-            int pos = exprStr.indexOf('.');
-            body = exprStr.substring(0, pos);
-            postfix = exprStr.substring(pos + 1);
-        } else {
-            body = exprStr;
-            postfix = null;
-        }
+    static Expr buildExpr(ExprInfo exprInfo) {
+        // 判断是否是整数字面量
+        if (StringUtils.isNumeric(exprInfo.body))
+            return new IntegerExpr(exprInfo.body);
 
         // 根据body找到对应的类型
-        Class<? extends Expr> exprClass = EXPR_CLASSES.get(body);
+        Class<? extends Expr> exprClass = EXPR_CLASSES.get(exprInfo.body);
         if (exprClass == null)
-            throw new KyouException("expression unsupported. expr: " + exprStr);
+            throw new KyouException("expression unsupported. body: " + exprInfo.body);
 
         // 创建expr实例
         Expr expr;
         try {
             expr = ClassUtils.newInstance(exprClass);
-            expr.postfix = postfix;
-            expr.postfixi = NumberUtils.toInt(postfix, -1);
+
+            expr.postfix = exprInfo.postfix;
+            expr.postfixi = NumberUtils.toInt(expr.postfix, -1);
+
+            if (exprInfo.complexPostfix == null)
+                return expr;
+
+            expr.postfixMap = new HashMap<String, Object>();
+            for (Entry<String, String> entry : exprInfo.complexPostfix.entrySet())
+                expr.postfixMap.put(entry.getKey(), entry.getValue());
 
             return expr;
         } catch (Exception ex) {
-            throw new KyouException("init expression fail. expr: " + exprStr, ex);
+            throw new KyouException("init expression fail. body: " + exprInfo.body, ex);
         }
     }
 
@@ -254,6 +310,12 @@ public abstract class Expr {
      */
     @ExprDescription(name = "", postfix = ExprPostfix.Int, typeIn = ValueType.Dom, typeOut = ValueType.Integer)
     private static class IntegerExpr extends Expr {
+
+        public IntegerExpr(String value) {
+            super.postfix = value;
+            super.postfixi = NumberUtils.toInt(value);
+            super.postfixMap = null;
+        }
 
         @Override
         protected Value eval(Value input, PackContext context) {

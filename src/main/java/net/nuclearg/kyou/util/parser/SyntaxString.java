@@ -1,5 +1,6 @@
 package net.nuclearg.kyou.util.parser;
 
+import net.nuclearg.kyou.KyouException;
 import net.nuclearg.kyou.util.lexer.LexTokenDefinition;
 import net.nuclearg.kyou.util.lexer.LexTokenString;
 
@@ -13,7 +14,12 @@ public class SyntaxString<L extends LexTokenDefinition, S extends SyntaxUnitDefi
     }
 
     public SyntaxUnit<L, S> parse(S syntax) {
-        return syntax.syntax().match(this.tokenStr);
+        SyntaxUnit<L, S> result = syntax.syntax().match(this.tokenStr);
+
+        if (!this.tokenStr.isEmpty())
+            throw new KyouException("syntax error. character left. str: " + str + ", left: " + this.tokenStr + ", syntax: " + syntax);
+
+        return result;
     }
 
     @Override

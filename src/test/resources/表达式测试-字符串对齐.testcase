@@ -24,31 +24,31 @@
 
     <style target="#.a">
         <format>%</format>
-        <param>s2b aligns[align=l,padding= ,len=5] v</param>
+        <param>s2b aligns[align='l',padding=' ',len='5'] v</param>
     </style>
     <style target="#.b">
         <format>%</format>
-        <param>s2b aligns[align=l,padding= ,len=2] v</param>
+        <param>s2b aligns[align='l',padding=' ',len='2'] v</param>
     </style>
     <style target="#.c">
         <format>%</format>
-        <param>s2b aligns[align=l,padding=xy,len=7] v</param>
+        <param>s2b aligns[align='l',padding='xy',len='7'] v</param>
     </style>
     <style target="#.d">
         <format>%</format>
-        <param>s2b aligns[align=r,padding= ,len=5] v</param>
+        <param>s2b aligns[align='r',padding='\'',len='5'] v</param>
     </style>
     <style target="#.e">
         <format>%</format>
-        <param>s2b aligns[align=r,padding= ,len=2] v</param>
+        <param>s2b aligns[align='r',padding=' ',len='2'] v</param>
     </style>
     <style target="#.f">
         <format>%</format>
-        <param>s2b aligns[align=r,padding=xy,len=7] v</param>
+        <param>s2b aligns[align='r',padding='xy',len='7'] v</param>
     </style>
 </pack>
 
 
 
 [[EXPECTED]]
-1    223xyxyxy    455xyxyxy6
+1    223xyxyxy''''455xyxyxy6

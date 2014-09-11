@@ -134,8 +134,8 @@ class ParamString {
                                 seq(
                                         lex(Lex.PostfixDelimiter),
                                         or(
-                                                ref(SimplePostfix),
-                                                ref(ComplexPostfix))),
+                                                ref(ComplexPostfix),
+                                                ref(SimplePostfix))),
                                 empty(Lex.class)))),
 
         ExprList(

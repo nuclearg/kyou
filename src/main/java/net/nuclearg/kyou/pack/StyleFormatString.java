@@ -13,8 +13,6 @@ import net.nuclearg.kyou.util.lexer.LexToken;
 import net.nuclearg.kyou.util.lexer.LexTokenDefinition;
 import net.nuclearg.kyou.util.lexer.LexTokenString;
 
-import org.apache.commons.lang.StringUtils;
-
 /**
  * 格式字符串
  * <p>
@@ -86,8 +84,6 @@ class StyleFormatString implements Iterable<byte[]> {
      *            编码
      */
     StyleFormatString(String formatStr, Charset encoding) {
-        if (StringUtils.isEmpty(formatStr))
-            throw new KyouException("str is empty");
         if (encoding == null)
             throw new KyouException("encoding is null");
 

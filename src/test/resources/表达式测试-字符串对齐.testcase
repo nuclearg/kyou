@@ -36,7 +36,7 @@
     </style>
     <style target="#.d">
         <format>%</format>
-        <param>s2b.gbk aligns[align='r',padding='_',len='5'] v</param>
+        <param>s2b.gbk aligns[align='r',padding='\'',len='5'] v</param>
     </style>
     <style target="#.e">
         <format>%</format>
@@ -51,4 +51,4 @@
 
 
 [[EXPECTED]]
-1    223xyxyxy____455xyxyxy6
+1    223xyxyxy''''455xyxyxy6

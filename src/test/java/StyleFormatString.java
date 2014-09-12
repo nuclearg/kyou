@@ -38,7 +38,7 @@ import org.apache.commons.lang.StringUtils;
  * 
  */
 class StyleFormatString implements Iterable<byte[]> {
-    private static enum FormatStringTokenType implements LexTokenDefinition {
+    private static enum Lex implements LexTokenDefinition {
         PARAM_CHAR("\\%"),
 
         HEX_CHAR("\\\\[0-9]{2}"),
@@ -51,7 +51,7 @@ class StyleFormatString implements Iterable<byte[]> {
 
         private final Pattern regex;
 
-        private FormatStringTokenType(String regex) {
+        private Lex(String regex) {
             this.regex = Pattern.compile(regex);
         }
 
@@ -100,7 +100,7 @@ class StyleFormatString implements Iterable<byte[]> {
         LexTokenString tokenStr = new LexTokenString(formatStr);
         while (!tokenStr.isEmpty())
             try {
-                LexToken<FormatStringTokenType> token = tokenStr.next(FormatStringTokenType.values());
+                LexToken<Lex> token = tokenStr.next(Lex.values());
                 if (token == null)
                     throw new KyouException("format string syntax error. formatStr: " + formatStr + ", pos: " + tokenStr.pos());
 

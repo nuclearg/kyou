@@ -19,32 +19,32 @@
         <encoding>utf8</encoding>
     </config>
 
-    <style target="document">
+    <style match="document">
         <format>%</format>
         <param>m</param>
     </style>
 
-    <style target="[a=1]">
+    <style match="[a=1]">
         <format>a=1</format>
     </style>
     
-    <style target="field[b]">
+    <style match="field[b]">
         <format>b=2</format>
     </style>
     
-    <style target="[head^=H]">
+    <style match="[head^=H]">
         <format>c=3</format>
     </style>
     
-    <style target="[tail$=ail]">
+    <style match="[tail$=ail]">
         <format>d=4</format>
     </style>
     
-    <style target="[e!=xxx]">
+    <style match="[e!=xxx]">
         <format>e=5</format>
     </style>
     
-    <style target="field">
+    <style match="field">
     	<format>%%</format>
     	<param>s2b n</param>
     	<param>s2b v</param>

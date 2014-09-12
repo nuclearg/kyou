@@ -75,7 +75,7 @@ public class Packer {
      */
     private static StyleItem selectStyle(PackContext context) {
         for (StyleItem style : context.style.styles)
-            if (style.target.matches(context.item))
+            if (style.matcher.matches(context.item))
                 return style;
 
         throw new KyouException("no style suitable. path: " + context.item.path() + ", item: " + context.item);

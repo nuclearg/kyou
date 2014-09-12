@@ -6,11 +6,17 @@ import net.nuclearg.kyou.KyouException;
 
 /**
  * 支持词法解析的字符串，可以按词法元素获取下一个词
+ * <p>
+ * 用户需要先通过实现{@link LexDefinition}的方式定义一系列的词法，然后尝试使用{@link #next()}方法从字符串的头部读取一个词法元素。
+ * <p>
+ * 如果读取成功，当前指针会向后移动相应的长度，于是可以继续使用{@link #next()}读取下一个词法元素，直到解析完整个字符串
+ * </p>
  * 
  * @author ng
  * 
+ * @param <T>
  */
-public class LexTokenString {
+public class LexString<T extends LexDefinition> {
     /**
      * 将被解析词法的字符串
      */
@@ -20,7 +26,7 @@ public class LexTokenString {
      */
     private int pos;
 
-    public LexTokenString(String str) {
+    public LexString(String str) {
         if (str == null)
             throw new KyouException("string to parse token is null");
 
@@ -28,13 +34,13 @@ public class LexTokenString {
     }
 
     /**
-     * 获取由{@link LexTokenDefinition}描述的下一个{@link LexToken}
+     * 尝试解析由{@link LexDefinition}描述的下一个{@link LexToken}
      * 
      * @param definition
      *            词法定义，如果字符串的当前位置满足该词法定义则返回该词法元素
      * @return 匹配出来的词法元素，如果无法匹配任何一个给定的词法元素定义则返回null
      */
-    public <T extends LexTokenDefinition> LexToken<T> next(T definition) {
+    public LexToken<T> tryToken(T definition) {
         Matcher m = definition.regex().matcher(this.str);
 
         if (m.find(this.pos) && m.start() == pos) {
@@ -48,28 +54,28 @@ public class LexTokenString {
     }
 
     /**
-     * 获取由{@link LexTokenDefinition}描述的下一个{@link LexToken}
+     * 尝试解析由{@link LexDefinition}描述的下一个{@link LexToken}
      * 
      * @param definitions
      *            词法定义的列表，如果字符串的当前位置满足任何一个词法定义则将返回该词法元素
      * @return 匹配出来的词法元素，如果无法匹配任何一个给定的词法元素定义则返回null
      */
-    public <T extends LexTokenDefinition> LexToken<T> next(T... definitions) {
+    public LexToken<T> tryToken(T... definitions) {
         LexToken<T> token;
         for (T definition : definitions)
-            if ((token = this.next(definition)) != null)
+            if ((token = this.tryToken(definition)) != null)
                 return token;
 
         return null;
     }
 
     /**
-     * 判断字符串是否为空，即当前是否仍有剩余的字符用于匹配词法元素
+     * 判断当前是否仍有待解析的剩余的字符
      * 
-     * @return 是否为空
+     * @return 是否有剩余
      */
-    public boolean isEmpty() {
-        return this.pos >= this.str.length();
+    public boolean hasRemaining() {
+        return this.pos < this.str.length();
     }
 
     /**
@@ -88,7 +94,7 @@ public class LexTokenString {
      *            新的位置
      * @return this
      */
-    public LexTokenString pos(int pos) {
+    public LexString<T> pos(int pos) {
         this.pos = pos;
         return this;
     }
@@ -100,7 +106,7 @@ public class LexTokenString {
      *            回退的字符数
      * @return this
      */
-    public LexTokenString backspace(int bk) {
+    public LexString<T> backspace(int bk) {
         this.pos -= bk;
         return this;
     }

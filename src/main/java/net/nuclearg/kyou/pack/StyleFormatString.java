@@ -10,8 +10,8 @@ import java.util.regex.Pattern;
 import net.nuclearg.kyou.KyouException;
 import net.nuclearg.kyou.util.ByteOutputStream;
 import net.nuclearg.kyou.util.lexer.LexToken;
-import net.nuclearg.kyou.util.lexer.LexTokenDefinition;
-import net.nuclearg.kyou.util.lexer.LexTokenString;
+import net.nuclearg.kyou.util.lexer.LexDefinition;
+import net.nuclearg.kyou.util.lexer.LexString;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -45,7 +45,7 @@ class StyleFormatString implements Iterable<byte[]> {
      * @author ng
      * 
      */
-    private static enum Lex implements LexTokenDefinition {
+    private static enum Lex implements LexDefinition {
         ParamChar("\\%"),
         HexChar("\\\\[0-9a-fA-F]{2}"),
         EscapeChar("\\\\[\\\\%rn]"),
@@ -94,7 +94,7 @@ class StyleFormatString implements Iterable<byte[]> {
         this.formatStr = formatStr;
 
         // 解析样式字符串
-        LexTokenString tokenStr = new LexTokenString(formatStr);
+        LexString<Lex> tokenStr = new LexString<Lex>(formatStr);
 
         // 将每个词法元素对应到段上
         List<byte[]> segments = new LinkedList<byte[]>();
@@ -102,9 +102,9 @@ class StyleFormatString implements Iterable<byte[]> {
         ByteOutputStream os = new ByteOutputStream();
         StringBuilder builder = new StringBuilder();
 
-        while (!tokenStr.isEmpty())
+        while (tokenStr.hasRemaining())
             try {
-                LexToken<Lex> token = tokenStr.next(Lex.values());
+                LexToken<Lex> token = tokenStr.tryToken(Lex.values());
                 switch (token.type) {
                     case ParamChar:
                         // 如果遇到一个参数段，则把之前的东西压成一个段

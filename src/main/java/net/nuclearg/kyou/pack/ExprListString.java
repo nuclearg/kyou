@@ -2,10 +2,10 @@ package net.nuclearg.kyou.pack;
 
 import static net.nuclearg.kyou.util.parser.SyntaxRule.empty;
 import static net.nuclearg.kyou.util.parser.SyntaxRule.lex;
-import static net.nuclearg.kyou.util.parser.SyntaxRule.optional;
+import static net.nuclearg.kyou.util.parser.SyntaxRule.opt;
 import static net.nuclearg.kyou.util.parser.SyntaxRule.or;
 import static net.nuclearg.kyou.util.parser.SyntaxRule.ref;
-import static net.nuclearg.kyou.util.parser.SyntaxRule.repeat;
+import static net.nuclearg.kyou.util.parser.SyntaxRule.rep;
 import static net.nuclearg.kyou.util.parser.SyntaxRule.seq;
 
 import java.util.ArrayList;
@@ -14,11 +14,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import net.nuclearg.kyou.util.lexer.LexTokenDefinition;
+import net.nuclearg.kyou.util.lexer.LexDefinition;
 import net.nuclearg.kyou.util.parser.SyntaxRule;
 import net.nuclearg.kyou.util.parser.SyntaxString;
-import net.nuclearg.kyou.util.parser.SyntaxUnit;
-import net.nuclearg.kyou.util.parser.SyntaxUnitDefinition;
+import net.nuclearg.kyou.util.parser.SyntaxTreeNode;
+import net.nuclearg.kyou.util.parser.SyntaxDefinition;
 
 class ExprListString {
     private final String str;
@@ -29,20 +29,20 @@ class ExprListString {
 
     List<ExprInfo> parseExprInfo() {
         SyntaxString<Lex, Syntax> syntaxStr = new SyntaxString<Lex, Syntax>(this.str);
-        SyntaxUnit<Lex, Syntax> root = syntaxStr.parse(Syntax.ExprList);
+        SyntaxTreeNode<Lex, Syntax> root = syntaxStr.tryParse(Syntax.ExprList);
 
         List<ExprInfo> result = new ArrayList<ExprInfo>();
 
         // 遍历exprlist，解析其中的每个expr
-        for (SyntaxUnit<Lex, Syntax> exprUnit : root.children) {
+        for (SyntaxTreeNode<Lex, Syntax> exprUnit : root.children) {
             exprUnit = exprUnit.children.get(0);
 
             // 解析body
-            SyntaxUnit<Lex, Syntax> bodyUnit = exprUnit.children.get(0);
-            String body = bodyUnit.tokens.get(0).str;
+            SyntaxTreeNode<Lex, Syntax> bodyUnit = exprUnit.children.get(0);
+            String body = bodyUnit.token.str;
 
             // 解析postfix
-            SyntaxUnit<Lex, Syntax> postfixUnit = exprUnit.children.get(1);
+            SyntaxTreeNode<Lex, Syntax> postfixUnit = exprUnit.children.get(1);
             if (postfixUnit.type == null) {
                 // 无后缀
                 result.add(new ExprInfo(body, (String) null));
@@ -51,7 +51,7 @@ class ExprListString {
 
             if (postfixUnit.type == Syntax.SimplePostfix) {
                 // 解析简单后缀
-                String postfix = postfixUnit.children.get(1).tokens.get(0).str;
+                String postfix = postfixUnit.children.get(1).token.str;
 
                 result.add(new ExprInfo(body, postfix));
             } else {
@@ -64,9 +64,9 @@ class ExprListString {
                     continue;
                 }
 
-                for (SyntaxUnit<Lex, Syntax> postfixFieldUnit : postfixUnit.children.get(1).children) {
-                    String k = postfixFieldUnit.children.get(1).tokens.get(0).str;
-                    String v = postfixFieldUnit.children.get(6).tokens.get(0).str;
+                for (SyntaxTreeNode<Lex, Syntax> postfixFieldUnit : postfixUnit.children.get(1).children) {
+                    String k = postfixFieldUnit.children.get(1).token.str;
+                    String v = postfixFieldUnit.children.get(6).token.str;
 
                     complexPostfixMap.put(k, v);
                 }
@@ -83,7 +83,7 @@ class ExprListString {
         return this.str;
     }
 
-    private static enum Lex implements LexTokenDefinition {
+    private static enum Lex implements LexDefinition {
         Space("\\s+"),
         Body("[0-9a-z]+|\\d+"),
         SimplePostfixDelimiter("\\."),
@@ -112,7 +112,7 @@ class ExprListString {
     }
 
     @SuppressWarnings("unchecked")
-    private static enum Syntax implements SyntaxUnitDefinition<Lex> {
+    private static enum Syntax implements SyntaxDefinition<Lex> {
         ExprBody(lex(Lex.Body)),
         SimplePostfix(
                 seq(
@@ -120,21 +120,21 @@ class ExprListString {
                         lex(Lex.SimplePostfix))),
         ComplexPostfixField(
                 seq(
-                        optional(lex(Lex.Space)),
+                        opt(lex(Lex.Space)),
                         lex(Lex.ComplexPostfixName),
-                        optional(lex(Lex.Space)),
+                        opt(lex(Lex.Space)),
                         lex(Lex.ComplexPostfixNVDelimiter),
-                        optional(lex(Lex.Space)),
+                        opt(lex(Lex.Space)),
                         lex(Lex.ComplexPostfixValueStart),
                         lex(Lex.ComplexPostfixValue),
                         lex(Lex.ComplexPostfixValueEnd),
-                        optional(lex(Lex.Space)),
-                        optional(lex(Lex.ComplexPostfixDelimiter)),
-                        optional(lex(Lex.Space)))),
+                        opt(lex(Lex.Space)),
+                        opt(lex(Lex.ComplexPostfixDelimiter)),
+                        opt(lex(Lex.Space)))),
         ComplexPostfix(
                 seq(
                         lex(Lex.ComplexPostfixStart),
-                        repeat(ref(ComplexPostfixField)),
+                        rep(ref(ComplexPostfixField)),
                         lex(Lex.ComplexPostfixEnd))),
 
         Expr(
@@ -146,10 +146,10 @@ class ExprListString {
                                 empty(Lex.class)))),
 
         ExprList(
-                repeat(
+                rep(
                 seq(
                         ref(Expr),
-                        optional(lex(Lex.Space))))), ;
+                        opt(lex(Lex.Space))))), ;
 
         private final SyntaxRule<Lex> syntax;
 

@@ -1,20 +1,17 @@
 package net.nuclearg.kyou.util.parser;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import net.nuclearg.kyou.util.lexer.LexDefinition;
+import net.nuclearg.kyou.util.lexer.LexString;
 import net.nuclearg.kyou.util.lexer.LexToken;
-import net.nuclearg.kyou.util.lexer.LexTokenDefinition;
-import net.nuclearg.kyou.util.lexer.LexTokenString;
 
 /**
- * 组成语法树最底层的叶子节点，对应一个词法单元
+ * 对应一个词法单元的语法规则
  * 
  * @author ng
  * 
- * @param <T>
+ * @param <L>
  */
-class LexRule<L extends LexTokenDefinition> extends SyntaxRule<L> {
+class LexRule<L extends LexDefinition> extends SyntaxRule<L> {
     private final L tokenType;
 
     public LexRule(L tokenType) {
@@ -22,16 +19,13 @@ class LexRule<L extends LexTokenDefinition> extends SyntaxRule<L> {
     }
 
     @Override
-    <S extends SyntaxUnitDefinition<L>> SyntaxUnit<L, S> match(LexTokenString tokenStr) {
-        LexToken<L> token = tokenStr.next(this.tokenType);
+    <S extends SyntaxDefinition<L>> SyntaxTreeNode<L, S> tryMatch(LexString<L> tokenStr) {
+        LexToken<L> token = tokenStr.tryToken(this.tokenType);
 
         if (token == null)
             return null;
 
-        List<LexToken<L>> tokens = new ArrayList<LexToken<L>>();
-        tokens.add(token);
-
-        return new SyntaxUnit<L, S>(null, null, tokens);
+        return new SyntaxTreeNode<L, S>(null, null, token);
     }
 
     @Override

@@ -26,7 +26,7 @@ class StyleItem {
     /**
      * 该组包样式单元适用于的元素
      */
-    final Matcher target;
+    final Matcher matcher;
     /**
      * 段列表
      */
@@ -47,26 +47,26 @@ class StyleItem {
          */
 
         // 初始化target
-        String target = XmlUtils.selectText(e, "@target");
-        if (StringUtils.isEmpty(target))
-            throw new KyouException("targat is empty");
+        String matchStr = XmlUtils.selectText(e, "@match");
+        if (StringUtils.isEmpty(matchStr))
+            throw new KyouException("match is empty");
         try {
-            this.target = Matcher.parse(target);
+            this.matcher = Matcher.parse(matchStr);
         } catch (Exception ex) {
-            throw new KyouException("target syntax error. target: " + target, ex);
+            throw new KyouException("target syntax error. target: " + matchStr, ex);
         }
 
         // 读取format
-        String format = XmlUtils.selectText(e, "format");
+        String formatStr = XmlUtils.selectText(e, "format");
 
         // 读取用户定义的参数
         List<String> params = XmlUtils.selectTextList(e, "param");
 
         // 初始化segments
         try {
-            this.segments = StyleFormatSegment.parseFormatString(format, style.config.encoding, params);
+            this.segments = StyleFormatSegment.parseFormatString(formatStr, style.config.encoding, params);
         } catch (Exception ex) {
-            throw new KyouException("expr syntax error.  target: " + target, ex);
+            throw new KyouException("expr syntax error.  target: " + matchStr, ex);
         }
     }
 }

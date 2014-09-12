@@ -31,24 +31,24 @@
         <encoding>utf8</encoding>
     </config>
 
-    <style target="#">
+    <style match="#">
         <format><![CDATA[<doc>%</doc>]]></format>
         <param>m</param>
     </style>
 
-    <style target="array">
+    <style match="array">
         <format>%</format>
         <param>m</param>
     </style>
 
-    <style target="field">
+    <style match="field">
         <format><![CDATA[<%>%</%>]]></format>
         <param>s2b n</param>
         <param>s2b v</param>
         <param>s2b n</param>
     </style>
 
-    <style target="struct">
+    <style match="struct">
         <format><![CDATA[<%>%</%>]]></format>
         <param>s2b n p</param>
         <param>m</param>

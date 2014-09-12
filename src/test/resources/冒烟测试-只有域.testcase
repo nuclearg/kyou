@@ -13,18 +13,18 @@
         <encoding>utf8</encoding>
     </config>
     
-    <style target="#">
+    <style match="#">
         <format>{%}</format>
         <param>m</param>
     </style>
     
-    <style target="#.aaa">
+    <style match="#.aaa">
         <format>"%":"%",</format>
         <param>s2b n</param>
         <param>s2b v</param>
     </style>
 
-    <style target="#.bbb">
+    <style match="#.bbb">
         <format>"%":"%"</format>
         <param>s2b n</param>
         <param>s2b v</param>

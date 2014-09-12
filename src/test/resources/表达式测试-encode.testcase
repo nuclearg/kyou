@@ -34,34 +34,34 @@
         <encoding>utf8</encoding>
     </config>
 
-    <style target="document">
+    <style match="document">
         <format>%</format>
         <param>m</param>
     </style>
 
-    <style target="struct">
+    <style match="struct">
         <format>%\r\n</format>
         <param>m</param>
     </style>
 
-    <style target="#url field">
+    <style match="#url field">
         <format>%</format>
         <param>s2b lowercases urlencode v</param>
     </style>
-    <style target="#url_gbk field">
+    <style match="#url_gbk field">
         <format>%</format>
         <param>s2b lowercases urlencode.gbk v</param>
     </style>
-    <style target="#xml field">
+    <style match="#xml field">
         <format>%</format>
         <param>s2b xmlencode v</param>
     </style>
-    <style target="#json field">
+    <style match="#json field">
         <format>%</format>
         <param>s2b jsonencode v</param>
     </style>
     
-    <style target="struct field">
+    <style match="struct field">
     	<format></format>
    	</style>
 </pack>

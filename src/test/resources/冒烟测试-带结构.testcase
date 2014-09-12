@@ -17,36 +17,36 @@
         <encoding>utf8</encoding>
     </config>
 
-    <style target="#">
+    <style match="#">
         <format>{%}</format>
         <param>m</param>
     </style>
 
-    <style target="#.aaa">
+    <style match="#.aaa">
         <format>"%":"%",</format>
         <param>s2b n</param>
         <param>s2b v</param>
     </style>
 
-    <style target="#.bbb">
+    <style match="#.bbb">
         <format>"%":"%",</format>
         <param>s2b n</param>
         <param>s2b v</param>
     </style>
 
-    <style target="#.sss">
+    <style match="#.sss">
         <format>"%":{%}</format>
         <param>s2b n</param>
         <param>m</param>
     </style>
     
-    <style target="#.sss.s1">
+    <style match="#.sss.s1">
         <format>"%":"%",</format>
         <param>s2b n</param>
         <param>s2b v</param>
     </style>   
 
-    <style target="#.sss.s2">
+    <style match="#.sss.s2">
         <format>"%":"%"</format>
         <param>s2b n</param>
         <param>s2b v</param>

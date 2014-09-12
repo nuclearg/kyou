@@ -17,32 +17,32 @@
         <encoding>utf8</encoding>
     </config>
 
-    <style target="document">
+    <style match="document">
         <format>%</format>
         <param>m</param>
     </style>
 
-    <style target="#.a">
+    <style match="#.a">
         <format>%</format>
         <param>s2b.gbk aligns[align='l',padding=' ',len='5'] v</param>
     </style>
-    <style target="#.b">
+    <style match="#.b">
         <format>%</format>
         <param>s2b.gbk aligns[ align = 'l' , padding = ' ' , len = '2' ] v</param>
     </style>
-    <style target="#.c">
+    <style match="#.c">
         <format>%</format>
         <param>s2b.gbk aligns[align='l',padding='xy',len='7'] v</param>
     </style>
-    <style target="#.d">
+    <style match="#.d">
         <format>%</format>
         <param>s2b.gbk aligns[align='r',padding='\'',len='5'] v</param>
     </style>
-    <style target="#.e">
+    <style match="#.e">
         <format>%</format>
         <param>s2b.gbk aligns[align='r',padding=' ',len='2'] v</param>
     </style>
-    <style target="#.f">
+    <style match="#.f">
         <format>%</format>
         <param>s2b.gbk aligns[align='r',padding='xy',len='7'] v</param>
     </style>

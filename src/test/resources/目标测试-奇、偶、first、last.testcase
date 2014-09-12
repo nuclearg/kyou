@@ -17,24 +17,24 @@
         <encoding>utf8</encoding>
     </config>
 
-    <style target="document">
+    <style match="document">
         <format>%</format>
         <param>m</param>
     </style>
 
-    <style target="field:first">
+    <style match="field:first">
         <format>[%</format>
         <param>s2b v</param>
     </style>
-    <style target="field:last">
+    <style match="field:last">
         <format>%]</format>
         <param>s2b v</param>
     </style>
-    <style target="field:odd">
+    <style match="field:odd">
         <format>/%/</format>
         <param>s2b v</param>
     </style>
-    <style target="field:even">
+    <style match="field:even">
         <format>_%_</format>
         <param>s2b v</param>
     </style>

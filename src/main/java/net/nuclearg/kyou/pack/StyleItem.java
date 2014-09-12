@@ -58,8 +58,6 @@ class StyleItem {
 
         // 读取format
         String format = XmlUtils.selectText(e, "format");
-        if (StringUtils.isEmpty(format))
-            throw new KyouException("format is empty. target: " + target);
 
         // 读取用户定义的参数
         List<String> params = XmlUtils.selectTextList(e, "param");

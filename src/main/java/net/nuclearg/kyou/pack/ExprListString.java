@@ -20,6 +20,8 @@ import net.nuclearg.kyou.util.parser.SyntaxString;
 import net.nuclearg.kyou.util.parser.SyntaxUnit;
 import net.nuclearg.kyou.util.parser.SyntaxUnitDefinition;
 
+import org.apache.commons.lang.StringUtils;
+
 class ExprListString {
     private final String str;
 
@@ -67,6 +69,7 @@ class ExprListString {
                 for (SyntaxUnit<Lex, Syntax> postfixFieldUnit : postfixUnit.children.get(1).children) {
                     String k = postfixFieldUnit.children.get(1).tokens.get(0).str;
                     String v = postfixFieldUnit.children.get(6).tokens.get(0).str;
+                    v = StringUtils.replace(v, "\\'", "'");
 
                     complexPostfixMap.put(k, v);
                 }
@@ -92,7 +95,7 @@ class ExprListString {
         ComplexPostfixName("[0-9a-zA-Z]+"),
         ComplexPostfixNVDelimiter("\\="),
         ComplexPostfixValueStart("\\'"),
-        ComplexPostfixValue("(\\w|\\s)*"), // TODO 这个正则不正确
+        ComplexPostfixValue("(\\\\'|[^'])*"),
         ComplexPostfixValueEnd("\\'"),
         ComplexPostfixDelimiter(","),
         ComplexPostfixEnd("\\]"),

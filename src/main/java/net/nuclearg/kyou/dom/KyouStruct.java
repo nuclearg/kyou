@@ -19,6 +19,7 @@ import org.apache.commons.lang.SystemUtils;
  * 
  */
 public class KyouStruct extends KyouContainer {
+    private static final String NAME_PATTERN = "[_a-zA-Z][-_0-9a-zA-Z]*";
     /**
      * 实际存放元素的map
      */
@@ -38,9 +39,8 @@ public class KyouStruct extends KyouContainer {
     public void add(String name, KyouItem item) {
         if (StringUtils.isBlank(name))
             throw new KyouException("name is blank");
-        if (!StringUtils.containsOnly(name, "_-1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
-                || "1234567890-".indexOf(name.charAt(0)) != -1)
-            throw new KyouException("name illegal");
+        if (!name.matches(NAME_PATTERN))
+            throw new KyouException("name illegal. name: " + name);
         if (item == null)
             throw new KyouException("try add null as child");
         if (item == this)

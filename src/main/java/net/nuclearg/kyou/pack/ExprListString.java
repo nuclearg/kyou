@@ -15,37 +15,51 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import net.nuclearg.kyou.util.lexer.LexDefinition;
+import net.nuclearg.kyou.util.parser.SyntaxDefinition;
 import net.nuclearg.kyou.util.parser.SyntaxRule;
 import net.nuclearg.kyou.util.parser.SyntaxString;
 import net.nuclearg.kyou.util.parser.SyntaxTreeNode;
-import net.nuclearg.kyou.util.parser.SyntaxDefinition;
 
+/**
+ * 表达式字符串，对应于组包样式中param的部分
+ * 
+ * @author ng
+ * 
+ */
 class ExprListString {
+    /**
+     * 原始的字符串
+     */
     private final String str;
 
     ExprListString(String str) {
         this.str = str;
     }
 
+    /**
+     * 将字符串解析为一系列的表达式信息。如果解析失败则抛异常
+     * 
+     * @return 解析出来的表达式信息列表
+     */
     List<ExprInfo> parseExprInfo() {
         SyntaxString<Lex, Syntax> syntaxStr = new SyntaxString<Lex, Syntax>(this.str);
-        SyntaxTreeNode<Lex, Syntax> root = syntaxStr.tryParse(Syntax.ExprList);
+        SyntaxTreeNode<Lex, Syntax> root = syntaxStr.tryParse(Syntax.Root);
 
         List<ExprInfo> result = new ArrayList<ExprInfo>();
 
-        // 遍历exprlist，解析其中的每个expr
+        // 遍历语法树，解析其中的每个expr
         for (SyntaxTreeNode<Lex, Syntax> exprUnit : root.children) {
             exprUnit = exprUnit.children.get(0);
 
-            // 解析body
-            SyntaxTreeNode<Lex, Syntax> bodyUnit = exprUnit.children.get(0);
-            String body = bodyUnit.token.str;
+            // 解析name
+            SyntaxTreeNode<Lex, Syntax> nameUnit = exprUnit.children.get(0);
+            String name = nameUnit.token.str;
 
             // 解析postfix
             SyntaxTreeNode<Lex, Syntax> postfixUnit = exprUnit.children.get(1);
             if (postfixUnit.type == null) {
                 // 无后缀
-                result.add(new ExprInfo(body, (String) null));
+                result.add(new ExprInfo(name, (String) null));
                 continue;
             }
 
@@ -53,14 +67,14 @@ class ExprListString {
                 // 解析简单后缀
                 String postfix = postfixUnit.children.get(1).token.str;
 
-                result.add(new ExprInfo(body, postfix));
+                result.add(new ExprInfo(name, postfix));
             } else {
                 // 解析复杂后缀
                 Map<String, String> complexPostfixMap = new HashMap<String, String>();
 
                 // size小于3表示start和end是紧挨着的，即postfix为空
                 if (postfixUnit.children.size() < 3) {
-                    result.add(new ExprInfo(body, complexPostfixMap));
+                    result.add(new ExprInfo(name, complexPostfixMap));
                     continue;
                 }
 
@@ -71,7 +85,7 @@ class ExprListString {
                     complexPostfixMap.put(k, v);
                 }
 
-                result.add(new ExprInfo(body, complexPostfixMap));
+                result.add(new ExprInfo(name, complexPostfixMap));
             }
         }
 
@@ -83,18 +97,96 @@ class ExprListString {
         return this.str;
     }
 
+    /**
+     * 表达式信息
+     * 
+     * @author ng
+     * 
+     */
+    static class ExprInfo {
+        /**
+         * 表达式本体
+         */
+        final String name;
+        /**
+         * 简单后缀
+         */
+        final String postfix;
+        /**
+         * 复杂后缀
+         */
+        final Map<String, String> complexPostfix;
+
+        ExprInfo(String body, String postfix) {
+            this.name = body;
+            this.postfix = postfix;
+            this.complexPostfix = null;
+        }
+
+        ExprInfo(String body, Map<String, String> complexPostfix) {
+            this.name = body;
+            this.postfix = null;
+            this.complexPostfix = complexPostfix;
+        }
+    }
+
+    /**
+     * 词法定义
+     * 
+     * @author ng
+     * 
+     */
     private static enum Lex implements LexDefinition {
+        /**
+         * 空白
+         */
         Space("\\s+"),
-        Body("[0-9a-z]+|\\d+"),
+
+        /**
+         * 表达式名称
+         */
+        Name("[0-9a-z]+|\\d+"),
+
+        /**
+         * 表达式的简单后缀的开始标志
+         */
         SimplePostfixDelimiter("\\."),
+        /**
+         * 表达式的简单后缀
+         */
         SimplePostfix("\\w+"),
+
+        /**
+         * 表达式的复杂后缀的开始标志
+         */
         ComplexPostfixStart("\\["),
+        /**
+         * 表达式的复杂后缀其中某一项的名称
+         */
         ComplexPostfixName("[0-9a-zA-Z]+"),
+        /**
+         * 表达式的复杂后缀其中某一项的名称与值的分隔符
+         */
         ComplexPostfixNVDelimiter("\\="),
+        /**
+         * 表达式的复杂后缀其中某一项的值的开始标志
+         */
         ComplexPostfixValueStart("\\'"),
+        /**
+         * 表达式的复杂后缀其中某一项的值
+         */
         ComplexPostfixValue("(\\w|\\s)*"), // TODO 这个正则不正确
+        /**
+         * 表达式的复杂后缀其中某一项的结束标志
+         */
         ComplexPostfixValueEnd("\\'"),
+        /**
+         * 表达式的复杂后缀其中的各项之间的分隔符
+         */
         ComplexPostfixDelimiter(","),
+        /**
+         * 表达式的复杂后缀的结束标志
+         */
         ComplexPostfixEnd("\\]"),
 
         ;
@@ -111,9 +203,16 @@ class ExprListString {
         }
     }
 
+    /**
+     * 语法定义
+     * 
+     * @author ng
+     * 
+     */
     @SuppressWarnings("unchecked")
     private static enum Syntax implements SyntaxDefinition<Lex> {
-        ExprBody(lex(Lex.Body)),
+        ExprName(
+                lex(Lex.Name)),
         SimplePostfix(
                 seq(
                         lex(Lex.SimplePostfixDelimiter),
@@ -139,13 +238,13 @@ class ExprListString {
 
         Expr(
                 seq(
-                        ref(ExprBody),
+                        ref(ExprName),
                         or(
                                 ref(SimplePostfix),
                                 ref(ComplexPostfix),
                                 empty(Lex.class)))),
 
-        ExprList(
+        Root(
                 rep(
                 seq(
                         ref(Expr),
@@ -160,24 +259,6 @@ class ExprListString {
         @Override
         public SyntaxRule<Lex> syntax() {
             return this.syntax;
-        }
-    }
-
-    static class ExprInfo {
-        final String body;
-        final String postfix;
-        final Map<String, String> complexPostfix;
-
-        ExprInfo(String body, String postfix) {
-            this.body = body;
-            this.postfix = postfix;
-            this.complexPostfix = null;
-        }
-
-        ExprInfo(String body, Map<String, String> complexPostfix) {
-            this.body = body;
-            this.postfix = null;
-            this.complexPostfix = complexPostfix;
         }
     }
 }

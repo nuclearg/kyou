@@ -177,109 +177,29 @@ public abstract class Expr {
 
     @Override
     public String toString() {
-        String body = this.getClass().getAnnotation(ExprDescription.class).name();
+        String name = this.getClass().getAnnotation(ExprDescription.class).name();
         if (this.postfix == null)
-            return body;
+            return name;
         else
-            return body + "." + this.postfix;
-    }
-
-    /**
-     * 标记在{@link Expr}的实现类上，为Param的实现类提供一些静态信息。
-     * 
-     * @author ng
-     */
-    @Target({ ElementType.TYPE })
-    @Retention(RetentionPolicy.RUNTIME)
-    public static @interface ExprDescription {
-        /**
-         * 参数的主体
-         */
-        String name();
-
-        /**
-         * 参数需要的后缀类型
-         */
-        ExprPostfix postfix();
-
-        /**
-         * 复杂参数的字段列表
-         */
-        ComplexPostfixField[] complexPostfixFields() default {};
-
-        /**
-         * 输入的类型
-         */
-        ValueType typeIn();
-
-        /**
-         * 输出的类型
-         */
-        ValueType typeOut();
-
-        /**
-         * 定义了参数的后缀类型
-         * 
-         * @author ng
-         */
-        public static enum ExprPostfix {
-            /**
-             * 表示参数不应有后缀
-             */
-            None,
-
-            /**
-             * 表示参数应当有一个字符串类型的后缀
-             */
-            String,
-            /**
-             * 表示参数应当有一个整数类型的后缀
-             */
-            Int,
-
-            /**
-             * 表示参数可以没有后缀，或有一个字符串类型的后缀
-             */
-            NoneOrString,
-            /**
-             * 表示参数可以没有后缀，或有一个整数类型的后缀
-             */
-            NoneOrInt,
-            /**
-             * 复杂类型
-             */
-            Complex,
-        }
-
-        /**
-         * 复杂参数的描述
-         * 
-         * @author ng
-         * 
-         */
-        public static @interface ComplexPostfixField {
-            String name();
-
-            ExprPostfix type();
-        }
+            return name + "." + this.postfix;
     }
 
     /**
      * 根据本体的字符串形式构建一个表达式实例
      * 
      * @param exprInfo
-     *            表达式本体
+     *            表达式信息
      * @return 表达式实例
      */
     static Expr buildExpr(ExprInfo exprInfo) {
         // 判断是否是整数字面量
-        if (StringUtils.isNumeric(exprInfo.body))
-            return new IntegerExpr(exprInfo.body);
+        if (StringUtils.isNumeric(exprInfo.name))
+            return new IntegerExpr(exprInfo.name);
 
         // 根据body找到对应的类型
-        Class<? extends Expr> exprClass = EXPR_CLASSES.get(exprInfo.body);
+        Class<? extends Expr> exprClass = EXPR_CLASSES.get(exprInfo.name);
         if (exprClass == null)
-            throw new KyouException("expression unsupported. body: " + exprInfo.body);
+            throw new KyouException("expression unsupported. name: " + exprInfo.name);
 
         // 创建expr实例
         Expr expr;
@@ -298,7 +218,87 @@ public abstract class Expr {
 
             return expr;
         } catch (Exception ex) {
-            throw new KyouException("init expression fail. body: " + exprInfo.body, ex);
+            throw new KyouException("init expression fail. name: " + exprInfo.name, ex);
+        }
+    }
+
+    /**
+     * 标记在{@link Expr}的实现类上，为{@link Expr}的实现类提供一些静态信息。
+     * 
+     * @author ng
+     */
+    @Target({ ElementType.TYPE })
+    @Retention(RetentionPolicy.RUNTIME)
+    public static @interface ExprDescription {
+        /**
+         * 表达式的名称
+         */
+        String name();
+
+        /**
+         * 表达式需要的后缀类型
+         */
+        ExprPostfix postfix();
+
+        /**
+         * 复杂表达式的字段列表
+         */
+        ComplexPostfixField[] complexPostfixFields() default {};
+
+        /**
+         * 输入数据的类型
+         */
+        ValueType typeIn();
+
+        /**
+         * 输出数据的类型
+         */
+        ValueType typeOut();
+
+        /**
+         * 定义了表达式的后缀类型
+         * 
+         * @author ng
+         */
+        public static enum ExprPostfix {
+            /**
+             * 表达式不应有后缀
+             */
+            None,
+
+            /**
+             * 表达式应当有一个字符串类型的后缀
+             */
+            String,
+            /**
+             * 表达式应当有一个整数类型的后缀
+             */
+            Int,
+
+            /**
+             * 表达式可以没有后缀，或有一个字符串类型的后缀
+             */
+            NoneOrString,
+            /**
+             * 表达式可以没有后缀，或有一个整数类型的后缀
+             */
+            NoneOrInt,
+            /**
+             * 表达式拥有一个复杂类型的后缀
+             */
+            Complex,
+        }
+
+        /**
+         * 复杂后缀的描述
+         * 
+         * @author ng
+         * 
+         */
+        public static @interface ComplexPostfixField {
+            String name();
+
+            ExprPostfix type();
         }
     }
 

@@ -1,5 +1,6 @@
 package net.nuclearg.kyou.util.parser;
 
+import net.nuclearg.kyou.KyouException;
 import net.nuclearg.kyou.util.lexer.LexDefinition;
 import net.nuclearg.kyou.util.lexer.LexString;
 
@@ -20,12 +21,12 @@ import net.nuclearg.kyou.util.lexer.LexString;
  */
 public class SyntaxString<L extends LexDefinition, S extends SyntaxDefinition<L>> {
     /**
-     * 底层的词法字符串
+     * 原始的待解析的字符串
      */
-    private final LexString<L> tokenStr;
+    private final String str;
 
     public SyntaxString(String str) {
-        this.tokenStr = new LexString<L>(str);
+        this.str = str;
     }
 
     /**
@@ -33,23 +34,23 @@ public class SyntaxString<L extends LexDefinition, S extends SyntaxDefinition<L>
      * 
      * @param syntax
      *            描述整棵语法树的语法定义
-     * @return ，如果解析失败则返回null
+     * @return 解析出来的语法树。果解析失败则报错
      */
     public SyntaxTreeNode<L, S> tryParse(S syntax) {
-        return syntax.syntax().tryMatch(this.tokenStr);
-    }
+        LexString<L> tokenStr = new LexString<L>(this.str);
+        SyntaxTreeNode<L, S> result = syntax.syntax().tryMatch(tokenStr);
 
-    /**
-     * 判断当前是否仍有待解析的剩余的字符
-     * 
-     * @return 是否有剩余
-     */
-    public boolean hasRemaining() {
-        return this.tokenStr.hasRemaining();
+        if (result == null)
+            throw new KyouException("syntax parse fail. text: " + this.str + ", syntax: " + syntax);
+
+        if (tokenStr.hasRemaining())
+            throw new KyouException("syntax parse fail. unexpected character left. str: " + this.str + ", left: " + tokenStr + ", tree: " + result);
+
+        return result;
     }
 
     @Override
     public String toString() {
-        return this.tokenStr.toString();
+        return this.str;
     }
 }

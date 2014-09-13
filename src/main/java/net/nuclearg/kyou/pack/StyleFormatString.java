@@ -9,14 +9,14 @@ import java.util.regex.Pattern;
 
 import net.nuclearg.kyou.KyouException;
 import net.nuclearg.kyou.util.ByteOutputStream;
-import net.nuclearg.kyou.util.lexer.LexToken;
 import net.nuclearg.kyou.util.lexer.LexDefinition;
 import net.nuclearg.kyou.util.lexer.LexString;
+import net.nuclearg.kyou.util.lexer.LexToken;
 
 import org.apache.commons.lang.StringUtils;
 
 /**
- * 格式字符串
+ * 格式字符串，对应于组包样式中format的部分
  * <p>
  * 格式字符串是kyou自定义的方式，用来表示组包格式。其中使用\作为转义符，支持字节的16进制表示。
  * <li>%表示参数</li>
@@ -40,31 +40,9 @@ import org.apache.commons.lang.StringUtils;
  */
 class StyleFormatString implements Iterable<byte[]> {
     /**
-     * 词法定义
-     * 
-     * @author ng
-     * 
+     * 原始的字符串
      */
-    private static enum Lex implements LexDefinition {
-        ParamChar("\\%"),
-        HexChar("\\\\[0-9a-fA-F]{2}"),
-        EscapeChar("\\\\[\\\\%rn]"),
-        SimpleChar("."),
-
-        ;
-
-        private final Pattern regex;
-
-        private Lex(String regex) {
-            this.regex = Pattern.compile(regex);
-        }
-
-        @Override
-        public Pattern regex() {
-            return this.regex;
-        }
-    }
-
+    private final String formatStr;
     /**
      * 段列表
      * <p>
@@ -72,10 +50,6 @@ class StyleFormatString implements Iterable<byte[]> {
      * </p>
      */
     private final List<byte[]> segments;
-    /**
-     * 原始的字符串
-     */
-    private final String formatStr;
 
     /**
      * 构造一个格式字符串
@@ -108,15 +82,15 @@ class StyleFormatString implements Iterable<byte[]> {
                 switch (token.type) {
                     case ParamChar:
                         // 如果遇到一个参数段，则把之前的东西压成一个段
-                        builder = pushTextToBytes(builder, os, encoding);
-                        os = pushBytesToSegments(os, segments);
+                        pushTextToBytes(builder, os, encoding);
+                        pushBytesToSegments(os, segments);
 
                         // 再压进去一个参数段
                         segments.add(null);
                         break;
                     case HexChar:
                         // 如果遇到一个十六进制字节则把之前的文本压到字节流里
-                        builder = pushTextToBytes(builder, os, encoding);
+                        pushTextToBytes(builder, os, encoding);
 
                         // 解析十六进制
                         String hex = token.str.substring(1);
@@ -161,24 +135,37 @@ class StyleFormatString implements Iterable<byte[]> {
         this.segments = Collections.unmodifiableList(segments);
     }
 
-    private static StringBuilder pushTextToBytes(StringBuilder builder, ByteOutputStream os, Charset encoding) {
+    /**
+     * 把builder里的东西压到os里，并清空builder
+     * 
+     * @param builder
+     * @param os
+     * @param encoding
+     */
+    private static void pushTextToBytes(StringBuilder builder, ByteOutputStream os, Charset encoding) {
         if (builder.length() <= 0)
-            return builder;
+            return;
 
         byte[] bytes = builder.toString().getBytes(encoding);
         os.write(bytes);
 
-        return new StringBuilder();
+        builder.delete(0, builder.length());
     }
 
-    private static ByteOutputStream pushBytesToSegments(ByteOutputStream os, List<byte[]> segments) {
+    /**
+     * 把os里的东西压到segments里，并清空os
+     * 
+     * @param os
+     * @param segments
+     */
+    private static void pushBytesToSegments(ByteOutputStream os, List<byte[]> segments) {
         byte[] bytes = os.export();
         if (bytes.length <= 0)
-            return os;
+            return;
 
         segments.add(bytes);
 
-        return new ByteOutputStream();
+        os.backspace(os.export().length);
     }
 
     /**
@@ -194,4 +181,41 @@ class StyleFormatString implements Iterable<byte[]> {
         return this.formatStr.toString();
     }
 
+    /**
+     * 词法定义
+     * 
+     * @author ng
+     * 
+     */
+    private static enum Lex implements LexDefinition {
+        /**
+         * 参数字符
+         */
+        ParamChar("\\%"),
+        /**
+         * 16进制字符
+         */
+        HexChar("\\\\[0-9a-fA-F]{2}"),
+        /**
+         * 转义字符
+         */
+        EscapeChar("\\\\[\\\\%rn]"),
+        /**
+         * 普通的字符
+         */
+        SimpleChar("."),
+
+        ;
+
+        private final Pattern regex;
+
+        private Lex(String regex) {
+            this.regex = Pattern.compile(regex);
+        }
+
+        @Override
+        public Pattern regex() {
+            return this.regex;
+        }
+    }
 }

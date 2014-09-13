@@ -12,13 +12,13 @@ public abstract class PipeMatcher extends Matcher {
     /**
      * 左侧的匹配器
      */
-    public Matcher left;
+    protected Matcher left;
     /**
      * 右侧的匹配器
      */
-    public Matcher right;
+    protected Matcher right;
 
-    public static PipeMatcher buildPipeMatcher(String name) {
+    public static PipeMatcher buildPipeMatcher(String name, Matcher left, Matcher right) {
         return null;
     }
 }

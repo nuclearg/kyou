@@ -1,13 +1,12 @@
 package net.nuclearg.kyou.pack.matcher;
 
-import static net.nuclearg.kyou.util.parser.SyntaxRule.empty;
 import static net.nuclearg.kyou.util.parser.SyntaxRule.lex;
+import static net.nuclearg.kyou.util.parser.SyntaxRule.nul;
 import static net.nuclearg.kyou.util.parser.SyntaxRule.or;
 import static net.nuclearg.kyou.util.parser.SyntaxRule.ref;
 import static net.nuclearg.kyou.util.parser.SyntaxRule.rep;
 import static net.nuclearg.kyou.util.parser.SyntaxRule.seq;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -31,43 +30,99 @@ import net.nuclearg.kyou.util.parser.SyntaxTreeNode;
  * @author ng
  * 
  */
-class MatchString {
+class MatcherString {
     private final String str;
 
-    MatchString(String str) {
+    MatcherString(String str) {
         this.str = str;
     }
 
     /**
-     * 将字符串解析为一系列匹配器信息，如果解析失败则抛异常
+     * 将字符串解析为一棵匹配器信息的树，如果解析失败则抛异常
      * 
-     * @return 解析出来的匹配器信息列表
+     * @return 解析出来的匹配器信息树
      */
-    List<MatcherInfo> parseMatcherInfo() {
+    MatcherInfo parseMatcherInfo() {
         SyntaxString<Lex, Syntax> syntaxStr = new SyntaxString<>(this.str);
         SyntaxTreeNode<Lex, Syntax> root = syntaxStr.parse(Syntax.Root);
 
-        List<MatcherInfo> result = new ArrayList<>();
-        System.out.println(result);
+        return this.parsePipeMatcherInfo(root, Syntax.Root);
+    }
 
-        // 遍历语法树，解析其中的每个匹配器
-        for (SyntaxTreeNode<Lex, Syntax> matcherNode : root.children)
-            switch (matcherNode.type) {
-                case AbsolutePath:
-                    break;
-                case NodeType:
-                    break;
-                case NodeName:
-                    break;
-                case Attribute:
-                    break;
-                case Filter:
-                    break;
-                default:
-                    throw new UnsupportedOperationException("matcher type " + matcherNode.type);
+    /**
+     * 将语法树节点翻译为匹配器信息
+     * 
+     * @param node
+     *            语法树节点
+     * @return 匹配器信息
+     */
+    private MatcherInfo parseMatcherInfo(SyntaxTreeNode<Lex, Syntax> node) {
+        switch (node.type) {
+            case MatcherListItem:
+            case MatcherGroup:
+                return this.parsePipeMatcherInfo(node, node.type);
+            case Matcher:
+                return this.parseMatcherInfo(node.children.get(0));
+            case AbsolutePath:
+                return this.parseAbsolutePathMatcherInfo(node);
+            case NodeType:
+                return new MatcherInfo(MatcherType.NodeType, node.token.str);
+            case NodeName:
+                return new MatcherInfo(MatcherType.NodeName, node.children.get(1).token.str);
+            case Attribute:
+            case Filter:
+            default:
+                throw new UnsupportedOperationException("syntax tree node type " + node.type);
+        }
+    }
+
+    /**
+     * 解析带管道的匹配器节点。这个方法是把多个匹配器信息拼成树的核心方法
+     * 
+     * @param parent
+     * @param nodeType
+     * @return
+     */
+    private MatcherInfo parsePipeMatcherInfo(SyntaxTreeNode<Lex, Syntax> parent, Syntax nodeType) {
+        SyntaxTreeNode<Lex, Syntax> firstChild = parent.children.get(0);
+        MatcherInfo current = parseMatcherInfo(firstChild);
+
+        // 判断有多少个MatcherListItem，这些节点之间应当用管道连接起来
+        List<SyntaxTreeNode<Lex, Syntax>> restChildren = parent.children.get(1).children;
+        for (SyntaxTreeNode<Lex, Syntax> node : restChildren) {
+            SyntaxTreeNode<Lex, Syntax> pipeNode = node.children.get(0);
+            SyntaxTreeNode<Lex, Syntax> childNode = node.children.get(1);
+
+            MatcherInfo child = this.parseMatcherInfo(childNode);
+
+            // 如果token为null表示这是一个And，需要特殊处理一下
+            String pipeName = pipeNode.token == null ? "" : pipeNode.token.str;
+            if (pipeName.length() > 0) {
+                pipeName = pipeName.trim(); // 把前后的空格trim掉
+                if (pipeName.length() == 0)// 如果trim光了，说明这是一个Ancestor，特殊处理一下
+                    pipeName = " ";
             }
 
-        return result;
+            MatcherInfo pipe = new MatcherInfo(pipeName, current, child);
+            current = pipe;
+        }
+
+        return current;
+    }
+
+    /**
+     * 解析绝对路径的匹配器信息
+     * 
+     * @param node
+     * @return
+     */
+    private MatcherInfo parseAbsolutePathMatcherInfo(SyntaxTreeNode<Lex, Syntax> node) {
+        StringBuilder builder = new StringBuilder("#");
+
+        for (SyntaxTreeNode<Lex, Syntax> child : node.children.get(1).children)
+            builder.append(child.children.get(0).token.str).append(child.children.get(1).token.str);
+
+        return new MatcherInfo(MatcherType.AbsolutePath, builder.toString());
     }
 
     /**
@@ -143,13 +198,21 @@ class MatchString {
          */
         final String filterParam;
 
+        /**
+         * 左侧节点
+         */
+        final MatcherInfo left;
+        /**
+         * 右侧节点
+         */
+        final MatcherInfo right;
+
         MatcherInfo(MatcherType type, String text) {
             this.type = type;
             this.text = text;
-            this.attrName = null;
-            this.attrOperator = null;
-            this.attrValue = null;
+            this.attrName = this.attrOperator = this.attrValue = null;
             this.filterParam = null;
+            this.left = this.right = null;
         }
 
         MatcherInfo(String attrName, String attrOperator, String attrValue) {
@@ -159,15 +222,23 @@ class MatchString {
             this.attrOperator = attrOperator;
             this.attrValue = attrValue;
             this.filterParam = null;
+            this.left = this.right = null;
         }
 
         MatcherInfo(MatcherType type, String filterName, String filterParam) {
             this.type = type;
             this.text = filterName;
-            this.attrName = null;
-            this.attrOperator = null;
-            this.attrValue = null;
+            this.attrName = this.attrOperator = this.attrValue = null;
             this.filterParam = filterParam;
+            this.left = this.right = null;
+        }
+
+        MatcherInfo(String pipeName, MatcherInfo left, MatcherInfo right) {
+            this.type = MatcherType.Pipe;
+            this.text = pipeName;
+            this.attrName = this.attrOperator = this.attrValue = null;
+            this.filterParam = null;
+            this.left = this.right = null;
         }
     }
 
@@ -182,6 +253,10 @@ class MatchString {
          * 空白
          */
         Space("\\s+"),
+        /**
+         * 一个空的占位符
+         */
+        Empty(""),
 
         /**
          * 井号
@@ -281,9 +356,11 @@ class MatchString {
                         lex(Lex.StringEnd))),
 
         AbsolutePath(
-                seq(lex(Lex.HashToken),
+                seq(
+                        lex(Lex.HashToken),
                         rep(
-                        seq(lex(Lex.DotToken),
+                        seq(
+                                lex(Lex.DotToken),
                                 lex(Lex.NodeName))))),
 
         NodeType(lex(Lex.NodeTypeKeyword)),
@@ -313,7 +390,7 @@ class MatchString {
                         lex(Lex.AttributeEnd))),
 
         FiliterNoneParam(
-                empty(Lex.class)),
+                nul(Lex.class)),
         FiliterIntegerParam(
                 seq(
                         lex(Lex.FilterParamStart),
@@ -334,7 +411,7 @@ class MatchString {
                                 ref(FiliterNoneParam)
                         ))),
 
-        AndPipe(empty(Lex.class)),
+        AndPipe(nul(Lex.class)),
 
         NormalPipe(lex(Lex.NormalPipeToken)),
 
@@ -346,7 +423,9 @@ class MatchString {
                         ref(NodeType),
                         ref(NodeName),
                         ref(Attribute),
-                        ref(Filter)))),
+                        ref(Filter),
+                        ref(AbsolutePath)
+                ))),
         MatcherGroup(
                 seq(
                         ref(Matcher),
@@ -362,13 +441,13 @@ class MatchString {
                                 ref(NormalPipe),
                                 ref(MatcherGroup))))),
 
-        Root(or(
+        Root(
                 seq(
                         ref(MatcherListItem),
-                        rep(seq(
+                        rep(
+                        seq(
                                 ref(OrPipe),
-                                ref(MatcherListItem)))),
-                ref(AbsolutePath))),
+                                ref(MatcherListItem))))),
 
         ;
 

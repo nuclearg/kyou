@@ -10,7 +10,7 @@ import net.nuclearg.kyou.util.lexer.LexString;
  * 
  * @param <L>
  */
-class EmptyRule<L extends LexDefinition> extends SyntaxRule<L> {
+class NullRule<L extends LexDefinition> extends SyntaxRule<L> {
 
     @Override
     <S extends SyntaxDefinition<L>> SyntaxTreeNode<L, S> tryMatch(LexString<L> tokenStr) {

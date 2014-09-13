@@ -3,10 +3,8 @@ package net.nuclearg.kyou.pack.expr;
 import java.nio.charset.Charset;
 
 import net.nuclearg.kyou.KyouException;
-import net.nuclearg.kyou.pack.Expr;
-import net.nuclearg.kyou.pack.Expr.ExprDescription;
-import net.nuclearg.kyou.pack.Expr.ExprDescription.ExprPostfix;
 import net.nuclearg.kyou.pack.PackContext;
+import net.nuclearg.kyou.pack.expr.ExprDescription.ExprPostfix;
 import net.nuclearg.kyou.util.value.Value;
 import net.nuclearg.kyou.util.value.ValueType;
 
@@ -20,14 +18,14 @@ import net.nuclearg.kyou.util.value.ValueType;
  * @author ng
  */
 @ExprDescription(name = "b2s", postfix = ExprPostfix.NoneOrString, typeIn = ValueType.Bytes, typeOut = ValueType.String)
-class ConvertBytes2StringExpr extends Expr {
+class ConvertBytes2String extends Expr {
     /**
      * 转换时使用的编码
      */
     private Charset encoding;
 
     @Override
-    protected Value eval(Value input, PackContext context) {
+    public Value eval(Value input, PackContext context) {
         Charset encoding = this.encoding == null ? context.style.config.encoding : this.encoding;
 
         return new Value(new String(input.bytesValue, encoding));

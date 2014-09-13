@@ -1,7 +1,7 @@
 package net.nuclearg.kyou.pack.matcher;
 
-import net.nuclearg.kyou.pack.matcher.MatchString.Lex;
-import net.nuclearg.kyou.pack.matcher.MatchString.Syntax;
+import net.nuclearg.kyou.pack.matcher.MatcherString.Lex;
+import net.nuclearg.kyou.pack.matcher.MatcherString.Syntax;
 import net.nuclearg.kyou.util.parser.SyntaxString;
 import net.nuclearg.kyou.util.parser.SyntaxTreeNode;
 
@@ -68,11 +68,14 @@ public class MatcherStrTest {
         test("struct#kkk[a='3']:asdf(12)");
         test("#a , #b");
         test("struct > #aaa[asdf^='ddd']");
+        test("struct > field , array > field, #head field");
     }
 
     private void test(String str) {
         SyntaxString<Lex, Syntax> syntaxStr = new SyntaxString<>(str);
         SyntaxTreeNode<Lex, Syntax> root = syntaxStr.parse(Syntax.Root);
+
+        System.out.println("==========");
         System.out.println(root);
     }
 }

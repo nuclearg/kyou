@@ -1,10 +1,8 @@
 package net.nuclearg.kyou.pack.expr;
 
 import net.nuclearg.kyou.KyouException;
-import net.nuclearg.kyou.pack.Expr;
-import net.nuclearg.kyou.pack.Expr.ExprDescription;
-import net.nuclearg.kyou.pack.Expr.ExprDescription.ExprPostfix;
 import net.nuclearg.kyou.pack.PackContext;
+import net.nuclearg.kyou.pack.expr.ExprDescription.ExprPostfix;
 import net.nuclearg.kyou.util.value.Value;
 import net.nuclearg.kyou.util.value.ValueType;
 
@@ -19,9 +17,9 @@ import net.nuclearg.kyou.util.value.ValueType;
  * 
  */
 @ExprDescription(name = "s2i", postfix = ExprPostfix.NoneOrInt, typeIn = ValueType.String, typeOut = ValueType.Integer)
-class ConvertString2IntegerExpr extends Expr {
+class ConvertString2Integer extends Expr {
     @Override
-    protected Value eval(Value input, PackContext context) {
+    public Value eval(Value input, PackContext context) {
         return new Value(Integer.parseInt(input.strValue, this.postfixi));
     }
 

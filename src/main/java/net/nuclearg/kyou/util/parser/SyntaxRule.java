@@ -103,8 +103,8 @@ public abstract class SyntaxRule<L extends LexDefinition> {
      *            该语法规则对应的词法定义的类型
      * @return 一个空的语法规则
      */
-    public static <L extends LexDefinition> SyntaxRule<L> empty(Class<L> cls) {
-        return new EmptyRule<>();
+    public static <L extends LexDefinition> SyntaxRule<L> nul(Class<L> cls) {
+        return new NullRule<>();
     }
 
 }

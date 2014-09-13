@@ -1,20 +1,19 @@
-package net.nuclearg.kyou.pack;
+package net.nuclearg.kyou.pack.expr;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import net.nuclearg.kyou.KyouException;
-import net.nuclearg.kyou.pack.Expr.ExprDescription.ComplexPostfixField;
-import net.nuclearg.kyou.pack.Expr.ExprDescription.ExprPostfix;
-import net.nuclearg.kyou.pack.ExprListString.ExprInfo;
+import net.nuclearg.kyou.pack.PackContext;
+import net.nuclearg.kyou.pack.expr.ExprDescription.ComplexPostfixField;
+import net.nuclearg.kyou.pack.expr.ExprDescription.ExprPostfix;
+import net.nuclearg.kyou.pack.expr.ExprString.ExprInfo;
 import net.nuclearg.kyou.util.ClassUtils;
+import net.nuclearg.kyou.util.ClassUtils.AnnotationNameParser;
 import net.nuclearg.kyou.util.value.Value;
 import net.nuclearg.kyou.util.value.ValueType;
 
@@ -44,7 +43,14 @@ import org.apache.commons.lang.math.NumberUtils;
  * @author ng
  */
 public abstract class Expr {
-    private static final Map<String, Class<? extends Expr>> EXPR_CLASSES;
+    private static final Map<String, Class<? extends Expr>> EXPR_CLASSES = ClassUtils.buildAnnotatedClassMap(ExprDescription.class, Expr.class, new AnnotationNameParser<ExprDescription>() {
+
+        @Override
+        public String parseName(ExprDescription annotation) {
+            return annotation.name();
+        }
+    });
+
     /**
      * 表达式的后缀 如果未提供后缀则为null
      */
@@ -67,27 +73,7 @@ public abstract class Expr {
      *            组包上下文
      * @return 表达式的计算结果
      */
-    protected abstract Value eval(Value input, PackContext context);
-
-    static {
-        Map<String, Class<? extends Expr>> exprClasses = new HashMap<>();
-
-        Set<Class<?>> classes = ClassUtils.searchClassesWithAnnotation(ExprDescription.class);
-        for (Class<?> cls : classes) {
-            ExprDescription desc = cls.getAnnotation(ExprDescription.class);
-            if (desc == null)
-                continue;
-
-            String name = desc.name();
-
-            if (exprClasses.containsKey(name))
-                throw new KyouException("expr name duplicated. old: " + exprClasses.get(name) + ", new: " + cls);
-
-            exprClasses.put(name, cls.asSubclass(Expr.class));
-        }
-
-        EXPR_CLASSES = Collections.unmodifiableMap(exprClasses);
-    }
+    public abstract Value eval(Value input, PackContext context);
 
     /**
      * 检查当前表达式是否存在问题，以及和前一个表达式之间的衔接是否有问题
@@ -183,6 +169,43 @@ public abstract class Expr {
     }
 
     /**
+     * 解析参数字符串并创建一系列表达式
+     * 
+     * @param str
+     *            参数字符串
+     * @return 解析出来的表达式列表
+     */
+    public static List<Expr> buildExprList(String str) {
+        if (StringUtils.isBlank(str))
+            throw new KyouException("param is blank");
+
+        List<Expr> exprChain = new ArrayList<>();
+
+        // 解析参数字符串
+        ExprString paramStr = new ExprString(str);
+        for (ExprInfo exprInfo : paramStr.parseExprInfo())
+            exprChain.add(Expr.buildExpr(exprInfo));
+
+        // 因为在实际组包时，是从最后一个表达式开始计算的，为省事现在在这里直接先倒序一下
+        Collections.reverse(exprChain);
+
+        // 检查各个表达式的正确性，以及与前一个表达式的衔接是否有问题
+        for (int i = 0; i < exprChain.size(); i++) {
+            Expr expr = exprChain.get(i);
+            Expr prev = i > 0 ? exprChain.get(i - 1) : null;
+
+            expr.check(prev);
+        }
+        // 检查最后一个表达式的输出是不是字节数组或Backspace
+        Expr last = exprChain.get(exprChain.size() - 1);
+        ValueType lastOutput = last.getClass().getAnnotation(ExprDescription.class).typeOut();
+        if (lastOutput != ValueType.Bytes && lastOutput != ValueType.Backspace)
+            throw new KyouException("last expr must return Bytes or Backspace but " + lastOutput);
+
+        return Collections.unmodifiableList(exprChain);
+    }
+
+    /**
      * 根据本体的字符串形式构建一个表达式实例
      * 
      * @param exprInfo
@@ -192,7 +215,7 @@ public abstract class Expr {
     static Expr buildExpr(ExprInfo exprInfo) {
         // 判断是否是整数字面量
         if (StringUtils.isNumeric(exprInfo.name))
-            return new IntegerExpr(exprInfo.name);
+            return new LiteralInteger(exprInfo.name);
 
         // 根据body找到对应的类型
         Class<? extends Expr> exprClass = EXPR_CLASSES.get(exprInfo.name);
@@ -218,108 +241,6 @@ public abstract class Expr {
         } catch (Exception ex) {
             throw new KyouException("init expression fail. name: " + exprInfo.name, ex);
         }
-    }
-
-    /**
-     * 标记在{@link Expr}的实现类上，为{@link Expr}的实现类提供一些静态信息。
-     * 
-     * @author ng
-     */
-    @Target({ ElementType.TYPE })
-    @Retention(RetentionPolicy.RUNTIME)
-    public static @interface ExprDescription {
-        /**
-         * 表达式的名称
-         */
-        String name();
-
-        /**
-         * 表达式需要的后缀类型
-         */
-        ExprPostfix postfix();
-
-        /**
-         * 复杂表达式的字段列表
-         */
-        ComplexPostfixField[] complexPostfixFields() default {};
-
-        /**
-         * 输入数据的类型
-         */
-        ValueType typeIn();
-
-        /**
-         * 输出数据的类型
-         */
-        ValueType typeOut();
-
-        /**
-         * 定义了表达式的后缀类型
-         * 
-         * @author ng
-         */
-        public static enum ExprPostfix {
-            /**
-             * 表达式不应有后缀
-             */
-            None,
-
-            /**
-             * 表达式应当有一个字符串类型的后缀
-             */
-            String,
-            /**
-             * 表达式应当有一个整数类型的后缀
-             */
-            Int,
-
-            /**
-             * 表达式可以没有后缀，或有一个字符串类型的后缀
-             */
-            NoneOrString,
-            /**
-             * 表达式可以没有后缀，或有一个整数类型的后缀
-             */
-            NoneOrInt,
-            /**
-             * 表达式拥有一个复杂类型的后缀
-             */
-            Complex,
-        }
-
-        /**
-         * 复杂后缀的描述
-         * 
-         * @author ng
-         * 
-         */
-        public static @interface ComplexPostfixField {
-            String name();
-
-            ExprPostfix type();
-        }
-    }
-
-    /**
-     * 输出一个立即数
-     * 
-     * @author ng
-     * 
-     */
-    @ExprDescription(name = "", postfix = ExprPostfix.Int, typeIn = ValueType.Dom, typeOut = ValueType.Integer)
-    private static class IntegerExpr extends Expr {
-
-        public IntegerExpr(String value) {
-            super.postfix = value;
-            super.postfixi = NumberUtils.toInt(value);
-            super.postfixMap = null;
-        }
-
-        @Override
-        protected Value eval(Value input, PackContext context) {
-            return new Value(this.postfixi);
-        }
-
     }
 
 }

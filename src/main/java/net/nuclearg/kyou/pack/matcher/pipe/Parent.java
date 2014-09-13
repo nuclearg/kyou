@@ -11,7 +11,8 @@ import net.nuclearg.kyou.dom.KyouItem;
  * @author ng
  * 
  */
-class AncestorMatcher extends PipeMatcher {
+@PipeDescription(">")
+class Parent extends PipeMatcher {
 
     @Override
     public boolean matches(KyouItem item) {

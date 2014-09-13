@@ -1,9 +1,7 @@
 package net.nuclearg.kyou.pack.expr;
 
-import net.nuclearg.kyou.pack.Expr;
-import net.nuclearg.kyou.pack.Expr.ExprDescription;
-import net.nuclearg.kyou.pack.Expr.ExprDescription.ExprPostfix;
 import net.nuclearg.kyou.pack.PackContext;
+import net.nuclearg.kyou.pack.expr.ExprDescription.ExprPostfix;
 import net.nuclearg.kyou.util.value.Value;
 import net.nuclearg.kyou.util.value.ValueType;
 
@@ -21,10 +19,10 @@ import net.nuclearg.kyou.util.value.ValueType;
  * 
  */
 @ExprDescription(name = "bk", postfix = ExprPostfix.None, typeIn = ValueType.Integer, typeOut = ValueType.Backspace)
-class BackspaceExpr extends Expr {
+class Backspace extends Expr {
 
     @Override
-    protected Value eval(Value input, PackContext context) {
+    public Value eval(Value input, PackContext context) {
         return new Value(ValueType.Backspace, null, input.intValue, null, null);
     }
 

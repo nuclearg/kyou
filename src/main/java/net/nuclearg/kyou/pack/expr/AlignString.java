@@ -1,11 +1,9 @@
 package net.nuclearg.kyou.pack.expr;
 
 import net.nuclearg.kyou.KyouException;
-import net.nuclearg.kyou.pack.Expr;
-import net.nuclearg.kyou.pack.Expr.ExprDescription;
-import net.nuclearg.kyou.pack.Expr.ExprDescription.ComplexPostfixField;
-import net.nuclearg.kyou.pack.Expr.ExprDescription.ExprPostfix;
 import net.nuclearg.kyou.pack.PackContext;
+import net.nuclearg.kyou.pack.expr.ExprDescription.ComplexPostfixField;
+import net.nuclearg.kyou.pack.expr.ExprDescription.ExprPostfix;
 import net.nuclearg.kyou.util.value.Value;
 import net.nuclearg.kyou.util.value.ValueType;
 
@@ -35,10 +33,10 @@ import org.apache.commons.lang.StringUtils;
                 @ComplexPostfixField(name = "align", type = ExprPostfix.String),
                 @ComplexPostfixField(name = "padding", type = ExprPostfix.String),
                 @ComplexPostfixField(name = "len", type = ExprPostfix.Int) })
-class AlignStringExpr extends Expr {
+class AlignString extends Expr {
 
     @Override
-    protected Value eval(Value input, PackContext context) {
+    public Value eval(Value input, PackContext context) {
         String align = (String) this.postfixMap.get("align");
         String padding = (String) this.postfixMap.get("padding");
         int len = (Integer) this.postfixMap.get("len");

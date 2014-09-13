@@ -1,6 +1,6 @@
-package net.nuclearg.kyou.pack;
+package net.nuclearg.kyou.pack.expr;
 
-import static net.nuclearg.kyou.util.parser.SyntaxRule.empty;
+import static net.nuclearg.kyou.util.parser.SyntaxRule.nul;
 import static net.nuclearg.kyou.util.parser.SyntaxRule.lex;
 import static net.nuclearg.kyou.util.parser.SyntaxRule.opt;
 import static net.nuclearg.kyou.util.parser.SyntaxRule.or;
@@ -26,13 +26,13 @@ import net.nuclearg.kyou.util.parser.SyntaxTreeNode;
  * @author ng
  * 
  */
-class ExprListString {
+class ExprString {
     /**
      * 原始的字符串
      */
     private final String str;
 
-    ExprListString(String str) {
+    ExprString(String str) {
         this.str = str;
     }
 
@@ -231,7 +231,7 @@ class ExprListString {
                         opt(lex(Lex.Space)))),
 
         NoPostfix(
-                empty(Lex.class)),
+                nul(Lex.class)),
         SimplePostfix(
                 seq(
                         lex(Lex.SimplePostfixDelimiter),

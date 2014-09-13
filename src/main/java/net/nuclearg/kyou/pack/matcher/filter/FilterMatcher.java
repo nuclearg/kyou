@@ -1,13 +1,12 @@
 package net.nuclearg.kyou.pack.matcher.filter;
 
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 
 import net.nuclearg.kyou.KyouException;
 import net.nuclearg.kyou.dom.KyouItem;
 import net.nuclearg.kyou.pack.matcher.Matcher;
 import net.nuclearg.kyou.util.ClassUtils;
+import net.nuclearg.kyou.util.ClassUtils.AnnotationNameParser;
 
 /**
  * 过滤匹配符，判断当前报文节点是否满足过滤条件
@@ -16,7 +15,13 @@ import net.nuclearg.kyou.util.ClassUtils;
  * 
  */
 public class FilterMatcher extends Matcher {
-    private static final Map<String, Class<? extends Filter>> FILTER_CLASSES;
+    private static final Map<String, Class<? extends Filter>> FILTER_CLASSES = ClassUtils.buildAnnotatedClassMap(FilterDescription.class, Filter.class, new AnnotationNameParser<FilterDescription>() {
+
+        @Override
+        public String parseName(FilterDescription annotation) {
+            return annotation.value();
+        }
+    });
 
     /**
      * 过滤器名称
@@ -26,22 +31,6 @@ public class FilterMatcher extends Matcher {
      * 实际的过滤器
      */
     private final Filter impl;
-
-    static {
-        Map<String, Class<? extends Filter>> classes = new HashMap<>();
-
-        for (Class<?> cls : ClassUtils.searchClassesWithAnnotation(FilterDescription.class)) {
-            FilterDescription desc = cls.getAnnotation(FilterDescription.class);
-            String name = desc.value();
-
-            if (classes.containsKey(name))
-                throw new KyouException("filter name duplicated. old: " + classes.get(name) + ", new: " + cls);
-
-            classes.put(name, cls.asSubclass(Filter.class));
-        }
-
-        FILTER_CLASSES = Collections.unmodifiableMap(classes);
-    }
 
     public FilterMatcher(String text) {
         this.name = text.substring(1);
@@ -64,6 +53,14 @@ public class FilterMatcher extends Matcher {
     @Override
     public String toString() {
         return ":" + this.name;
+    }
+
+    public static Matcher buildFilterMatcher(String filterName) {
+        return null;
+    }
+
+    public static Matcher buildFilterMatcher(String filterName, int param) {
+        return null;
     }
 
     public static Matcher buildFilterMatcher(String filterName, String param) {

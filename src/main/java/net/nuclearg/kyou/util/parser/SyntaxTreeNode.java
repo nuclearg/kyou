@@ -1,6 +1,5 @@
 package net.nuclearg.kyou.util.parser;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import net.nuclearg.kyou.util.lexer.LexDefinition;
@@ -55,21 +54,6 @@ public class SyntaxTreeNode<L extends LexDefinition, S extends SyntaxDefinition<
         this.type = type;
         this.children = children;
         this.token = token;
-    }
-
-    /**
-     * 获取这个语法节点对应的所有词法单元列表
-     */
-    public List<LexToken<L>> tokens() {
-        List<LexToken<L>> tokens = new ArrayList<>();
-
-        if (this.token != null)
-            tokens.add(this.token);
-        else
-            for (SyntaxTreeNode<L, S> child : this.children)
-                tokens.addAll(child.tokens());
-
-        return tokens;
     }
 
     @Override

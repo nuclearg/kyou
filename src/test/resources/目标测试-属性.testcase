@@ -24,23 +24,23 @@
         <param>m</param>
     </style>
 
-    <style target="[a=1]">
+    <style target="[a='1']">
         <format>a=1</format>
     </style>
     
-    <style target="field[b]">
+    <style target="field['b']">
         <format>b=2</format>
     </style>
     
-    <style target="[head^=H]">
+    <style target="[head^='H']">
         <format>c=3</format>
     </style>
     
-    <style target="[tail$=ail]">
+    <style target="['tail'$='ail']">
         <format>d=4</format>
     </style>
     
-    <style target="[e!=xxx]">
+    <style target="[e!='x\'xx']">
         <format>e=5</format>
     </style>
     

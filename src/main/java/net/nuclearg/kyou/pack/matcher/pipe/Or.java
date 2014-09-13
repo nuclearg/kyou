@@ -11,7 +11,8 @@ import net.nuclearg.kyou.dom.KyouItem;
  * @author ng
  * 
  */
-class OrMatcher extends PipeMatcher {
+@PipeDescription(",")
+class Or extends PipeMatcher {
 
     @Override
     public boolean matches(KyouItem item) {

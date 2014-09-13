@@ -36,7 +36,7 @@ public class SyntaxString<L extends LexDefinition, S extends SyntaxDefinition<L>
      *            描述整棵语法树的语法定义
      * @return 解析出来的语法树。果解析失败则报错
      */
-    public SyntaxTreeNode<L, S> tryParse(S syntax) {
+    public SyntaxTreeNode<L, S> parse(S syntax) {
         LexString<L> tokenStr = new LexString<L>(this.str);
         SyntaxTreeNode<L, S> result = syntax.syntax().tryMatch(tokenStr);
 

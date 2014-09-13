@@ -5,10 +5,11 @@ import java.util.List;
 
 import net.nuclearg.kyou.KyouException;
 import net.nuclearg.kyou.dom.KyouItem;
+import net.nuclearg.kyou.pack.matcher.MatchString.MatcherInfo;
 import net.nuclearg.kyou.pack.matcher.attribute.AttributeMatcher;
 import net.nuclearg.kyou.pack.matcher.basic.AbsolutePathMatcher;
 import net.nuclearg.kyou.pack.matcher.basic.NodeNameMatcher;
-import net.nuclearg.kyou.pack.matcher.basic.TypeMatcher;
+import net.nuclearg.kyou.pack.matcher.basic.NodeTypeMatcher;
 import net.nuclearg.kyou.pack.matcher.filter.FilterMatcher;
 import net.nuclearg.kyou.pack.matcher.pipe.PipeMatcher;
 
@@ -37,26 +38,25 @@ public abstract class Matcher {
     /**
      * 解析匹配字符串
      * 
-     * @param queryStr
+     * @param str
      *            匹配字符串
      * @return 匹配器
      */
-    public static Matcher parse(String queryStr) {
-        if (StringUtils.isBlank(queryStr))
-            throw new KyouException("query is blank");
+    public static Matcher parse(String str) {
+        if (StringUtils.isBlank(str))
+            throw new KyouException("match is blank");
 
         /*
-         * 匹配字符串对应的匹配器列表
+         * 解析匹配字符串，构造匹配器列表
          */
         List<Matcher> matchers = new ArrayList<Matcher>();
+        try {
+            MatchString matchStr = new MatchString(str);
 
-        String str = queryStr;
-        while (!str.isEmpty()) {
-            MatchExpressionToken token = MatchExpressionToken.tryParse(str);
-
-            matchers.add(buildMatcher(token));
-
-            str = str.substring(token.text.length());
+            for (MatcherInfo info : matchStr.parseMatcherInfo())
+                matchers.add(buildMatcher(info));
+        } catch (Exception ex) {
+            throw new KyouException("parse match fail. match: " + str, ex);
         }
 
         /*
@@ -75,17 +75,16 @@ public abstract class Matcher {
 
             // 当前的匹配器是否是独立的。为处理方便，两端都挂满了的管道匹配器也作为独立匹配器考虑
             boolean currAlone = !(current instanceof PipeMatcher)
-                    || (current instanceof PipeMatcher && ((PipeMatcher) current).right != null);
+                    || current instanceof PipeMatcher && ((PipeMatcher) current).right != null;
             // 下一个匹配器是否是独立的。下一个匹配器永远不可能是两端都挂满了的管道匹配器
             boolean nextAlone = !(next instanceof PipeMatcher);
 
             // 如果当前matcher是独立匹配器，新来的这个也是一个独立匹配器
             // 或者当前matcher是管道匹配器，但左右都挂满了
             // 则用一个AndPipeMatcher把这两个连起来并设为当前matcher
-            if (currAlone && nextAlone) {
-                current = PipeMatcher.and(current, next);
+            if (currAlone && nextAlone)
+                // current = PipeMatcher.and(current, next);
                 continue;
-            }
 
             // 如果当前matcher是独立匹配器，新来的这个是一个管道匹配器，则把当前匹配器作为left，新来的这个作为right，并把当前matcher指向right
             if (currAlone && !nextAlone) {
@@ -111,28 +110,30 @@ public abstract class Matcher {
     }
 
     /**
-     * 根据词法元素创建匹配器
+     * 根据匹配器信息创建匹配器
      * 
-     * @param token
-     *            词法元素
-     * @return 与词法元素对应的匹配器
+     * @param info
+     *            匹配器信息
+     * @return 匹配器实例
      */
-    private static Matcher buildMatcher(MatchExpressionToken token) {
-        switch (token.type) {
+    private static Matcher buildMatcher(MatcherInfo info) {
+        switch (info.type) {
             case AbsolutePath:
-                return new AbsolutePathMatcher(token.text);
-            case Attribute:
-                return new AttributeMatcher(token.text);
-            case Filter:
-                return new FilterMatcher(token.text);
+                return new AbsolutePathMatcher(info.text);
+            case NodeType:
+                return new NodeTypeMatcher(info.text);
             case NodeName:
-                return new NodeNameMatcher(token.text);
-            case Space:
-                return PipeMatcher.parent();
-            case Type:
-                return new TypeMatcher(token.text);
+                return new NodeNameMatcher(info.text);
+            case Pipe:
+                return PipeMatcher.buildPipeMatcher(info.text);
+            case Attribute:
+                return AttributeMatcher.buildAttributeMatcher(info.attrName, info.attrOperator, info.attrValue);
+            case FilterNoParam:
+            case FilterIntegerParam:
+            case FilterStringParam:
+                return FilterMatcher.buildFilterMatcher(info.text, info.filterParam);
             default:
-                throw new UnsupportedOperationException("token type: " + token.type);
+                throw new UnsupportedOperationException("matcher type " + info.type);
         }
     }
 }

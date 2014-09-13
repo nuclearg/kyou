@@ -31,7 +31,7 @@ class DomBuilder {
     /**
      * 当前构建栈
      */
-    private Stack<KyouContainer> stack = new Stack<KyouContainer>();
+    private Stack<KyouContainer> stack = new Stack<>();
     /**
      * 构建数组原型的builder
      */

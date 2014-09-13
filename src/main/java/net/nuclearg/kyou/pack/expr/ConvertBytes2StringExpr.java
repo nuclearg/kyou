@@ -33,6 +33,7 @@ class ConvertBytes2StringExpr extends Expr {
         return new Value(new String(input.bytesValue, encoding));
     }
 
+    @Override
     protected void check(Expr prev) {
         super.check(prev);
 

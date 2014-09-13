@@ -1,4 +1,3 @@
-
 import java.io.File;
 import java.io.FilenameFilter;
 import java.net.URI;
@@ -29,7 +28,7 @@ public class PackTests extends ParentRunner<PackTestData> {
         super(testClass);
 
         try {
-            this.tests = findTests();
+            this.tests = this.findTests();
         } catch (Exception ex) {
             throw new InitializationError(ex);
         }
@@ -90,7 +89,7 @@ public class PackTests extends ParentRunner<PackTestData> {
             }
         };
 
-        runLeaf(statement, describeChild(child), notifier);
+        this.runLeaf(statement, this.describeChild(child), notifier);
     }
 
     private List<PackTestData> findTests() throws Exception {

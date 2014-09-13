@@ -86,4 +86,7 @@ public class AttributeMatcher extends Matcher {
         return "[" + this.name + this.op + (this.value != null ? this.value : "") + "]";
     }
 
+    public static Matcher buildAttributeMatcher(String attrName, String op, String attrValue) {
+        return null;
+    }
 }

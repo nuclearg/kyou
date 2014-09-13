@@ -1,5 +1,4 @@
 
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -26,7 +25,7 @@ class PackTestData {
 
             StringBuilder builder = new StringBuilder();
             String ln;
-            while ((ln = r.readLine()) != null) {
+            while ((ln = r.readLine()) != null)
                 if (ln.equals("[[DOC]]"))
                     builder = docBuilder;
                 else if (ln.equals("[[STYLE]]"))
@@ -37,7 +36,6 @@ class PackTestData {
                     builder = new StringBuilder();
                 else
                     builder.append(ln).append(SystemUtils.LINE_SEPARATOR);
-            }
             builder.delete(builder.length() - SystemUtils.LINE_SEPARATOR.length(), builder.length());
 
             this.name = file.getName().substring(0, file.getName().length() - ".testcase".length());

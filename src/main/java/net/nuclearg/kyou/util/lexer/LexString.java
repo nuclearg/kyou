@@ -43,8 +43,8 @@ public class LexString<T extends LexDefinition> {
     public LexToken<T> tryToken(T definition) {
         Matcher m = definition.regex().matcher(this.str);
 
-        if (m.find(this.pos) && m.start() == pos) {
-            pos += m.end() - m.start();
+        if (m.find(this.pos) && m.start() == this.pos) {
+            this.pos += m.end() - m.start();
 
             String str = this.str.substring(m.start(), m.end());
             return new LexToken<T>(definition, str);

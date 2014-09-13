@@ -1,7 +1,5 @@
 package net.nuclearg.kyou;
 
-import static org.junit.Assert.fail;
-
 import java.io.InputStream;
 
 import junit.framework.Assert;
@@ -30,11 +28,12 @@ public class KyouTest {
 
         }
     }
-//
-//    @Test
-//    public void testSaveDocument() {
-//        fail("Not yet implemented");
-//    }
+
+    //
+    // @Test
+    // public void testSaveDocument() {
+    // fail("Not yet implemented");
+    // }
 
     @Test
     public void testLoadPackStyleInputStream() {

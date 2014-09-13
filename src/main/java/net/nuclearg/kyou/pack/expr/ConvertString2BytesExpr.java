@@ -33,6 +33,7 @@ class ConvertString2BytesExpr extends Expr {
         return new Value(input.strValue.getBytes(encoding));
     }
 
+    @Override
     protected void check(Expr prev) {
         super.check(prev);
 
@@ -44,7 +45,7 @@ class ConvertString2BytesExpr extends Expr {
         try {
             this.encoding = Charset.forName(this.postfix);
         } catch (Exception ex) {
-            throw new KyouException("encoding not found. encoding: " + encoding);
+            throw new KyouException("encoding not found. encoding: " + this.encoding);
         }
     }
 }

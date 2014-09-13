@@ -16,9 +16,9 @@ package net.nuclearg.kyou.pack;
 import org.w3c.dom.Element;
 
 class StyleScript {
-    
+
     final String name;
-    
+
     StyleScript(Element e) {
         this.name = "test";
     }

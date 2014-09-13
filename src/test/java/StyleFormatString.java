@@ -7,9 +7,9 @@ import java.util.regex.Pattern;
 
 import net.nuclearg.kyou.KyouException;
 import net.nuclearg.kyou.util.ByteOutputStream;
-import net.nuclearg.kyou.util.lexer.LexToken;
 import net.nuclearg.kyou.util.lexer.LexDefinition;
 import net.nuclearg.kyou.util.lexer.LexString;
+import net.nuclearg.kyou.util.lexer.LexToken;
 
 import org.apache.commons.lang.StringUtils;
 

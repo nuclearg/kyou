@@ -43,7 +43,7 @@ class ExprListString {
      */
     List<ExprInfo> parseExprInfo() {
         SyntaxString<Lex, Syntax> syntaxStr = new SyntaxString<Lex, Syntax>(this.str);
-        SyntaxTreeNode<Lex, Syntax> root = syntaxStr.tryParse(Syntax.Root);
+        SyntaxTreeNode<Lex, Syntax> root = syntaxStr.parse(Syntax.Root);
 
         List<ExprInfo> result = new ArrayList<ExprInfo>();
 

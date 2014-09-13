@@ -88,7 +88,7 @@ public class SyntaxTreeNode<L extends LexDefinition, S extends SyntaxDefinition<
                 builder.append(SystemUtils.LINE_SEPARATOR).append(child.toString(prefix + "  "));
 
         if (this.token != null)
-            builder.append(" ").append(token);
+            builder.append(" ").append(this.token);
 
         return builder.toString();
     }

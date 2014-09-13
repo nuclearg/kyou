@@ -15,10 +15,10 @@ import org.apache.commons.lang.StringUtils;
  * @author ng
  * 
  */
-public class TypeMatcher extends Matcher {
+public class NodeTypeMatcher extends Matcher {
     private final Type type;
 
-    public TypeMatcher(String type) {
+    public NodeTypeMatcher(String type) {
         this.type = Enum.valueOf(Type.class, StringUtils.capitalize(type));
     }
 

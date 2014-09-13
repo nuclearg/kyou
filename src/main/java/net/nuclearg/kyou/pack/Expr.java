@@ -112,10 +112,8 @@ public abstract class Expr {
         if (prev == null) {
             if (annotation.typeIn() != ValueType.Dom)
                 throw new KyouException("expr requires input. expr: " + this);
-        } else {
-            if (annotation.typeIn() != prev.getClass().getAnnotation(ExprDescription.class).typeOut())
-                throw new KyouException("expr input type mismatch. expr: " + this + ", prev: " + prev);
-        }
+        } else if (annotation.typeIn() != prev.getClass().getAnnotation(ExprDescription.class).typeOut())
+            throw new KyouException("expr input type mismatch. expr: " + this + ", prev: " + prev);
     }
 
     /**

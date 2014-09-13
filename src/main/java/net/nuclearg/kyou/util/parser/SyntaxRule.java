@@ -57,6 +57,7 @@ public abstract class SyntaxRule<L extends LexDefinition> {
      *            子元素的语法规则列表
      * @return 顺序连接多个语法规则的语法规则
      */
+    @SafeVarargs
     public static <L extends LexDefinition> SyntaxRule<L> seq(SyntaxRule<L>... elements) {
         return new SequenceRule<L>(elements);
     }
@@ -79,6 +80,7 @@ public abstract class SyntaxRule<L extends LexDefinition> {
      *            作为选项的语法规则列表
      * @return 表示或的语法规则
      */
+    @SafeVarargs
     public static <L extends LexDefinition> SyntaxRule<L> or(SyntaxRule<L>... conditions) {
         return new OrRule<L>(conditions);
     }

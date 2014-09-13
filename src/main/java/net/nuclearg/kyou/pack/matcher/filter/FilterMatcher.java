@@ -45,14 +45,14 @@ public class FilterMatcher extends Matcher {
 
     public FilterMatcher(String text) {
         this.name = text.substring(1);
-        Class<? extends Filter> filterClass = FILTER_CLASSES.get(name);
+        Class<? extends Filter> filterClass = FILTER_CLASSES.get(this.name);
         if (filterClass == null)
-            throw new KyouException("filter unsupported. filter: " + name);
+            throw new KyouException("filter unsupported. filter: " + this.name);
 
         try {
             this.impl = ClassUtils.newInstance(filterClass);
         } catch (Exception ex) {
-            throw new KyouException("init filter fail. filter: " + name, ex);
+            throw new KyouException("init filter fail. filter: " + this.name, ex);
         }
     }
 
@@ -64,5 +64,9 @@ public class FilterMatcher extends Matcher {
     @Override
     public String toString() {
         return ":" + this.name;
+    }
+
+    public static Matcher buildFilterMatcher(String filterName, String param) {
+        return null;
     }
 }

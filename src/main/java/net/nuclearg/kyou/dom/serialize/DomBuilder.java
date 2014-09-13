@@ -10,9 +10,6 @@ import net.nuclearg.kyou.dom.KyouField;
 import net.nuclearg.kyou.dom.KyouItem;
 import net.nuclearg.kyou.dom.KyouStruct;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * 工具类 用于根据需求建造出一棵DOM树
  * <p>
@@ -22,8 +19,6 @@ import org.slf4j.LoggerFactory;
  * @author ng
  */
 class DomBuilder {
-    private static final Logger logger = LoggerFactory.getLogger(DomBuilder.class);
-
     /**
      * 当前正被构造的{@link KyouDocument}对象
      */
@@ -53,8 +48,6 @@ class DomBuilder {
      * @param attributes
      */
     void beginDocument(Map<String, String> attributes) {
-        logger.debug("beginDocument. attributes: {}", attributes);
-
         this.doc = new KyouDocument();
         this.doc.attributes().putAll(attributes);
 
@@ -67,8 +60,6 @@ class DomBuilder {
      * @return 构建好的整篇报文数据
      */
     KyouDocument endDocument() {
-        logger.debug("endDocument. doc: {}", this.doc);
-
         return this.doc;
     }
 
@@ -85,7 +76,6 @@ class DomBuilder {
             this.prototypeBuilder.beginStruct(name, attributes);
             return;
         }
-        logger.debug("beginStruct. name: {}, attributes: ", name, attributes);
 
         KyouStruct stru;
         KyouContainer parent = this.stack.peek();
@@ -115,7 +105,6 @@ class DomBuilder {
             this.prototypeBuilder.endStruct();
             return;
         }
-        logger.debug("endStruct. name: {}", this.stack.peek().name());
 
         this.stack.pop();
     }
@@ -131,7 +120,6 @@ class DomBuilder {
             this.prototypeBuilder.beginField(name, attributes);
             return;
         }
-        logger.debug("beginField. name: {}, attributes: ", name, attributes);
 
         KyouField field;
         KyouContainer parent = this.stack.peek();
@@ -166,7 +154,6 @@ class DomBuilder {
             this.prototypeBuilder.endField(value);
             return;
         }
-        logger.debug("endField. name: {}, value: {}", this.currentField.name(), value);
 
         this.currentField.value(value);
     }
@@ -184,7 +171,6 @@ class DomBuilder {
             this.prototypeBuilder.beginArray(name, attributes);
             return;
         }
-        logger.debug("beginArray. name: {}, attributes: {}", name, attributes);
 
         KyouContainer parent = this.stack.peek();
         if (parent instanceof KyouStruct) {
@@ -210,7 +196,6 @@ class DomBuilder {
             this.prototypeBuilder.endArray();
             return;
         }
-        logger.debug("endArray. name: {}", this.stack.peek().name());
 
         this.stack.pop();
     }
@@ -223,7 +208,6 @@ class DomBuilder {
             this.prototypeBuilder.beginArrayPrototype();
             return;
         }
-        logger.debug("beginArrayPrototype");
     }
 
     /**
@@ -234,7 +218,6 @@ class DomBuilder {
             this.prototypeBuilder.endArrayPrototype();
             return;
         }
-        logger.debug("endArrayPrototype. prototype: {}", this.prototypeBuilder.doc);
 
         KyouDocument prototypeDoc = this.prototypeBuilder.doc;
         KyouItem prototype = prototypeDoc.get(0);

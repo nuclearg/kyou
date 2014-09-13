@@ -70,7 +70,9 @@ class MatcherString {
             case NodeName:
                 return new MatcherInfo(MatcherType.NodeName, node.children.get(1).token.str);
             case Attribute:
+                return this.parseAttributeMatcherInfo(node);
             case Filter:
+                return this.parseFilterMatcherInfo(node);
             default:
                 throw new UnsupportedOperationException("syntax tree node type " + node.type);
         }
@@ -123,6 +125,44 @@ class MatcherString {
             builder.append(child.children.get(0).token.str).append(child.children.get(1).token.str);
 
         return new MatcherInfo(MatcherType.AbsolutePath, builder.toString());
+    }
+
+    /**
+     * 解析属性相关的匹配器信息
+     * 
+     * @param node
+     * @return
+     */
+    private MatcherInfo parseAttributeMatcherInfo(SyntaxTreeNode<Lex, Syntax> node) {
+        node = node.children.get(1);
+
+        // 读取属性名
+        String attrName;
+        SyntaxTreeNode<Lex, Syntax> attrNameNode = node.children.get(0);
+        if (attrNameNode.type == Syntax.String)
+            attrName = attrNameNode.children.get(1).token.str;
+        else
+            attrName = attrNameNode.token.str;
+
+        // 如果是简单属性直接返回
+        if (node.type == Syntax.SimpleAttribute)
+            return new MatcherInfo(attrName, (String) null, (String) null);
+
+        // 读取运算符和属性值
+        String attrOperator = node.children.get(1).token.str.trim();
+        String attrValue = node.children.get(2).children.get(1).token.str;
+
+        return new MatcherInfo(attrName, attrOperator, attrValue);
+    }
+
+    /**
+     * 解析过滤器相关的匹配器信息
+     * 
+     * @param node
+     * @return
+     */
+    private MatcherInfo parseFilterMatcherInfo(SyntaxTreeNode<Lex, Syntax> node) {
+        throw new UnsupportedOperationException();
     }
 
     /**
@@ -238,7 +278,8 @@ class MatcherString {
             this.text = pipeName;
             this.attrName = this.attrOperator = this.attrValue = null;
             this.filterParam = null;
-            this.left = this.right = null;
+            this.left = left;
+            this.right = right;
         }
     }
 
@@ -297,15 +338,15 @@ class MatcherString {
         /**
          * 属性开始
          */
-        AttributeStart("\\["),
+        AttributeStart("\\[\\s*"),
         /**
          * 属性运算符
          */
-        AttributeOperator("[=!~^$]?\\="),
+        AttributeOperator("\\s*[=!~^$]?\\=\\s*"),
         /**
          * 属性结束
          */
-        AttributeEnd("\\]"),
+        AttributeEnd("\\s*\\]"),
 
         /**
          * 过滤器标志符
@@ -314,11 +355,11 @@ class MatcherString {
         /**
          * 过滤器参数开始
          */
-        FilterParamStart("\\("),
+        FilterParamStart("\\(\\s*"),
         /**
          * 过滤器参数结束
          */
-        FilterParamEnd("\\)"),
+        FilterParamEnd("\\s*\\)"),
 
         /**
          * 表示祖先的管道符

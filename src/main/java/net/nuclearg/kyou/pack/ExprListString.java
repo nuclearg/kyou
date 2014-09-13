@@ -56,37 +56,40 @@ class ExprListString {
             String name = nameUnit.token.str;
 
             // 解析postfix
+            ExprInfo exprInfo;
             SyntaxTreeNode<Lex, Syntax> postfixUnit = exprUnit.children.get(1);
-            if (postfixUnit.type == null) {
-                // 无后缀
-                result.add(new ExprInfo(name, (String) null));
-                continue;
+            switch (postfixUnit.type) {
+                case NoPostfix:
+                    // 无后缀
+                    exprInfo = new ExprInfo(name, (String) null);
+                    break;
+                case SimplePostfix:
+                    // 简单后缀
+                    String postfix = postfixUnit.children.get(1).token.str;
+                    exprInfo = new ExprInfo(name, postfix);
+                    break;
+                case ComplexPostfix:
+                    // 解析复杂后缀
+                    Map<String, String> complexPostfixMap = new HashMap<String, String>();
+
+                    // size小于3表示start和end是紧挨着的，即postfix为空
+                    for (SyntaxTreeNode<Lex, Syntax> postfixFieldUnit : postfixUnit.children.get(1).children) {
+                        if (postfixFieldUnit.type != Syntax.ComplexPostfixField)
+                            continue;
+
+                        String k = postfixFieldUnit.children.get(1).token.str;
+                        String v = postfixFieldUnit.children.get(6).token.str;
+
+                        complexPostfixMap.put(k, v);
+                    }
+
+                    exprInfo = new ExprInfo(name, complexPostfixMap);
+                    break;
+                default:
+                    throw new UnsupportedOperationException("postfix type " + postfixUnit.type);
             }
 
-            if (postfixUnit.type == Syntax.SimplePostfix) {
-                // 解析简单后缀
-                String postfix = postfixUnit.children.get(1).token.str;
-
-                result.add(new ExprInfo(name, postfix));
-            } else {
-                // 解析复杂后缀
-                Map<String, String> complexPostfixMap = new HashMap<String, String>();
-
-                // size小于3表示start和end是紧挨着的，即postfix为空
-                if (postfixUnit.children.size() < 3) {
-                    result.add(new ExprInfo(name, complexPostfixMap));
-                    continue;
-                }
-
-                for (SyntaxTreeNode<Lex, Syntax> postfixFieldUnit : postfixUnit.children.get(1).children) {
-                    String k = postfixFieldUnit.children.get(1).token.str;
-                    String v = postfixFieldUnit.children.get(6).token.str;
-
-                    complexPostfixMap.put(k, v);
-                }
-
-                result.add(new ExprInfo(name, complexPostfixMap));
-            }
+            result.add(exprInfo);
         }
 
         return result;
@@ -117,14 +120,14 @@ class ExprListString {
          */
         final Map<String, String> complexPostfix;
 
-        ExprInfo(String body, String postfix) {
-            this.name = body;
+        ExprInfo(String name, String postfix) {
+            this.name = name;
             this.postfix = postfix;
             this.complexPostfix = null;
         }
 
-        ExprInfo(String body, Map<String, String> complexPostfix) {
-            this.name = body;
+        ExprInfo(String name, Map<String, String> complexPostfix) {
+            this.name = name;
             this.postfix = null;
             this.complexPostfix = complexPostfix;
         }
@@ -213,10 +216,7 @@ class ExprListString {
     private static enum Syntax implements SyntaxDefinition<Lex> {
         ExprName(
                 lex(Lex.Name)),
-        SimplePostfix(
-                seq(
-                        lex(Lex.SimplePostfixDelimiter),
-                        lex(Lex.SimplePostfix))),
+
         ComplexPostfixField(
                 seq(
                         opt(lex(Lex.Space)),
@@ -230,19 +230,25 @@ class ExprListString {
                         opt(lex(Lex.Space)),
                         opt(lex(Lex.ComplexPostfixDelimiter)),
                         opt(lex(Lex.Space)))),
+
+        NoPostfix(
+                empty(Lex.class)),
+        SimplePostfix(
+                seq(
+                        lex(Lex.SimplePostfixDelimiter),
+                        lex(Lex.SimplePostfix))),
         ComplexPostfix(
                 seq(
                         lex(Lex.ComplexPostfixStart),
                         rep(ref(ComplexPostfixField)),
                         lex(Lex.ComplexPostfixEnd))),
-
         Expr(
                 seq(
                         ref(ExprName),
                         or(
                                 ref(SimplePostfix),
                                 ref(ComplexPostfix),
-                                empty(Lex.class)))),
+                                ref(NoPostfix)))),
 
         Root(
                 rep(

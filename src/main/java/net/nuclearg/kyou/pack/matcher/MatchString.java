@@ -1,6 +1,6 @@
 package net.nuclearg.kyou.pack.matcher;
 
-import static net.nuclearg.kyou.util.parser.SyntaxRule.lex;
+import static net.nuclearg.kyou.util.parser.SyntaxRule.*;
 import static net.nuclearg.kyou.util.parser.SyntaxRule.seq;
 
 import java.util.List;
@@ -79,6 +79,10 @@ class MatchString {
          * 点号
          */
         DotToken("\\."),
+        /**
+         * 管道符
+         */
+        PipeToken("(\\s+)|(\\s*\\>\\s*)|(\\s*\\,\\s*)"),
 
         /**
          * 报文节点名称
@@ -141,6 +145,28 @@ class MatchString {
                 lex(Lex.StringValue),
                 lex(Lex.StringEnd))),
 
+        AbsolutePath(seq(lex(Lex.HashToken),
+                rep(seq(lex(Lex.DotToken), lex(Lex.NodeName))))),
+
+        NodeType(lex(Lex.NodeType)),
+
+        Pipe(lex(Lex.PipeToken)),
+
+        SimpleAttribute(seq(
+                lex(Lex.AttributeStart),
+                ref(String),
+                lex(Lex.AttributeEnd))),
+        NormalAttribute(seq(
+                lex(Lex.AttributeStart),
+                ref(String),
+                lex(Lex.AttributeOperator),
+                ref(String),
+                lex(Lex.AttributeEnd))),
+        Attribute(or(
+                ref(SimpleAttribute),
+                ref(NormalAttribute))),
+
+        Filter(null),
         // TODO 定义语法
         ;
 

@@ -18,7 +18,7 @@ import org.apache.commons.lang.StringUtils;
 class OrRule<L extends LexDefinition> extends SyntaxRule<L> {
     private final List<SyntaxRule<L>> conditions;
 
-    @SafeVarargs
+    @SuppressWarnings("unchecked")
     OrRule(SyntaxRule<L>... conditions) {
         this.conditions = Arrays.asList(conditions);
     }

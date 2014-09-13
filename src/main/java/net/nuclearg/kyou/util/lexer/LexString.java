@@ -60,6 +60,7 @@ public class LexString<T extends LexDefinition> {
      *            词法定义的列表，如果字符串的当前位置满足任何一个词法定义则将返回该词法元素
      * @return 匹配出来的词法元素，如果无法匹配任何一个给定的词法元素定义则返回null
      */
+    @SuppressWarnings("unchecked")
     public LexToken<T> tryToken(T... definitions) {
         LexToken<T> token;
         for (T definition : definitions)

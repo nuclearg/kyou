@@ -61,7 +61,7 @@ public class SyntaxTreeNode<L extends LexDefinition, S extends SyntaxDefinition<
      * 获取这个语法节点对应的所有词法单元列表
      */
     public List<LexToken<L>> tokens() {
-        List<LexToken<L>> tokens = new ArrayList<LexToken<L>>();
+        List<LexToken<L>> tokens = new ArrayList<>();
 
         if (this.token != null)
             tokens.add(this.token);

@@ -239,7 +239,7 @@ public class XmlDomSerializer implements KyouDomSerializer, KyouDomDeserializer 
                     if (StringUtils.isBlank(attributeStr))
                         return Collections.emptyMap();
 
-                    Map<String, String> attributes = new HashMap<String, String>();
+                    Map<String, String> attributes = new HashMap<>();
                     for (String attribute : StringUtils.split(attributeStr, '&'))
                         try {
                             String[] kv = StringUtils.split(attribute, '=');

@@ -19,7 +19,7 @@ import org.apache.commons.lang.StringUtils;
 class SequenceRule<L extends LexDefinition> extends SyntaxRule<L> {
     private final List<SyntaxRule<L>> elements;
 
-    @SafeVarargs
+    @SuppressWarnings("unchecked")
     SequenceRule(SyntaxRule<L>... elements) {
         this.elements = Arrays.asList(elements);
     }
@@ -28,7 +28,7 @@ class SequenceRule<L extends LexDefinition> extends SyntaxRule<L> {
     <S extends SyntaxDefinition<L>> SyntaxTreeNode<L, S> tryMatch(LexString<L> tokenStr) {
         int pos = tokenStr.pos();
 
-        List<SyntaxTreeNode<L, S>> children = new ArrayList<SyntaxTreeNode<L, S>>();
+        List<SyntaxTreeNode<L, S>> children = new ArrayList<>();
 
         SyntaxTreeNode<L, S> child;
         for (SyntaxRule<L> element : this.elements)
@@ -39,7 +39,7 @@ class SequenceRule<L extends LexDefinition> extends SyntaxRule<L> {
                 return null;
             }
 
-        return new SyntaxTreeNode<L, S>(null, children, null);
+        return new SyntaxTreeNode<>(null, children, null);
     }
 
     @Override

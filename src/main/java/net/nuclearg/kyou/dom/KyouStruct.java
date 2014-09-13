@@ -23,12 +23,12 @@ public class KyouStruct extends KyouContainer {
     /**
      * 实际存放元素的map
      */
-    private final Map<String, KyouItem> children = new LinkedHashMap<String, KyouItem>();
+    private final Map<String, KyouItem> children = new LinkedHashMap<>();
 
     /**
      * 缓存名称顺序的map
      */
-    private final List<String> nameList = new ArrayList<String>();
+    private final List<String> nameList = new ArrayList<>();
 
     /**
      * 向结构体中添加元素

@@ -70,7 +70,7 @@ public abstract class Expr {
     protected abstract Value eval(Value input, PackContext context);
 
     static {
-        Map<String, Class<? extends Expr>> exprClasses = new HashMap<String, Class<? extends Expr>>();
+        Map<String, Class<? extends Expr>> exprClasses = new HashMap<>();
 
         Set<Class<?>> classes = ClassUtils.searchClassesWithAnnotation(ExprDescription.class);
         for (Class<?> cls : classes) {
@@ -210,7 +210,7 @@ public abstract class Expr {
             if (exprInfo.complexPostfix == null)
                 return expr;
 
-            expr.postfixMap = new HashMap<String, Object>();
+            expr.postfixMap = new HashMap<>();
             for (Entry<String, String> entry : exprInfo.complexPostfix.entrySet())
                 expr.postfixMap.put(entry.getKey(), entry.getValue());
 

@@ -14,7 +14,7 @@ class EmptyRule<L extends LexDefinition> extends SyntaxRule<L> {
 
     @Override
     <S extends SyntaxDefinition<L>> SyntaxTreeNode<L, S> tryMatch(LexString<L> tokenStr) {
-        return new SyntaxTreeNode<L, S>(null, null, null);
+        return new SyntaxTreeNode<>(null, null, null);
     }
 
     @Override

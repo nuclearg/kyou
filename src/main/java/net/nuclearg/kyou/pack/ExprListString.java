@@ -42,10 +42,10 @@ class ExprListString {
      * @return 解析出来的表达式信息列表
      */
     List<ExprInfo> parseExprInfo() {
-        SyntaxString<Lex, Syntax> syntaxStr = new SyntaxString<Lex, Syntax>(this.str);
+        SyntaxString<Lex, Syntax> syntaxStr = new SyntaxString<>(this.str);
         SyntaxTreeNode<Lex, Syntax> root = syntaxStr.parse(Syntax.Root);
 
-        List<ExprInfo> result = new ArrayList<ExprInfo>();
+        List<ExprInfo> result = new ArrayList<>();
 
         // 遍历语法树，解析其中的每个expr
         for (SyntaxTreeNode<Lex, Syntax> exprUnit : root.children) {
@@ -70,7 +70,7 @@ class ExprListString {
                     break;
                 case ComplexPostfix:
                     // 解析复杂后缀
-                    Map<String, String> complexPostfixMap = new HashMap<String, String>();
+                    Map<String, String> complexPostfixMap = new HashMap<>();
 
                     // size小于3表示start和end是紧挨着的，即postfix为空
                     for (SyntaxTreeNode<Lex, Syntax> postfixFieldUnit : postfixUnit.children.get(1).children) {
@@ -212,7 +212,6 @@ class ExprListString {
      * @author ng
      * 
      */
-    @SuppressWarnings("unchecked")
     private static enum Syntax implements SyntaxDefinition<Lex> {
         ExprName(
                 lex(Lex.Name)),

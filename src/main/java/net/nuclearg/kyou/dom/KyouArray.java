@@ -36,7 +36,7 @@ public class KyouArray extends KyouContainer {
         prototype.name = "__prototype";
         prototype.parent = null;
 
-        this.children = new ArrayList<KyouItem>();
+        this.children = new ArrayList<>();
         this.prototype = prototype;
     }
 

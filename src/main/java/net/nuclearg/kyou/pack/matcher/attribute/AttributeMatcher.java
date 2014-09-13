@@ -18,7 +18,7 @@ import org.apache.commons.lang.StringUtils;
  * 
  */
 public class AttributeMatcher extends Matcher {
-    private static final Map<String, Class<? extends AttributeOperator>> OPERATOR_CLASSES;
+    private static final Map<String, Class<? extends Operator>> OPERATOR_CLASSES;
 
     /**
      * 属性名
@@ -27,23 +27,23 @@ public class AttributeMatcher extends Matcher {
     /**
      * 运算符
      */
-    private final AttributeOperator op;
+    private final Operator op;
     /**
      * 属性值
      */
     private final String value;
 
     static {
-        Map<String, Class<? extends AttributeOperator>> classes = new HashMap<String, Class<? extends AttributeOperator>>();
+        Map<String, Class<? extends Operator>> classes = new HashMap<>();
 
-        for (Class<?> cls : ClassUtils.searchClassesWithAnnotation(AttributeOperatorDescription.class)) {
-            AttributeOperatorDescription annotation = cls.getAnnotation(AttributeOperatorDescription.class);
+        for (Class<?> cls : ClassUtils.searchClassesWithAnnotation(OperatorDescription.class)) {
+            OperatorDescription annotation = cls.getAnnotation(OperatorDescription.class);
             String name = annotation.value();
 
             if (classes.containsKey(name))
                 throw new KyouException("attribute operator name duplicated. old: " + classes.get(name) + ", new: " + cls);
 
-            classes.put(annotation.value(), cls.asSubclass(AttributeOperator.class));
+            classes.put(annotation.value(), cls.asSubclass(Operator.class));
         }
 
         OPERATOR_CLASSES = Collections.unmodifiableMap(classes);
@@ -71,7 +71,7 @@ public class AttributeMatcher extends Matcher {
                 }
 
         this.name = text;
-        this.op = new NotNull();
+        this.op = new Exists();
         this.value = null;
     }
 

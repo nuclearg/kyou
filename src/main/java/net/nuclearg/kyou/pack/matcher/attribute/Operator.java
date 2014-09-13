@@ -6,7 +6,7 @@ package net.nuclearg.kyou.pack.matcher.attribute;
  * @author ng
  * 
  */
-abstract class AttributeOperator {
+abstract class Operator {
     /**
      * 判断当前节点是否满足基于属性运算出来的结果
      * 

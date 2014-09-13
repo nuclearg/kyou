@@ -49,7 +49,7 @@ public abstract class Matcher {
         /*
          * 解析匹配字符串，构造匹配器列表
          */
-        List<Matcher> matchers = new ArrayList<Matcher>();
+        List<Matcher> matchers = new ArrayList<>();
         try {
             MatchString matchStr = new MatchString(str);
 

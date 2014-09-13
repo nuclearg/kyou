@@ -36,7 +36,7 @@ public abstract class SyntaxRule<L extends LexDefinition> {
      * @return 基于词的语法规则
      */
     public static <L extends LexDefinition> SyntaxRule<L> lex(L tokenType) {
-        return new LexRule<L>(tokenType);
+        return new LexRule<>(tokenType);
     }
 
     /**
@@ -47,7 +47,7 @@ public abstract class SyntaxRule<L extends LexDefinition> {
      * @return 引用其它语法规则的语法规则
      */
     public static <L extends LexDefinition> SyntaxRule<L> ref(SyntaxDefinition<L> type) {
-        return new RefRule<L>(type);
+        return new RefRule<>(type);
     }
 
     /**
@@ -59,7 +59,7 @@ public abstract class SyntaxRule<L extends LexDefinition> {
      */
     @SafeVarargs
     public static <L extends LexDefinition> SyntaxRule<L> seq(SyntaxRule<L>... elements) {
-        return new SequenceRule<L>(elements);
+        return new SequenceRule<>(elements);
     }
 
     /**
@@ -70,7 +70,7 @@ public abstract class SyntaxRule<L extends LexDefinition> {
      * @return 可以出现0或1次指定语法规则的语法规则
      */
     public static <L extends LexDefinition> SyntaxRule<L> opt(SyntaxRule<L> body) {
-        return new OptionalRule<L>(body);
+        return new OptionalRule<>(body);
     }
 
     /**
@@ -82,7 +82,7 @@ public abstract class SyntaxRule<L extends LexDefinition> {
      */
     @SafeVarargs
     public static <L extends LexDefinition> SyntaxRule<L> or(SyntaxRule<L>... conditions) {
-        return new OrRule<L>(conditions);
+        return new OrRule<>(conditions);
     }
 
     /**
@@ -93,7 +93,7 @@ public abstract class SyntaxRule<L extends LexDefinition> {
      * @return 可以出现0次或无数次指定语法规则的语法规则
      */
     public static <L extends LexDefinition> SyntaxRule<L> rep(SyntaxRule<L> body) {
-        return new RepeatRule<L>(body);
+        return new RepeatRule<>(body);
     }
 
     /**
@@ -104,7 +104,7 @@ public abstract class SyntaxRule<L extends LexDefinition> {
      * @return 一个空的语法规则
      */
     public static <L extends LexDefinition> SyntaxRule<L> empty(Class<L> cls) {
-        return new EmptyRule<L>();
+        return new EmptyRule<>();
     }
 
 }

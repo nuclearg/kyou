@@ -28,7 +28,7 @@ public class FilterMatcher extends Matcher {
     private final Filter impl;
 
     static {
-        Map<String, Class<? extends Filter>> classes = new HashMap<String, Class<? extends Filter>>();
+        Map<String, Class<? extends Filter>> classes = new HashMap<>();
 
         for (Class<?> cls : ClassUtils.searchClassesWithAnnotation(FilterDescription.class)) {
             FilterDescription desc = cls.getAnnotation(FilterDescription.class);

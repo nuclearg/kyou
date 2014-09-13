@@ -24,7 +24,7 @@ class OptionalRule<L extends LexDefinition> extends SyntaxRule<L> {
         if (result != null)
             return result;
         else
-            return new SyntaxTreeNode<L, S>(null, null, null);
+            return new SyntaxTreeNode<>(null, null, null);
     }
 
     @Override

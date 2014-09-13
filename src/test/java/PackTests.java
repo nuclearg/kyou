@@ -101,7 +101,7 @@ public class PackTests extends ParentRunner<PackTestData> {
             }
         });
 
-        List<PackTestData> tests = new ArrayList<PackTestData>();
+        List<PackTestData> tests = new ArrayList<>();
         for (File file : files)
             tests.add(new PackTestData(file));
 

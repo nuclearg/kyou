@@ -54,14 +54,14 @@ public class KyouPackStyle {
 
             // 初始化styles
             List<Element> styleElements = XmlUtils.selectElementList(doc, "/pack/style");
-            List<StyleItem> styles = new ArrayList<StyleItem>();
+            List<StyleItem> styles = new ArrayList<>();
             for (Element e : styleElements)
                 styles.add(new StyleItem(e, this));
             this.styles = Collections.unmodifiableList(styles);
 
             // 初始化scripts
             List<Element> scriptElements = XmlUtils.selectElementList(doc, "/pack/script");
-            List<StyleScript> scripts = new ArrayList<StyleScript>();
+            List<StyleScript> scripts = new ArrayList<>();
             for (Element e : scriptElements)
                 scripts.add(new StyleScript(e));
             this.scripts = Collections.unmodifiableList(scripts);

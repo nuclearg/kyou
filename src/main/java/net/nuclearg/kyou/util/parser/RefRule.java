@@ -25,7 +25,7 @@ class RefRule<L extends LexDefinition> extends SyntaxRule<L> {
         if (result == null)
             return null;
 
-        return new SyntaxTreeNode<L, S>((S) this.type, result.children, result.token);
+        return new SyntaxTreeNode<>((S) this.type, result.children, result.token);
     }
 
     @Override

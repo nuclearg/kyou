@@ -91,12 +91,12 @@ class StyleFormatString implements Iterable<byte[]> {
         /*
          * 开始解析
          */
-        List<byte[]> segments = new LinkedList<byte[]>();
+        List<byte[]> segments = new LinkedList<>();
 
         ByteOutputStream os = new ByteOutputStream();
         StringBuilder builder = new StringBuilder();
 
-        LexString<FormatStringTokenType> tokenStr = new LexString<FormatStringTokenType>(formatStr);
+        LexString<FormatStringTokenType> tokenStr = new LexString<>(formatStr);
         while (tokenStr.hasRemaining())
             try {
                 LexToken<FormatStringTokenType> token = tokenStr.tryToken(FormatStringTokenType.values());

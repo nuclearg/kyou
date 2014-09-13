@@ -25,7 +25,7 @@ class LexRule<L extends LexDefinition> extends SyntaxRule<L> {
         if (token == null)
             return null;
 
-        return new SyntaxTreeNode<L, S>(null, null, token);
+        return new SyntaxTreeNode<>(null, null, token);
     }
 
     @Override

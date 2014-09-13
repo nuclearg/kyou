@@ -48,7 +48,7 @@ abstract class StyleFormatSegment {
     static List<StyleFormatSegment> parseFormatString(String formatStr, Charset encoding, List<String> params) {
         StyleFormatString format = new StyleFormatString(formatStr, encoding);
 
-        List<StyleFormatSegment> segments = new ArrayList<StyleFormatSegment>();
+        List<StyleFormatSegment> segments = new ArrayList<>();
         int paramId = 0;
         for (byte[] bytes : format)
             // 判断这个段的类型
@@ -104,7 +104,7 @@ abstract class StyleFormatSegment {
             if (StringUtils.isBlank(paramStr))
                 throw new KyouException("param is blank");
 
-            List<Expr> exprChain = new ArrayList<Expr>();
+            List<Expr> exprChain = new ArrayList<>();
 
             // 解析参数字符串
             ExprListString paramString = new ExprListString(paramStr);

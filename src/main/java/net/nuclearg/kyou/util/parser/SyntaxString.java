@@ -37,7 +37,7 @@ public class SyntaxString<L extends LexDefinition, S extends SyntaxDefinition<L>
      * @return 解析出来的语法树。果解析失败则报错
      */
     public SyntaxTreeNode<L, S> parse(S syntax) {
-        LexString<L> tokenStr = new LexString<L>(this.str);
+        LexString<L> tokenStr = new LexString<>(this.str);
         SyntaxTreeNode<L, S> result = syntax.syntax().tryMatch(tokenStr);
 
         if (result == null)

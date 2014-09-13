@@ -68,10 +68,10 @@ class StyleFormatString implements Iterable<byte[]> {
         this.formatStr = formatStr;
 
         // 解析样式字符串
-        LexString<Lex> tokenStr = new LexString<Lex>(formatStr);
+        LexString<Lex> tokenStr = new LexString<>(formatStr);
 
         // 将每个词法元素对应到段上
-        List<byte[]> segments = new LinkedList<byte[]>();
+        List<byte[]> segments = new LinkedList<>();
 
         ByteOutputStream os = new ByteOutputStream();
         StringBuilder builder = new StringBuilder();

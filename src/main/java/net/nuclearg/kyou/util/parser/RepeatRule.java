@@ -29,7 +29,7 @@ class RepeatRule<L extends LexDefinition> extends SyntaxRule<L> {
         while ((child = this.body.tryMatch(tokenStr)) != null)
             children.add(child);
 
-        return new SyntaxTreeNode<L, S>(null, children, null);
+        return new SyntaxTreeNode<>(null, children, null);
     }
 
     @Override

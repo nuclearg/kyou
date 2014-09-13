@@ -44,7 +44,7 @@ class MatchString {
      * @return 解析出来的匹配器信息列表
      */
     List<MatcherInfo> parseMatcherInfo() {
-        SyntaxString<Lex, Syntax> syntaxStr = new SyntaxString<Lex, Syntax>(this.str);
+        SyntaxString<Lex, Syntax> syntaxStr = new SyntaxString<>(this.str);
         SyntaxTreeNode<Lex, Syntax> root = syntaxStr.parse(Syntax.Root);
 
         List<MatcherInfo> result = new ArrayList<>();

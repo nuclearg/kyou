@@ -3,17 +3,17 @@ package net.nuclearg.kyou.util.parser;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.nuclearg.kyou.util.lexer.LexTokenDefinition;
-import net.nuclearg.kyou.util.lexer.LexTokenString;
+import net.nuclearg.kyou.util.lexer.LexDefinition;
+import net.nuclearg.kyou.util.lexer.LexString;
 
 /**
  * 可以重复0次或无数次
  * 
  * @author ng
  * 
- * @param <T>
+ * @param <L>
  */
-class RepeatRule<L extends LexTokenDefinition> extends SyntaxRule<L> {
+class RepeatRule<L extends LexDefinition> extends SyntaxRule<L> {
     private final SyntaxRule<L> body;
 
     RepeatRule(SyntaxRule<L> body) {
@@ -21,15 +21,15 @@ class RepeatRule<L extends LexTokenDefinition> extends SyntaxRule<L> {
     }
 
     @Override
-    <S extends SyntaxUnitDefinition<L>> SyntaxUnit<L, S> match(LexTokenString tokenStr) {
-        List<SyntaxUnit<L, S>> children = new ArrayList<SyntaxUnit<L, S>>();
+    <S extends SyntaxDefinition<L>> SyntaxTreeNode<L, S> tryMatch(LexString<L> tokenStr) {
+        List<SyntaxTreeNode<L, S>> children = new ArrayList<SyntaxTreeNode<L, S>>();
 
-        SyntaxUnit<L, S> child;
+        SyntaxTreeNode<L, S> child;
 
-        while ((child = this.body.match(tokenStr)) != null)
+        while ((child = this.body.tryMatch(tokenStr)) != null)
             children.add(child);
 
-        return new SyntaxUnit<L, S>(null, children, null);
+        return new SyntaxTreeNode<>(null, children, null);
     }
 
     @Override

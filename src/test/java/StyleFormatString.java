@@ -1,4 +1,3 @@
-
 import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.Iterator;
@@ -8,9 +7,9 @@ import java.util.regex.Pattern;
 
 import net.nuclearg.kyou.KyouException;
 import net.nuclearg.kyou.util.ByteOutputStream;
+import net.nuclearg.kyou.util.lexer.LexDefinition;
+import net.nuclearg.kyou.util.lexer.LexString;
 import net.nuclearg.kyou.util.lexer.LexToken;
-import net.nuclearg.kyou.util.lexer.LexTokenDefinition;
-import net.nuclearg.kyou.util.lexer.LexTokenString;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -38,7 +37,7 @@ import org.apache.commons.lang.StringUtils;
  * 
  */
 class StyleFormatString implements Iterable<byte[]> {
-    private static enum Lex implements LexTokenDefinition {
+    private static enum Lex implements LexDefinition {
         PARAM_CHAR("\\%"),
 
         HEX_CHAR("\\\\[0-9]{2}"),
@@ -58,6 +57,11 @@ class StyleFormatString implements Iterable<byte[]> {
         @Override
         public Pattern regex() {
             return this.regex;
+        }
+
+        @Override
+        public String token(String selectedStr) {
+            return selectedStr;
         }
     }
 
@@ -92,15 +96,15 @@ class StyleFormatString implements Iterable<byte[]> {
         /*
          * 开始解析
          */
-        List<byte[]> segments = new LinkedList<byte[]>();
+        List<byte[]> segments = new LinkedList<>();
 
         ByteOutputStream os = new ByteOutputStream();
         StringBuilder builder = new StringBuilder();
 
-        LexTokenString tokenStr = new LexTokenString(formatStr);
-        while (!tokenStr.isEmpty())
+        LexString<Lex> tokenStr = new LexString<>(formatStr);
+        while (tokenStr.hasRemaining())
             try {
-                LexToken<Lex> token = tokenStr.next(Lex.values());
+                LexToken<Lex> token = tokenStr.tryToken(Lex.values());
                 if (token == null)
                     throw new KyouException("format string syntax error. formatStr: " + formatStr + ", pos: " + tokenStr.pos());
 

@@ -2,17 +2,12 @@ package net.nuclearg.kyou.pack;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import net.nuclearg.kyou.KyouException;
-import net.nuclearg.kyou.pack.Expr.ExprDescription;
-import net.nuclearg.kyou.pack.ExprListString.ExprInfo;
+import net.nuclearg.kyou.pack.expr.Expr;
 import net.nuclearg.kyou.util.ByteOutputStream;
 import net.nuclearg.kyou.util.value.Value;
-import net.nuclearg.kyou.util.value.ValueType;
-
-import org.apache.commons.lang.StringUtils;
 
 /**
  * 组包片段，对应格式字符串{@link StyleFormatString}中的一段
@@ -48,7 +43,7 @@ abstract class StyleFormatSegment {
     static List<StyleFormatSegment> parseFormatString(String formatStr, Charset encoding, List<String> params) {
         StyleFormatString format = new StyleFormatString(formatStr, encoding);
 
-        List<StyleFormatSegment> segments = new ArrayList<StyleFormatSegment>();
+        List<StyleFormatSegment> segments = new ArrayList<>();
         int paramId = 0;
         for (byte[] bytes : format)
             // 判断这个段的类型
@@ -101,32 +96,7 @@ abstract class StyleFormatSegment {
         private final List<Expr> exprChain;
 
         ParamSegment(String paramStr) {
-            if (StringUtils.isBlank(paramStr))
-                throw new KyouException("param is blank");
-
-            List<Expr> exprChain = new ArrayList<Expr>();
-
-            // 解析参数字符串
-            ExprListString paramString = new ExprListString(paramStr);
-            for (ExprInfo exprInfo : paramString.parseExprInfo())
-                exprChain.add(Expr.buildExpr(exprInfo));
-            // 因为在实际组包时，是从最后一个表达式开始计算的，为省事现在在这里直接先倒序一下
-            Collections.reverse(exprChain);
-
-            // 检查各个表达式的正确性，以及与前一个表达式的衔接是否有问题
-            for (int i = 0; i < exprChain.size(); i++) {
-                Expr expr = exprChain.get(i);
-                Expr prev = i > 0 ? exprChain.get(i - 1) : null;
-
-                expr.check(prev);
-            }
-            // 检查最后一个表达式的输出是不是字节数组或Backspace
-            Expr last = exprChain.get(exprChain.size() - 1);
-            ValueType lastOutput = last.getClass().getAnnotation(ExprDescription.class).typeOut();
-            if (lastOutput != ValueType.Bytes && lastOutput != ValueType.Backspace)
-                throw new KyouException("last expr must return Bytes or Backspace but " + lastOutput);
-
-            this.exprChain = Collections.unmodifiableList(exprChain);
+            this.exprChain = Expr.parseExprList(paramStr);
         }
 
         @Override

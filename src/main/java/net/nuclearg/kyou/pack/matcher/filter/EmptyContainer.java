@@ -2,6 +2,7 @@ package net.nuclearg.kyou.pack.matcher.filter;
 
 import net.nuclearg.kyou.dom.KyouContainer;
 import net.nuclearg.kyou.dom.KyouItem;
+import net.nuclearg.kyou.pack.matcher.filter.FilterMatcherDescription.ParamType;
 
 /**
  * 匹配不包含任何元素的容器节点
@@ -9,11 +10,11 @@ import net.nuclearg.kyou.dom.KyouItem;
  * @author ng
  * 
  */
-@FilterDescription("empty")
-class EmptyContainer extends Filter {
+@FilterMatcherDescription(name = "empty", paramType = ParamType.None)
+class EmptyContainer extends FilterMatcher {
 
     @Override
-    boolean matches(KyouItem item) {
+    public boolean matches(KyouItem item) {
         if (!(item instanceof KyouContainer))
             return false;
 

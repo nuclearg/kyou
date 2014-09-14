@@ -1,31 +1,31 @@
 package net.nuclearg.kyou.util.parser;
 
-import net.nuclearg.kyou.util.lexer.LexTokenDefinition;
-import net.nuclearg.kyou.util.lexer.LexTokenString;
+import net.nuclearg.kyou.util.lexer.LexDefinition;
+import net.nuclearg.kyou.util.lexer.LexString;
 
 /**
  * 引用另一个语法单元定义
  * 
  * @author ng
  * 
- * @param <T>
+ * @param <L>
  */
-class RefRule<L extends LexTokenDefinition> extends SyntaxRule<L> {
-    private final SyntaxUnitDefinition<L> type;
+class RefRule<L extends LexDefinition> extends SyntaxRule<L> {
+    private final SyntaxDefinition<L> type;
 
-    public RefRule(SyntaxUnitDefinition<L> type) {
+    public RefRule(SyntaxDefinition<L> type) {
         this.type = type;
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    <S extends SyntaxUnitDefinition<L>> SyntaxUnit<L, S> match(LexTokenString tokenStr) {
-        SyntaxUnit<L, S> result = this.type.syntax().match(tokenStr);
+    <S extends SyntaxDefinition<L>> SyntaxTreeNode<L, S> tryMatch(LexString<L> tokenStr) {
+        SyntaxTreeNode<L, S> result = this.type.syntax().tryMatch(tokenStr);
 
         if (result == null)
             return null;
 
-        return new SyntaxUnit<L, S>((S) this.type, result.children, result.tokens);
+        return new SyntaxTreeNode<>((S) this.type, result.children, result.token);
     }
 
     @Override

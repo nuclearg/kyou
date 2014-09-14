@@ -27,7 +27,7 @@ public class PackTests extends ParentRunner<PackTestData> {
         super(testClass);
 
         try {
-            this.tests = findTests();
+            this.tests = this.findTests();
         } catch (Exception ex) {
             throw new InitializationError(ex);
         }
@@ -79,7 +79,7 @@ public class PackTests extends ParentRunner<PackTestData> {
             }
         };
 
-        runLeaf(statement, describeChild(child), notifier);
+        this.runLeaf(statement, this.describeChild(child), notifier);
     }
 
     private List<PackTestData> findTests() throws Exception {
@@ -91,7 +91,7 @@ public class PackTests extends ParentRunner<PackTestData> {
             }
         });
 
-        List<PackTestData> tests = new ArrayList<PackTestData>();
+        List<PackTestData> tests = new ArrayList<>();
         for (File file : files)
             tests.add(new PackTestData(file));
 

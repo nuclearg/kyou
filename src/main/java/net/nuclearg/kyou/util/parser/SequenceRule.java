@@ -4,41 +4,42 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import net.nuclearg.kyou.util.lexer.LexTokenDefinition;
-import net.nuclearg.kyou.util.lexer.LexTokenString;
+import net.nuclearg.kyou.util.lexer.LexDefinition;
+import net.nuclearg.kyou.util.lexer.LexString;
 
 import org.apache.commons.lang.StringUtils;
 
 /**
- * 语法定义
+ * 表示顺序出现
  * 
  * @author ng
  * 
- * @param <T>
+ * @param <L>
  */
-class SequenceRule<L extends LexTokenDefinition> extends SyntaxRule<L> {
+class SequenceRule<L extends LexDefinition> extends SyntaxRule<L> {
     private final List<SyntaxRule<L>> elements;
 
+    @SuppressWarnings("unchecked")
     SequenceRule(SyntaxRule<L>... elements) {
         this.elements = Arrays.asList(elements);
     }
 
     @Override
-    <S extends SyntaxUnitDefinition<L>> SyntaxUnit<L, S> match(LexTokenString tokenStr) {
+    <S extends SyntaxDefinition<L>> SyntaxTreeNode<L, S> tryMatch(LexString<L> tokenStr) {
         int pos = tokenStr.pos();
 
-        List<SyntaxUnit<L, S>> children = new ArrayList<SyntaxUnit<L, S>>();
+        List<SyntaxTreeNode<L, S>> children = new ArrayList<>();
 
-        SyntaxUnit<L, S> child;
-        for (SyntaxRule<L> element : elements)
-            if ((child = element.match(tokenStr)) != null)
+        SyntaxTreeNode<L, S> child;
+        for (SyntaxRule<L> element : this.elements)
+            if ((child = element.tryMatch(tokenStr)) != null)
                 children.add(child);
             else {
                 tokenStr.pos(pos);
                 return null;
             }
 
-        return new SyntaxUnit<L, S>(null, children, null);
+        return new SyntaxTreeNode<>(null, children, null);
     }
 
     @Override

@@ -94,7 +94,7 @@ public class XmlUtils {
         try {
             NodeList list = (NodeList) xpathFactory.newXPath().evaluate(xpath, base, XPathConstants.NODESET);
 
-            List<Element> result = new ArrayList<Element>();
+            List<Element> result = new ArrayList<>();
             for (int i = 0; i < list.getLength(); i++)
                 result.add((Element) list.item(i));
             return result;
@@ -144,7 +144,7 @@ public class XmlUtils {
         try {
             NodeList list = (NodeList) xpathFactory.newXPath().evaluate(xpath, base, XPathConstants.NODESET);
 
-            List<String> result = new ArrayList<String>();
+            List<String> result = new ArrayList<>();
             for (int i = 0; i < list.getLength(); i++)
                 result.add(list.item(i).getTextContent().trim());
             return result;

@@ -2,6 +2,7 @@ package net.nuclearg.kyou.pack.matcher.filter;
 
 import net.nuclearg.kyou.dom.KyouContainer;
 import net.nuclearg.kyou.dom.KyouItem;
+import net.nuclearg.kyou.pack.matcher.filter.FilterMatcherDescription.ParamType;
 
 /**
  * 匹配所有兄弟节点的最后一个
@@ -9,11 +10,11 @@ import net.nuclearg.kyou.dom.KyouItem;
  * @author ng
  * 
  */
-@FilterDescription("last")
-class Last extends Filter {
+@FilterMatcherDescription(name = "last", paramType = ParamType.None)
+class Last extends FilterMatcher {
 
     @Override
-    boolean matches(KyouItem item) {
+    public boolean matches(KyouItem item) {
         KyouContainer parent = item.parent();
         if (parent == null || parent == item)
             return false;

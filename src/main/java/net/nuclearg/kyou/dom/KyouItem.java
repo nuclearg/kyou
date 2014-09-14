@@ -41,7 +41,7 @@ public abstract class KyouItem {
     /**
      * 该报文元素的属性列表
      */
-    protected Map<String, String> attributes = new TreeMap<String, String>();
+    protected Map<String, String> attributes = new TreeMap<>();
 
     /**
      * 获取该节点的名称

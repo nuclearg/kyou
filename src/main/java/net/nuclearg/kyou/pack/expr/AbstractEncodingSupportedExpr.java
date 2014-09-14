@@ -3,7 +3,6 @@ package net.nuclearg.kyou.pack.expr;
 import java.nio.charset.Charset;
 
 import net.nuclearg.kyou.KyouException;
-import net.nuclearg.kyou.pack.Expr;
 import net.nuclearg.kyou.pack.PackContext;
 import net.nuclearg.kyou.util.value.Value;
 
@@ -20,7 +19,7 @@ abstract class AbstractEncodingSupportedExpr extends Expr {
     private Charset encoding;
 
     @Override
-    protected Value eval(Value input, PackContext context) {
+    public Value eval(Value input, PackContext context) {
         Charset encoding = this.encoding == null ? context.style.config.encoding : this.encoding;
 
         return this.eval(input, context, encoding);

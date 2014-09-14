@@ -28,6 +28,7 @@ public class KyouException extends RuntimeException {
      * Kyou加载失败时抛出此异常
      */
     public KyouException(String message, Throwable cause) {
+        // super(message,cause);
         super(buildMessage(message, cause), findRootCause(cause));
     }
 
@@ -35,19 +36,23 @@ public class KyouException extends RuntimeException {
      * Kyou加载失败时抛出此异常
      */
     public KyouException(Throwable cause) {
+        // super(cause);
         super(cause.getMessage(), findRootCause(cause));
     }
 
     private static String buildMessage(String message, Throwable cause) {
         if (cause instanceof KyouException)
-            return buildMessage(message + SystemUtils.LINE_SEPARATOR + " >> " + cause.getMessage(), cause.getCause());
+            if (cause.getCause() != null)
+                return buildMessage(message + SystemUtils.LINE_SEPARATOR + " >> " + cause.getMessage(), cause.getCause());
+            else
+                return message + SystemUtils.LINE_SEPARATOR + " >> " + cause.getMessage();
         else
             return cause.getMessage();
     }
 
     private static Throwable findRootCause(Throwable cause) {
         if (cause instanceof KyouException)
-            return findRootCause(cause.getCause());
+            return (cause.getCause() != null && cause.getCause() != cause) ? findRootCause(cause.getCause()) : cause;
         else
             return cause;
     }

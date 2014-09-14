@@ -1,15 +1,12 @@
 package net.nuclearg.kyou.pack.matcher.attribute;
 
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 
 import net.nuclearg.kyou.KyouException;
 import net.nuclearg.kyou.dom.KyouItem;
 import net.nuclearg.kyou.pack.matcher.Matcher;
 import net.nuclearg.kyou.util.ClassUtils;
-
-import org.apache.commons.lang.StringUtils;
+import net.nuclearg.kyou.util.ClassUtils.AnnotationNameParser;
 
 /**
  * 对属性进行判断的匹配器
@@ -18,7 +15,13 @@ import org.apache.commons.lang.StringUtils;
  * 
  */
 public class AttributeMatcher extends Matcher {
-    private static final Map<String, Class<? extends AttributeOperator>> OPERATOR_CLASSES;
+    private static final Map<String, Class<? extends Operator>> OPERATOR_CLASSES = ClassUtils.buildAnnotatedClassMap(OperatorDescription.class, Operator.class, new AnnotationNameParser<OperatorDescription>() {
+
+        @Override
+        public String parseName(OperatorDescription annotation) {
+            return annotation.value();
+        }
+    });
 
     /**
      * 属性名
@@ -27,63 +30,47 @@ public class AttributeMatcher extends Matcher {
     /**
      * 运算符
      */
-    private final AttributeOperator op;
+    private final Operator op;
     /**
      * 属性值
      */
     private final String value;
 
-    static {
-        Map<String, Class<? extends AttributeOperator>> classes = new HashMap<String, Class<? extends AttributeOperator>>();
-
-        for (Class<?> cls : ClassUtils.searchClassesWithAnnotation(AttributeOperatorDescription.class)) {
-            AttributeOperatorDescription annotation = cls.getAnnotation(AttributeOperatorDescription.class);
-            String name = annotation.value();
-
-            if (classes.containsKey(name))
-                throw new KyouException("attribute operator name duplicated. old: " + classes.get(name) + ", new: " + cls);
-
-            classes.put(annotation.value(), cls.asSubclass(AttributeOperator.class));
-        }
-
-        OPERATOR_CLASSES = Collections.unmodifiableMap(classes);
-    }
-
-    public AttributeMatcher(String text) {
-        // 去掉头尾的中括号
-        text = text.substring(1, text.length() - 1);
-
-        for (String op : OPERATOR_CLASSES.keySet())
-            if (text.contains(op))
-                try {
-                    this.name = text.substring(0, text.indexOf(op));
-                    this.op = ClassUtils.newInstance(OPERATOR_CLASSES.get(op));
-                    this.value = text.substring(text.indexOf(op) + op.length());
-
-                    if (StringUtils.isEmpty(this.name))
-                        throw new KyouException("attribute name is empty. expr: [" + text + "]");
-                    if (StringUtils.isEmpty(this.value))
-                        throw new KyouException("attribute value is empty. expr: [" + text + "]");
-
-                    return;
-                } catch (Exception ex) {
-                    throw new KyouException("init attribute operator fail. text: " + text, ex);
-                }
-
-        this.name = text;
-        this.op = new NotNull();
-        this.value = null;
+    private AttributeMatcher(String name, Operator op, String value) {
+        this.name = name;
+        this.op = op;
+        this.value = value;
     }
 
     @Override
     public boolean matches(KyouItem item) {
-        String attr = item.attr(this.name);
-        return this.op.matches(this.value, attr);
+        return this.op.matches(this.value, item.attr(this.name));
     }
 
     @Override
     public String toString() {
-        return "[" + this.name + this.op + (this.value != null ? this.value : "") + "]";
+        return "[" + this.name + " " + this.op.getClass().getSimpleName() + (this.value != null ? " " + this.value : "") + "]";
     }
 
+    /**
+     * 构建一个属性匹配器
+     * 
+     * @param attrName
+     *            属性名称
+     * @param attrOperator
+     *            运算符
+     * @param attrValue
+     *            属性的值
+     * @return 属性匹配器实例
+     */
+    public static Matcher buildAttributeMatcher(String attrName, String attrOperator, String attrValue) {
+        if (attrOperator == null)
+            attrOperator = "";
+
+        Operator op = ClassUtils.newInstance(OPERATOR_CLASSES, attrOperator);
+        if (op == null)
+            throw new KyouException("unsupported attribute operator. op: " + attrOperator);
+
+        return new AttributeMatcher(attrName, op, attrValue);
+    }
 }

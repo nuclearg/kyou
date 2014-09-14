@@ -13,7 +13,7 @@ public class NodeNameMatcher extends Matcher {
     private final String name;
 
     public NodeNameMatcher(String name) {
-        this.name = name.substring(1);
+        this.name = name;
     }
 
     @Override

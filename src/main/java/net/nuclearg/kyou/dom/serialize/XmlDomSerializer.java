@@ -89,54 +89,54 @@ public class XmlDomSerializer implements KyouDomSerializer, KyouDomDeserializer 
 
         @Override
         public void docStart(KyouDocument doc) {
-            builder.append("<?xml version=\"1.0\" encoding=\"utf-8\"?><document");
-            this.appendAttributes(builder, doc);
-            builder.append(">");
+            this.builder.append("<?xml version=\"1.0\" encoding=\"utf-8\"?><document");
+            this.appendAttributes(this.builder, doc);
+            this.builder.append(">");
         }
 
         @Override
         public void docEnd(KyouDocument doc) {
-            builder.append("</document>");
+            this.builder.append("</document>");
         }
 
         @Override
         public void struStart(KyouStruct stru) {
-            builder.append("<struct name=\"").append(stru.name()).append("\"");
-            this.appendAttributes(builder, stru);
-            builder.append(">");
+            this.builder.append("<struct name=\"").append(stru.name()).append("\"");
+            this.appendAttributes(this.builder, stru);
+            this.builder.append(">");
         }
 
         @Override
         public void struEnd(KyouStruct stru) {
-            builder.append("</struct>");
+            this.builder.append("</struct>");
         }
 
         @Override
         public void arrayStart(KyouArray array) {
-            builder.append("<array name=\"").append(array.name()).append("\"");
-            this.appendAttributes(builder, array);
-            builder.append(">");
+            this.builder.append("<array name=\"").append(array.name()).append("\"");
+            this.appendAttributes(this.builder, array);
+            this.builder.append(">");
 
-            builder.append("<prototype>");
+            this.builder.append("<prototype>");
             SerializerVisitor visitor = new SerializerVisitor(this.builder);
             array.prototype().foreach(visitor);
-            builder.append("</prototype>");
+            this.builder.append("</prototype>");
         }
 
         @Override
         public void arrayEnd(KyouArray array) {
-            builder.append("</array>");
+            this.builder.append("</array>");
         }
 
         @Override
         public void field(KyouField field) {
-            builder.append("<field");
-            this.appendAttributes(builder, field);
-            builder.append(">");
+            this.builder.append("<field");
+            this.appendAttributes(this.builder, field);
+            this.builder.append(">");
 
-            builder.append(StringEscapeUtils.escapeXml(field.value()));
+            this.builder.append(StringEscapeUtils.escapeXml(field.value()));
 
-            builder.append("</field>");
+            this.builder.append("</field>");
         }
 
         private void appendAttributes(StringBuilder builder, KyouItem item) {
@@ -227,7 +227,7 @@ public class XmlDomSerializer implements KyouDomSerializer, KyouDomDeserializer 
 
                 @Override
                 public void characters(char[] ch, int start, int length) throws SAXException {
-                    text.append(new String(ch, start, length));
+                    this.text.append(new String(ch, start, length));
                 }
 
                 @Override
@@ -239,7 +239,7 @@ public class XmlDomSerializer implements KyouDomSerializer, KyouDomDeserializer 
                     if (StringUtils.isBlank(attributeStr))
                         return Collections.emptyMap();
 
-                    Map<String, String> attributes = new HashMap<String, String>();
+                    Map<String, String> attributes = new HashMap<>();
                     for (String attribute : StringUtils.split(attributeStr, '&'))
                         try {
                             String[] kv = StringUtils.split(attribute, '=');

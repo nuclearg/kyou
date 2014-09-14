@@ -24,23 +24,23 @@
         <param>m</param>
     </style>
 
-    <style match="[a=1]">
+    <style match="[a='1']">
         <format>a=1</format>
     </style>
     
-    <style match="field[b]">
+    <style match="field['b']">
         <format>b=2</format>
     </style>
     
-    <style match="[head^=H]">
+    <style match="[head^='H']">
         <format>c=3</format>
     </style>
     
-    <style match="[tail$=ail]">
+    <style match="['tail'$='ail']">
         <format>d=4</format>
     </style>
     
-    <style match="[e!=xxx]">
+    <style match="[e!='xxx']">
         <format>e=5</format>
     </style>
     

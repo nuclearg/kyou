@@ -2,6 +2,7 @@ package net.nuclearg.kyou.pack.matcher.filter;
 
 import net.nuclearg.kyou.dom.KyouContainer;
 import net.nuclearg.kyou.dom.KyouItem;
+import net.nuclearg.kyou.pack.matcher.filter.FilterMatcherDescription.ParamType;
 
 /**
  * 匹配所有兄弟节点中的第一个
@@ -9,11 +10,11 @@ import net.nuclearg.kyou.dom.KyouItem;
  * @author ng
  * 
  */
-@FilterDescription("first")
-class First extends Filter {
+@FilterMatcherDescription(name = "first", paramType = ParamType.None)
+class First extends FilterMatcher {
 
     @Override
-    boolean matches(KyouItem item) {
+    public boolean matches(KyouItem item) {
         KyouContainer parent = item.parent();
         if (parent == null || parent == item)
             return false;

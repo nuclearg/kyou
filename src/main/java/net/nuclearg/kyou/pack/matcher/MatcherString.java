@@ -136,17 +136,23 @@ class MatcherString {
     private MatcherInfo parseAttributeMatcherInfo(SyntaxTreeNode<Lex, Syntax> node) {
         node = node.children.get(1);
 
-        // 读取属性名
+        // 处理简单属性
+        if (node.type == Syntax.SimpleAttribute) {
+            String attrName;
+            if (node.token != null)
+                attrName = node.token.str;
+            else
+                attrName = node.children.get(1).token.str;
+            return new MatcherInfo(attrName, (String) null, (String) null);
+        }
+
+        // 处理复杂属性
         String attrName;
         SyntaxTreeNode<Lex, Syntax> attrNameNode = node.children.get(0);
-        if (attrNameNode.type == Syntax.String)
-            attrName = attrNameNode.children.get(1).token.str;
-        else
+        if (attrNameNode.token != null)
             attrName = attrNameNode.token.str;
-
-        // 如果是简单属性直接返回
-        if (node.type == Syntax.SimpleAttribute)
-            return new MatcherInfo(attrName, (String) null, (String) null);
+        else
+            attrName = attrNameNode.children.get(1).token.str;
 
         // 读取运算符和属性值
         String attrOperator = node.children.get(1).token.str.trim();

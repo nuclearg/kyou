@@ -49,7 +49,7 @@ public class AttributeMatcher extends Matcher {
 
     @Override
     public String toString() {
-        return "[" + this.name + this.op + (this.value != null ? this.value : "") + "]";
+        return "[" + this.name + " " + this.op.getClass().getSimpleName() + (this.value != null ? " " + this.value : "") + "]";
     }
 
     /**

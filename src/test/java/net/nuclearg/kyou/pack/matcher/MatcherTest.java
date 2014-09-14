@@ -38,8 +38,11 @@ public class MatcherTest {
 
     @Test
     public void 属性() {
+        test("[attr]");
+        test("['attr']");
         test("[a='3']");
         test("['a'='3']");
+        test("[e!='x\\'xx']");
         try {
             test("[a=3]");
             Assert.fail();
@@ -60,6 +63,7 @@ public class MatcherTest {
 
     @Test
     public void 混成一坨() {
+        test("field['b']");
         test("struct#name field");
         test("struct#kkk[a='3']:asdf(12)");
         test("#a , #b");
@@ -68,6 +72,13 @@ public class MatcherTest {
     }
 
     private void test(String str) {
-        Assert.assertNotNull(Matcher.parse(str));
+        try {
+            System.out.print(str + " ===> ");
+            Matcher matcher = Matcher.parse(str);
+            System.out.print(matcher);
+            Assert.assertNotNull(matcher);
+        } finally {
+            System.out.println();
+        }
     }
 }

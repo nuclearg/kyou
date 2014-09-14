@@ -8,6 +8,9 @@ import net.nuclearg.kyou.dom.KyouItem;
  * 在右侧匹配器与当前报文节点相匹配的前提下，检查左侧匹配器是否与当前报文节点的父节点成功匹配
  * </p>
  * 
+ * @example array>field
+ *          匹配所有位于数组中的报文域
+ * 
  * @author ng
  * 
  */

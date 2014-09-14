@@ -15,6 +15,9 @@ import net.nuclearg.kyou.util.value.ValueType;
  * @in 要回退的字节数
  * @out 回退的动作。表示该“回退”动作的输出无法作为任何其它表达式的输入
  * 
+ * @example bk 2
+ *          表示回退2个字节。其中2是整数字面量
+ * 
  * @author ng
  * 
  */

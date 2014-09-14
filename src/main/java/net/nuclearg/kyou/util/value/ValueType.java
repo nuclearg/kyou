@@ -8,6 +8,10 @@ package net.nuclearg.kyou.util.value;
  */
 public enum ValueType {
     /**
+     * 表示一个不应该存在的值类型
+     */
+    Null,
+    /**
      * 报文文档树的一部分
      */
     Dom,

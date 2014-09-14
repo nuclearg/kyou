@@ -96,7 +96,7 @@ public abstract class Expr {
 
         // 检查和前一环节的表达式之间的衔接是否有问题
         if (prev == null) {
-            if (annotation.typeIn() != ValueType.Dom)
+            if (annotation.typeIn() != ValueType.Dom && annotation.typeIn() != ValueType.Null)
                 throw new KyouException("expr requires input. expr: " + this);
         } else if (annotation.typeIn() != prev.getClass().getAnnotation(ExprDescription.class).typeOut())
             throw new KyouException("expr input type mismatch. expr: " + this + ", prev: " + prev);

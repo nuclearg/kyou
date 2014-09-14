@@ -9,10 +9,19 @@ import org.apache.commons.lang.StringUtils;
 
 /**
  * 求报文元素的某个属性的值
+ * <p>
+ * 如果属性的名称符合节点名称的语法，则可以直接获取，例如a.attr1<br/>
+ * 否则需要使用一个字符串，例如a.'属性A'
+ * </p>
  * 
  * @in 要被获取属性值的报文元素
  * @out 报文元素对应属性的值，如果该属性不存在则返回一个空字符串
  * @postfix 要获取的属性的名称
+ * 
+ * @example a.aaa
+ *          对于field[aaa='3', bbb='4']，返回"3"的字符串
+ * @example a.'属性A'
+ *          对于field['属性A'='3', '属性B'='4']，返回"3"的字符串
  * 
  * @author ng
  * 

@@ -26,7 +26,7 @@ import org.apache.commons.lang.StringUtils;
  * 
  */
 @ExprDescription(name = "urlencode", postfix = ExprPostfix.NoneOrString, typeIn = ValueType.String, typeOut = ValueType.String)
-public class EncodeUrlExpr extends AbstractEncodingSupportedExpr {
+public class EncodeUrl extends AbstractEncodingSupportedExpr {
 
     @Override
     protected Value eval(Value input, PackContext context, Charset encoding) {

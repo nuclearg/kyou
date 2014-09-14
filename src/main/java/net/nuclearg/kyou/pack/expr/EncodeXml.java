@@ -17,7 +17,7 @@ import org.apache.commons.lang.StringEscapeUtils;
  * 
  */
 @ExprDescription(name = "xmlencode", postfix = ExprPostfix.None, typeIn = ValueType.String, typeOut = ValueType.String)
-public class EncodeXmlExpr extends Expr {
+public class EncodeXml extends Expr {
 
     @Override
     public Value eval(Value input, PackContext context) {

@@ -40,7 +40,10 @@ public class KyouException extends RuntimeException {
 
     private static String buildMessage(String message, Throwable cause) {
         if (cause instanceof KyouException)
-            return buildMessage(message + SystemUtils.LINE_SEPARATOR + " >> " + cause.getMessage(), cause.getCause());
+            if (cause.getCause() != null)
+                return buildMessage(message + SystemUtils.LINE_SEPARATOR + " >> " + cause.getMessage(), cause.getCause());
+            else
+                return message + SystemUtils.LINE_SEPARATOR + " >> " + cause.getMessage();
         else
             return cause.getMessage();
     }

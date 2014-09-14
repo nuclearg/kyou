@@ -15,7 +15,7 @@ import net.nuclearg.kyou.util.value.ValueType;
  * 
  */
 @ExprDescription(name = "lens", postfix = ExprPostfix.None, typeIn = ValueType.String, typeOut = ValueType.Integer)
-class LenStringExpr extends Expr {
+class LenString extends Expr {
 
     @Override
     public Value eval(Value input, PackContext context) {

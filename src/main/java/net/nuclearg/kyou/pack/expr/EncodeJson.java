@@ -17,7 +17,7 @@ import org.apache.commons.lang.StringEscapeUtils;
  * 
  */
 @ExprDescription(name = "jsonencode", postfix = ExprPostfix.None, typeIn = ValueType.String, typeOut = ValueType.String)
-public class EncodeJsonExpr extends Expr {
+public class EncodeJson extends Expr {
 
     @Override
     public Value eval(Value input, PackContext context) {

@@ -16,6 +16,8 @@ import net.nuclearg.kyou.util.parser.SyntaxRule;
 import net.nuclearg.kyou.util.parser.SyntaxString;
 import net.nuclearg.kyou.util.parser.SyntaxTreeNode;
 
+import org.apache.commons.lang.StringUtils;
+
 /**
  * 匹配字符串，对应组包样式中match的部分
  * <p>
@@ -337,9 +339,10 @@ class MatcherString {
         StringEnd("\\'"),
 
         /**
-         * 报文节点名称
+         *  标识符
          */
-        NodeName("[_a-zA-Z][-_0-9a-zA-Z]*"),
+        Identifier("[_a-zA-Z][-_0-9a-zA-Z]*"),
+
         /**
          * 报文节点类型的关键字
          */
@@ -390,6 +393,14 @@ class MatcherString {
         public Pattern regex() {
             return this.regex;
         }
+
+        @Override
+        public String token(String selectedStr) {
+            if (this == StringValue)
+                return StringUtils.replace(selectedStr, "\\'", "'");
+            else
+                return selectedStr;
+        }
     }
 
     /**
@@ -412,24 +423,24 @@ class MatcherString {
                         rep(
                         seq(
                                 lex(Lex.DotToken),
-                                lex(Lex.NodeName))))),
+                                lex(Lex.Identifier))))),
 
         NodeType(lex(Lex.NodeTypeKeyword)),
 
         NodeName(
                 seq(
                         lex(Lex.HashToken),
-                        lex(Lex.NodeName))),
+                        lex(Lex.Identifier))),
 
         SimpleAttribute(
                 or(
                         ref(String),
-                        lex(Lex.NodeName))),
+                        lex(Lex.Identifier))),
         NormalAttribute(
                 seq(
                         or(
                                 ref(String),
-                                lex(Lex.NodeName)),
+                                lex(Lex.Identifier)),
                         lex(Lex.AttributeOperator),
                         ref(String))),
         Attribute(
@@ -455,7 +466,7 @@ class MatcherString {
         Filter(
                 seq(
                         lex(Lex.FilterSign),
-                        lex(Lex.NodeName),
+                        lex(Lex.Identifier),
                         or(
                                 ref(FilterIntegerParam),
                                 ref(FilterStringParam),

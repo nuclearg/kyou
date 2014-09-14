@@ -175,7 +175,7 @@ public abstract class Expr {
      *            参数字符串
      * @return 解析出来的表达式列表
      */
-    public static List<Expr> buildExprList(String str) {
+    public static List<Expr> parseExprList(String str) {
         if (StringUtils.isBlank(str))
             throw new KyouException("param is blank");
 

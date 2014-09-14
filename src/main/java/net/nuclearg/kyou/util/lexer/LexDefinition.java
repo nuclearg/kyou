@@ -19,4 +19,9 @@ public interface LexDefinition {
      * 该词法元素对应的正则表达式
      */
     public Pattern regex();
+
+    /**
+     * 经常有正则描述的字符串与实际期望的字符串不一致的情况，这里提供一个修改的后门
+     */
+    public String token(String selectedStr);
 }

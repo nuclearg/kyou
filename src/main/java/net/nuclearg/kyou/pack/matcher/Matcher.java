@@ -44,9 +44,8 @@ public abstract class Matcher {
             throw new KyouException("match is blank");
 
         // 解析匹配字符串，构造匹配器树
-        MatcherString matchStr = new MatcherString(str);
         try {
-            MatcherInfo root = matchStr.parseMatcherInfo();
+            MatcherInfo root = new MatcherString(str).parseMatcherInfo();
 
             return buildMatcher(root);
         } catch (Exception ex) {

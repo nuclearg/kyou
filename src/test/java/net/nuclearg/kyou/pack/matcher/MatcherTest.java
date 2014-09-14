@@ -66,7 +66,6 @@ public class MatcherTest {
         test("field['b']");
         test("struct#name field");
         test("struct#kkk[a='3']:nth-child(12)");
-        test("s2b.gbk aligns[align='r', padding='\\'', len='5'] v");
         test("#a , #b");
         test("struct > #aaa[asdf^='ddd']");
         test("struct > field , array > field, #head field");

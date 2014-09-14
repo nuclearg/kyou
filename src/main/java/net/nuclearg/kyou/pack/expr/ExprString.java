@@ -20,6 +20,8 @@ import net.nuclearg.kyou.util.parser.SyntaxRule;
 import net.nuclearg.kyou.util.parser.SyntaxString;
 import net.nuclearg.kyou.util.parser.SyntaxTreeNode;
 
+import org.apache.commons.lang.StringUtils;
+
 /**
  * 表达式字符串，对应于组包样式中param的部分
  * 
@@ -51,6 +53,12 @@ class ExprString {
         for (SyntaxTreeNode<Lex, Syntax> exprUnit : root.children) {
             exprUnit = exprUnit.children.get(0);
 
+            // 判断是不是整数字面量，如果是的话要单独处理
+            if (exprUnit.token != null) {
+                result.add(new ExprInfo(exprUnit.token.str, (String) null));
+                continue;
+            }
+
             // 解析name
             SyntaxTreeNode<Lex, Syntax> nameUnit = exprUnit.children.get(0);
             String name = nameUnit.token.str;
@@ -77,8 +85,8 @@ class ExprString {
                         if (postfixFieldUnit.type != Syntax.ComplexPostfixField)
                             continue;
 
-                        String k = postfixFieldUnit.children.get(1).token.str;
-                        String v = postfixFieldUnit.children.get(6).token.str;
+                        String k = postfixFieldUnit.children.get(0).token.str;
+                        String v = postfixFieldUnit.children.get(2).children.get(1).token.str;
 
                         complexPostfixMap.put(k, v);
                     }
@@ -146,9 +154,27 @@ class ExprString {
         Space("\\s+"),
 
         /**
-         * 表达式名称
+         * 整数
          */
-        Name("[0-9a-z]+|\\d+"),
+        Integer("\\d+"),
+
+        /**
+         * 字符串开始
+         */
+        StringStart("\\'"),
+        /**
+         * 字符串值
+         */
+        StringValue("(\\\\'|[^'])*"),
+        /**
+         * 字符串结束
+         */
+        StringEnd("\\'"),
+
+        /**
+         *  标识符
+         */
+        Identifier("[_a-zA-Z][-_0-9a-zA-Z]*"),
 
         /**
          * 表达式的简单后缀的开始标志
@@ -162,35 +188,19 @@ class ExprString {
         /**
          * 表达式的复杂后缀的开始标志
          */
-        ComplexPostfixStart("\\["),
-        /**
-         * 表达式的复杂后缀其中某一项的名称
-         */
-        ComplexPostfixName("[0-9a-zA-Z]+"),
+        ComplexPostfixStart("\\[\\s*"),
         /**
          * 表达式的复杂后缀其中某一项的名称与值的分隔符
          */
-        ComplexPostfixNVDelimiter("\\="),
-        /**
-         * 表达式的复杂后缀其中某一项的值的开始标志
-         */
-        ComplexPostfixValueStart("\\'"),
-        /**
-         * 表达式的复杂后缀其中某一项的值
-         */
-        ComplexPostfixValue("(\\w|\\s)*"), // TODO 这个正则不正确
-        /**
-         * 表达式的复杂后缀其中某一项的结束标志
-         */
-        ComplexPostfixValueEnd("\\'"),
+        ComplexPostfixNVDelimiter("\\s*\\=\\s*"),
         /**
          * 表达式的复杂后缀其中的各项之间的分隔符
          */
-        ComplexPostfixDelimiter(","),
+        ComplexPostfixDelimiter("\\s*\\,\\s*"),
         /**
          * 表达式的复杂后缀的结束标志
          */
-        ComplexPostfixEnd("\\]"),
+        ComplexPostfixEnd("\\s*\\]"),
 
         ;
 
@@ -204,6 +214,14 @@ class ExprString {
         public Pattern regex() {
             return this.regex;
         }
+
+        @Override
+        public String token(String selectedStr) {
+            if (this == StringValue)
+                return StringUtils.replace(selectedStr, "\\'", "'");
+            else
+                return selectedStr;
+        }
     }
 
     /**
@@ -213,22 +231,22 @@ class ExprString {
      * 
      */
     private static enum Syntax implements SyntaxDefinition<Lex> {
+        Integer(lex(Lex.Integer)),
+        String(
+                seq(
+                        lex(Lex.StringStart),
+                        lex(Lex.StringValue),
+                        lex(Lex.StringEnd))),
+
         ExprName(
-                lex(Lex.Name)),
+                lex(Lex.Identifier)),
 
         ComplexPostfixField(
                 seq(
-                        opt(lex(Lex.Space)),
-                        lex(Lex.ComplexPostfixName),
-                        opt(lex(Lex.Space)),
+                        lex(Lex.Identifier),
                         lex(Lex.ComplexPostfixNVDelimiter),
-                        opt(lex(Lex.Space)),
-                        lex(Lex.ComplexPostfixValueStart),
-                        lex(Lex.ComplexPostfixValue),
-                        lex(Lex.ComplexPostfixValueEnd),
-                        opt(lex(Lex.Space)),
-                        opt(lex(Lex.ComplexPostfixDelimiter)),
-                        opt(lex(Lex.Space)))),
+                        ref(String),
+                        opt(lex(Lex.ComplexPostfixDelimiter)))),
 
         NoPostfix(
                 nul(Lex.class)),
@@ -242,12 +260,14 @@ class ExprString {
                         rep(ref(ComplexPostfixField)),
                         lex(Lex.ComplexPostfixEnd))),
         Expr(
-                seq(
-                        ref(ExprName),
-                        or(
-                                ref(SimplePostfix),
-                                ref(ComplexPostfix),
-                                ref(NoPostfix)))),
+                or(
+                        seq(
+                                ref(ExprName),
+                                or(
+                                        ref(SimplePostfix),
+                                        ref(ComplexPostfix),
+                                        ref(NoPostfix))),
+                        ref(Integer))),
 
         Root(
                 rep(

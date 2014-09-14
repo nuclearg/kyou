@@ -96,7 +96,7 @@ abstract class StyleFormatSegment {
         private final List<Expr> exprChain;
 
         ParamSegment(String paramStr) {
-            this.exprChain = Expr.buildExprList(paramStr);
+            this.exprChain = Expr.parseExprList(paramStr);
         }
 
         @Override

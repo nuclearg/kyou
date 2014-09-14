@@ -213,5 +213,10 @@ class StyleFormatString implements Iterable<byte[]> {
         public Pattern regex() {
             return this.regex;
         }
+
+        @Override
+        public String token(String selectedStr) {
+            return selectedStr;
+        }
     }
 }

@@ -47,6 +47,7 @@ public class LexString<T extends LexDefinition> {
             this.pos += m.end() - m.start();
 
             String str = this.str.substring(m.start(), m.end());
+            str = definition.token(str);
             return new LexToken<T>(definition, str);
         }
 

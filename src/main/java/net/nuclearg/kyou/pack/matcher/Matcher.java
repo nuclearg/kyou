@@ -11,7 +11,6 @@ import net.nuclearg.kyou.pack.matcher.filter.FilterMatcher;
 import net.nuclearg.kyou.pack.matcher.pipe.PipeMatcher;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.math.NumberUtils;
 
 /**
  * 匹配器，用来判断报文节点是否满足某个条件
@@ -74,11 +73,7 @@ public abstract class Matcher {
                 return PipeMatcher.buildPipeMatcher(info.text, buildMatcher(info.left), buildMatcher(info.right));
             case Attribute:
                 return AttributeMatcher.buildAttributeMatcher(info.attrName, info.attrOperator, info.attrValue);
-            case FilterNoParam:
-                return FilterMatcher.buildFilterMatcher(info.text);
-            case FilterIntegerParam:
-                return FilterMatcher.buildFilterMatcher(info.text, NumberUtils.toInt(info.filterParam));
-            case FilterStringParam:
+            case Filter:
                 return FilterMatcher.buildFilterMatcher(info.text, info.filterParam);
             default:
                 throw new UnsupportedOperationException("matcher type " + info.type);

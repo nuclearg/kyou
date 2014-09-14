@@ -168,7 +168,19 @@ class MatcherString {
      * @return
      */
     private MatcherInfo parseFilterMatcherInfo(SyntaxTreeNode<Lex, Syntax> node) {
-        throw new UnsupportedOperationException();
+        String filterName = node.children.get(1).token.str;
+
+        SyntaxTreeNode<Lex, Syntax> paramNode = node.children.get(2);
+        switch (paramNode.type) {
+            case FilterNoneParam:
+                return new MatcherInfo(filterName, null);
+            case FilterStringParam:
+                return new MatcherInfo(filterName, paramNode.children.get(1).children.get(1).token.str);
+            case FilterIntegerParam:
+                return new MatcherInfo(filterName, paramNode.children.get(1).token.str);
+            default:
+                throw new UnsupportedOperationException("filter param type " + paramNode.type);
+        }
     }
 
     /**
@@ -195,17 +207,9 @@ class MatcherString {
          */
         Attribute,
         /**
-         * 无参数的过滤器
+         * 过滤器
          */
-        FilterNoParam,
-        /**
-         * 整数参数的过滤器
-         */
-        FilterIntegerParam,
-        /**
-         * 字符串参数的过滤器
-         */
-        FilterStringParam,
+        Filter,
         /**
          * 管道
          */
@@ -271,8 +275,8 @@ class MatcherString {
             this.left = this.right = null;
         }
 
-        MatcherInfo(MatcherType type, String filterName, String filterParam) {
-            this.type = type;
+        MatcherInfo(String filterName, String filterParam) {
+            this.type = MatcherType.Filter;
             this.text = filterName;
             this.attrName = this.attrOperator = this.attrValue = null;
             this.filterParam = filterParam;
@@ -436,9 +440,9 @@ class MatcherString {
                                 ref(SimpleAttribute)),
                         lex(Lex.AttributeEnd))),
 
-        FiliterNoneParam(
+        FilterNoneParam(
                 nul(Lex.class)),
-        FiliterIntegerParam(
+        FilterIntegerParam(
                 seq(
                         lex(Lex.FilterParamStart),
                         ref(Integer),
@@ -453,9 +457,9 @@ class MatcherString {
                         lex(Lex.FilterSign),
                         lex(Lex.NodeName),
                         or(
-                                ref(FiliterIntegerParam),
+                                ref(FilterIntegerParam),
                                 ref(FilterStringParam),
-                                ref(FiliterNoneParam)
+                                ref(FilterNoneParam)
                         ))),
 
         AndPipe(nul(Lex.class)),

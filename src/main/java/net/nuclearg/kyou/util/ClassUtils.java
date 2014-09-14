@@ -66,7 +66,25 @@ public class ClassUtils {
     }
 
     /**
-     * 创建指定类型的实例，调用其无参构造函数
+     * 根据名称创建map中对应类型的实例
+     * 
+     * @param classMap
+     *            名称与类型的map
+     * @param name
+     *            名称
+     * @param args
+     *            传递给构造函数的参数列表
+     * @return 创建出来的对象。如果指定的name在map中找不到则返回null
+     */
+    public static <T> T newInstance(Map<String, Class<? extends T>> classMap, String name, Object... args) {
+        if (!classMap.containsKey(name))
+            return null;
+
+        return newInstance(classMap.get(name), args);
+    }
+
+    /**
+     * 创建指定类型的实例
      * 
      * @param cls
      *            类型

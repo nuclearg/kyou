@@ -52,9 +52,9 @@ public class MatcherTest {
 
     @Test
     public void 过滤器() {
-        test(":asdf");
-        test(":asdf(1)");
-        test(":asdf('asdf')");
+        test(":empty");
+        test(":nth-child(1)");
+        test(":nth-child('3')");
         try {
             test(":asdf(汉字)");
         } catch (Exception ex) {
@@ -65,7 +65,8 @@ public class MatcherTest {
     public void 混成一坨() {
         test("field['b']");
         test("struct#name field");
-        test("struct#kkk[a='3']:asdf(12)");
+        test("struct#kkk[a='3']:nth-child(12)");
+        test("s2b.gbk aligns[align='r', padding='\\'', len='5'] v");
         test("#a , #b");
         test("struct > #aaa[asdf^='ddd']");
         test("struct > field , array > field, #head field");

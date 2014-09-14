@@ -14,10 +14,10 @@ import net.nuclearg.kyou.util.ClassUtils.AnnotationNameParser;
  * 
  */
 public abstract class PipeMatcher extends Matcher {
-    private static final Map<String, Class<? extends PipeMatcher>> PIPE_CLASSES = ClassUtils.buildAnnotatedClassMap(PipeDescription.class, PipeMatcher.class, new AnnotationNameParser<PipeDescription>() {
+    private static final Map<String, Class<? extends PipeMatcher>> PIPE_CLASSES = ClassUtils.buildAnnotatedClassMap(PipeMatcherDescription.class, PipeMatcher.class, new AnnotationNameParser<PipeMatcherDescription>() {
 
         @Override
-        public String parseName(PipeDescription annotation) {
+        public String parseName(PipeMatcherDescription annotation) {
             return annotation.value();
         }
     });
@@ -32,18 +32,20 @@ public abstract class PipeMatcher extends Matcher {
     protected Matcher right;
 
     /**
+     * 构建一个管道匹配器，用于把两个匹配器按照指定的逻辑关系连接起来
      * 
      * @param name
+     *            管道匹配器的名称
      * @param left
+     *            左边的匹配器
      * @param right
-     * @return
+     *            右边的匹配器
+     * @return 管道匹配器实例
      */
     public static PipeMatcher buildPipeMatcher(String name, Matcher left, Matcher right) {
-        Class<? extends PipeMatcher> pipeClass = PIPE_CLASSES.get(name);
-        if (pipeClass == null)
+        PipeMatcher pipe = ClassUtils.newInstance(PIPE_CLASSES, name);
+        if (pipe == null)
             throw new KyouException("unsupported pipe operator. op: " + name);
-
-        PipeMatcher pipe = ClassUtils.newInstance(pipeClass);
 
         pipe.left = left;
         pipe.right = right;

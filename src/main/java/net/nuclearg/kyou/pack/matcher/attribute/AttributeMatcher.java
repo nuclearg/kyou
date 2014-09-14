@@ -61,17 +61,15 @@ public class AttributeMatcher extends Matcher {
      *            运算符
      * @param attrValue
      *            属性的值
-     * @return 属性匹配器
+     * @return 属性匹配器实例
      */
     public static Matcher buildAttributeMatcher(String attrName, String attrOperator, String attrValue) {
         if (attrOperator == null)
             attrOperator = "";
 
-        Class<? extends Operator> opClass = OPERATOR_CLASSES.get(attrOperator);
-        if (opClass == null)
+        Operator op = ClassUtils.newInstance(OPERATOR_CLASSES, attrOperator);
+        if (op == null)
             throw new KyouException("unsupported attribute operator. op: " + attrOperator);
-
-        Operator op = ClassUtils.newInstance(opClass);
 
         return new AttributeMatcher(attrName, op, attrValue);
     }

@@ -2,6 +2,7 @@ package net.nuclearg.kyou.pack.matcher.filter;
 
 import net.nuclearg.kyou.dom.KyouContainer;
 import net.nuclearg.kyou.dom.KyouItem;
+import net.nuclearg.kyou.pack.matcher.filter.FilterMatcherDescription.ParamType;
 
 /**
  * 匹配位于奇数位置上的节点，这个是按直觉来的（从1开始计数）
@@ -9,11 +10,11 @@ import net.nuclearg.kyou.dom.KyouItem;
  * @author ng
  * 
  */
-@FilterDescription("odd")
-class IndexOdd extends Filter {
+@FilterMatcherDescription(name = "odd", paramType = ParamType.None)
+class IndexOdd extends FilterMatcher {
 
     @Override
-    boolean matches(KyouItem item) {
+    public boolean matches(KyouItem item) {
         KyouContainer parent = item.parent();
         if (parent == null || parent == item)
             return false;

@@ -217,15 +217,11 @@ public abstract class Expr {
         if (StringUtils.isNumeric(exprInfo.name))
             return new LiteralInteger(exprInfo.name);
 
-        // 根据body找到对应的类型
-        Class<? extends Expr> exprClass = EXPR_CLASSES.get(exprInfo.name);
-        if (exprClass == null)
-            throw new KyouException("expression unsupported. name: " + exprInfo.name);
-
         // 创建expr实例
-        Expr expr;
         try {
-            expr = ClassUtils.newInstance(exprClass);
+            Expr expr = ClassUtils.newInstance(EXPR_CLASSES, exprInfo.name);
+            if (expr == null)
+                throw new KyouException("expression unsupported. name: " + exprInfo.name);
 
             expr.postfix = exprInfo.postfix;
             expr.postfixi = NumberUtils.toInt(expr.postfix, -1);

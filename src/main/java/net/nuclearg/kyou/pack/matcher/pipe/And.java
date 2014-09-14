@@ -11,7 +11,7 @@ import net.nuclearg.kyou.dom.KyouItem;
  * @author ng
  * 
  */
-@PipeDescription("")
+@PipeMatcherDescription("")
 class And extends PipeMatcher {
 
     @Override

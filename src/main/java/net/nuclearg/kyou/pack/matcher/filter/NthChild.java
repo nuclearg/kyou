@@ -5,22 +5,21 @@ import net.nuclearg.kyou.dom.KyouItem;
 import net.nuclearg.kyou.pack.matcher.filter.FilterMatcherDescription.ParamType;
 
 /**
- * 匹配不包含任何元素的容器节点
+ * 匹配位于指定位置的元素
  * 
  * @author ng
  * 
  */
-@FilterMatcherDescription(name = "empty", paramType = ParamType.None)
-class EmptyContainer extends FilterMatcher {
+@FilterMatcherDescription(name = "nth-child", paramType = ParamType.Integer)
+class NthChild extends FilterMatcher {
 
     @Override
     public boolean matches(KyouItem item) {
-        if (!(item instanceof KyouContainer))
+        KyouContainer parent = item.parent();
+        if (parent == null || parent == item)
             return false;
 
-        KyouContainer container = (KyouContainer) item;
-
-        return container.size() == 0;
+        return parent.indexOf(item) == this.parami;
     }
 
 }

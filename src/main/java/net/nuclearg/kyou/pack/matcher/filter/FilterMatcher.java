@@ -3,10 +3,11 @@ package net.nuclearg.kyou.pack.matcher.filter;
 import java.util.Map;
 
 import net.nuclearg.kyou.KyouException;
-import net.nuclearg.kyou.dom.KyouItem;
 import net.nuclearg.kyou.pack.matcher.Matcher;
 import net.nuclearg.kyou.util.ClassUtils;
 import net.nuclearg.kyou.util.ClassUtils.AnnotationNameParser;
+
+import org.apache.commons.lang.math.NumberUtils;
 
 /**
  * 过滤匹配符，判断当前报文节点是否满足过滤条件
@@ -14,56 +15,94 @@ import net.nuclearg.kyou.util.ClassUtils.AnnotationNameParser;
  * @author ng
  * 
  */
-public class FilterMatcher extends Matcher {
-    private static final Map<String, Class<? extends Filter>> FILTER_CLASSES = ClassUtils.buildAnnotatedClassMap(FilterDescription.class, Filter.class, new AnnotationNameParser<FilterDescription>() {
+public abstract class FilterMatcher extends Matcher {
+    private static final Map<String, Class<? extends FilterMatcher>> FILTER_CLASSES = ClassUtils.buildAnnotatedClassMap(FilterMatcherDescription.class, FilterMatcher.class, new AnnotationNameParser<FilterMatcherDescription>() {
 
         @Override
-        public String parseName(FilterDescription annotation) {
-            return annotation.value();
+        public String parseName(FilterMatcherDescription annotation) {
+            return annotation.name();
         }
     });
 
     /**
-     * 过滤器名称
+     * 参数
      */
-    private final String name;
+    protected String param;
     /**
-     * 实际的过滤器
+     * 参数的整数形式
      */
-    private final Filter impl;
+    protected int parami = -1;
 
-    public FilterMatcher(String text) {
-        this.name = text.substring(1);
-        Class<? extends Filter> filterClass = FILTER_CLASSES.get(this.name);
-        if (filterClass == null)
-            throw new KyouException("filter unsupported. filter: " + this.name);
+    /**
+     * 检查当前过滤器是否有问题
+     */
+    protected void check() {
+        FilterMatcherDescription annotation = this.getClass().getAnnotation(FilterMatcherDescription.class);
 
-        try {
-            this.impl = ClassUtils.newInstance(filterClass);
-        } catch (Exception ex) {
-            throw new KyouException("init filter fail. filter: " + this.name, ex);
+        switch (annotation.paramType()) {
+            case None:
+                ensure(this.param == null && this.parami == -1, "param not expected. param: " + this.param);
+                break;
+            case Integer:
+                ensure(this.parami >= 0, "param shoule be integer. param: " + this.param);
+                break;
+            case String:
+                ensure(this.param != null, "param is empty");
+                break;
+            default:
+                throw new UnsupportedOperationException("param type " + annotation.paramType());
+
         }
     }
 
-    @Override
-    public boolean matches(KyouItem item) {
-        return this.impl.matches(item);
+    /**
+     * 工具方法，不满足条件就抛异常
+     */
+    private static void ensure(boolean result, String err) {
+        if (!result)
+            throw new KyouException(err);
     }
 
     @Override
     public String toString() {
-        return ":" + this.name;
+        FilterMatcherDescription annotation = this.getClass().getAnnotation(FilterMatcherDescription.class);
+
+        switch (annotation.paramType()) {
+            case None:
+                return ":" + annotation.name();
+            case Integer:
+                return ":" + annotation.name() + "(" + this.parami + ")";
+            case String:
+                return ":" + annotation.name() + "(\"" + this.param + "\")";
+            default:
+                throw new UnsupportedOperationException("param type " + annotation.paramType());
+        }
     }
 
-    public static Matcher buildFilterMatcher(String filterName) {
-        return null;
+    /**
+     * 构建一个过滤器
+     * 
+     * @param name
+     *            过滤器名称
+     * @param param
+     *            参数
+     * @return 过滤器实例
+     */
+    public static Matcher buildFilterMatcher(String name, String param) {
+        FilterMatcher filter = ClassUtils.newInstance(FILTER_CLASSES, name);
+        if (filter == null)
+            throw new KyouException("filter unsupported. name: " + name);
+
+        filter.param = param;
+        filter.parami = NumberUtils.toInt(param, -1);
+
+        try {
+            filter.check();
+        } catch (Exception ex) {
+            throw new KyouException("build filter fail. name: " + name + ", param: " + param, ex);
+        }
+
+        return filter;
     }
 
-    public static Matcher buildFilterMatcher(String filterName, int param) {
-        return null;
-    }
-
-    public static Matcher buildFilterMatcher(String filterName, String param) {
-        return null;
-    }
 }

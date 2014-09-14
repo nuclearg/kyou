@@ -19,20 +19,20 @@
         <encoding>utf8</encoding>
     </config>
 
-    <style target="#">
+    <style match="#">
         <format>{%%}</format>
         <param>m</param>
         <param>bk 1</param>
     </style>
 
-    <style target="array">
+    <style match="array">
         <format>"%":[%%],</format>
         <param>s2b n</param>
         <param>m</param>
         <param>bk 1</param>
     </style>
 
-    <style target="field">
+    <style match="field">
         <format>"%",</format>
         <param>s2b v</param>
     </style>

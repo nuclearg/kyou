@@ -1,7 +1,7 @@
 package net.nuclearg.kyou.pack.expr;
 
-import static net.nuclearg.kyou.util.parser.SyntaxRule.nul;
 import static net.nuclearg.kyou.util.parser.SyntaxRule.lex;
+import static net.nuclearg.kyou.util.parser.SyntaxRule.nul;
 import static net.nuclearg.kyou.util.parser.SyntaxRule.opt;
 import static net.nuclearg.kyou.util.parser.SyntaxRule.or;
 import static net.nuclearg.kyou.util.parser.SyntaxRule.ref;

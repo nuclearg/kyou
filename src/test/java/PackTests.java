@@ -9,7 +9,6 @@ import net.nuclearg.kyou.dom.KyouDocument;
 import net.nuclearg.kyou.pack.KyouPackStyle;
 import net.nuclearg.kyou.util.ByteOutputStream;
 
-import org.apache.commons.lang.StringUtils;
 import org.junit.Assert;
 import org.junit.runner.Description;
 import org.junit.runner.RunWith;
@@ -55,37 +54,28 @@ public class PackTests extends ParentRunner<PackTestData> {
                 // style
                 KyouPackStyle style = Kyou.loadPackStyle(child.style);
 
-                // expected bytes
-                @SuppressWarnings("resource")
-                ByteOutputStream os = new ByteOutputStream();
-                StyleFormatString expected = new StyleFormatString(child.expected, style.config.encoding);
-                for (byte[] segment : expected)
-                    if (segment == null)
-                        throw new UnsupportedOperationException("result must simple");
-                    else
-                        os.write(segment);
-                byte[] expectedBytes = os.export();
-
-                // expected string
-                String expectedStr = StringUtils.replace(child.expected, "\\\\", "");
-                expectedStr = StringUtils.replace(expectedStr, "\\%", "");
-                if (child.expected.contains("\\"))
-                    expectedStr = null;
-                else
-                    expectedStr = child.expected;
-
-                /*
-                 * pack
-                 */
+                // 组包
                 byte[] output = Kyou.pack(doc, style);
 
-                /*
-                 * compare
-                 */
-                if (expectedStr != null)
-                    Assert.assertEquals(expectedStr, new String(output, style.config.encoding));
-                else
+                // 判断是走字符串还是走字节
+                if (child.configs.contains("BYTES_TARGET")) {
+                    // 走字节
+                    @SuppressWarnings("resource")
+                    ByteOutputStream os = new ByteOutputStream();
+                    StyleFormatString expected = new StyleFormatString(child.expected, style.config.encoding);
+                    for (byte[] segment : expected)
+                        if (segment == null)
+                            throw new UnsupportedOperationException("result must simple");
+                        else
+                            os.write(segment);
+                    byte[] expectedBytes = os.export();
+
                     Assert.assertArrayEquals(expectedBytes, output);
+                } else {
+                    // 走字符串
+                    String outputStr = new String(output, style.config.encoding);
+                    Assert.assertEquals(child.expected, outputStr);
+                }
             }
         };
 

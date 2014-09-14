@@ -1,0 +1,74 @@
+[[DOC]]
+<?xml version="1.0"?>
+<document>
+    <struct name="url">
+        <field name="a">abc def</field>
+        <field name="b">!@#$%^&amp;*()[]{}\|;':",./&lt;&gt;?</field>
+        <field name="c">我人有的和主产不为这</field>
+    </struct>
+
+    <struct name="url_gbk">
+        <field name="a">abc def</field>
+        <field name="b">!@#$%^&amp;*()[]{}\|;':",./&lt;&gt;?</field>	
+        <field name="c">我人有的和主产不为这</field>
+    </struct>
+    
+    <struct name="xml">
+        <field name="a">abc def</field>
+        <field name="b">!@#$%^&amp;*()[]{}\|;':",./&lt;&gt;?</field>	
+        <field name="c">我人有的和主产不为这</field>
+    </struct>
+    
+    <struct name="json">
+        <field name="a">abc def</field>
+        <field name="b">!@#$%^&amp;*()[]{}\|;':",./&lt;&gt;?</field>	
+        <field name="c">我人有的和主产不为这</field>
+    </struct>
+</document>
+
+
+[[STYLE]]
+<?xml version="1.0"?>
+<pack>
+    <config>
+        <encoding>utf8</encoding>
+    </config>
+
+    <style match="document">
+        <format>%</format>
+        <param>m</param>
+    </style>
+
+    <style match="struct">
+        <format>%\r\n</format>
+        <param>m</param>
+    </style>
+
+    <style match="#url field">
+        <format>%</format>
+        <param>s2b lowercases urlencode v</param>
+    </style>
+    <style match="#url_gbk field">
+        <format>%</format>
+        <param>s2b lowercases urlencode.gbk v</param>
+    </style>
+    <style match="#xml field">
+        <format>%</format>
+        <param>s2b xmlencode v</param>
+    </style>
+    <style match="#json field">
+        <format>%</format>
+        <param>s2b jsonencode v</param>
+    </style>
+    
+    <style match="struct field">
+    	<format></format>
+   	</style>
+</pack>
+
+
+[[EXPECTED]]
+abc%20def%21%40%23%24%25%5e%26*%28%29%5b%5d%7b%7d%5c%7c%3b%27%3a%22%2c.%2f%3c%3e%3f%e6%88%91%e4%ba%ba%e6%9c%89%e7%9a%84%e5%92%8c%e4%b8%bb%e4%ba%a7%e4%b8%8d%e4%b8%ba%e8%bf%99
+abc%20def%21%40%23%24%25%5e%26*%28%29%5b%5d%7b%7d%5c%7c%3b%27%3a%22%2c.%2f%3c%3e%3f%ce%d2%c8%cb%d3%d0%b5%c4%ba%cd%d6%f7%b2%fa%b2%bb%ce%aa%d5%e2
+abc&nbsp;def!@#$%^&amp;*()[]{}\|;':",./&lt;&gt;?我人有的和主产不为这
+abc def!@#$%^&*()[]{}\|;':",./<>?我人有的和主产不为这

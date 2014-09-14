@@ -55,15 +55,6 @@ public class Value {
         this.bytesValue = bytesValue;
     }
 
-    public Value(Value value) {
-        this.type = value.type;
-
-        this.domValue = value.domValue;
-        this.intValue = value.intValue;
-        this.strValue = value.strValue;
-        this.bytesValue = value.bytesValue;
-    }
-
     public Value(ValueType type, KyouItem domValue, int intValue, String strValue, byte[] bytesValue) {
         this.type = type;
         this.domValue = domValue;

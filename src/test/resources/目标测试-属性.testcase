@@ -19,7 +19,7 @@
         <encoding>utf8</encoding>
     </config>
 
-    <style target="document">
+    <style match="document">
         <format>%</format>
         <param>m</param>
     </style>
@@ -44,7 +44,7 @@
         <format>e=5</format>
     </style>
     
-    <style target="field">
+    <style match="field">
     	<format>%%</format>
     	<param>s2b n</param>
     	<param>s2b v</param>

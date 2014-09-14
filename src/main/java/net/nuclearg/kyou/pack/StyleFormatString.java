@@ -13,8 +13,6 @@ import net.nuclearg.kyou.util.lexer.LexDefinition;
 import net.nuclearg.kyou.util.lexer.LexString;
 import net.nuclearg.kyou.util.lexer.LexToken;
 
-import org.apache.commons.lang.StringUtils;
-
 /**
  * 格式字符串，对应于组包样式中format的部分
  * <p>
@@ -60,8 +58,6 @@ class StyleFormatString implements Iterable<byte[]> {
      *            编码
      */
     StyleFormatString(String formatStr, Charset encoding) {
-        if (StringUtils.isEmpty(formatStr))
-            throw new KyouException("str is empty");
         if (encoding == null)
             throw new KyouException("encoding is null");
 

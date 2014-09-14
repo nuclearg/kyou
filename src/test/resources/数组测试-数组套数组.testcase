@@ -28,18 +28,18 @@
         <encoding>utf8</encoding>
     </config>
 
-    <style target="#">
+    <style match="#">
         <format>%%</format>
         <param>m</param>
         <param>bk 1</param>
     </style>
 
-    <style target="array">
+    <style match="array">
         <format>%</format>
         <param>m</param>
     </style>
 
-    <style target="field">
+    <style match="field">
         <format>%\20</format>
         <param>s2b v</param>
     </style>

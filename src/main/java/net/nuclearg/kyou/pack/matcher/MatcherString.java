@@ -355,7 +355,7 @@ class MatcherString {
         /**
          * 属性运算符
          */
-        AttributeOperator("\\s*[=!~^$]?\\=\\s*"),
+        AttributeOperator("\\s*[=!~^$?|]*\\=\\s*"),
         /**
          * 属性结束
          */

@@ -65,15 +65,21 @@ class ExprString {
 
             // 解析postfix
             ExprInfo exprInfo;
-            SyntaxTreeNode<Lex, Syntax> postfixUnit = exprUnit.children.get(1);
-            switch (postfixUnit.type) {
+            SyntaxTreeNode<Lex, Syntax> postfixNode = exprUnit.children.get(1);
+            switch (postfixNode.type) {
                 case NoPostfix:
                     // 无后缀
                     exprInfo = new ExprInfo(name, (String) null);
                     break;
                 case SimplePostfix:
                     // 简单后缀
-                    String postfix = postfixUnit.children.get(1).token.str;
+                    SyntaxTreeNode<Lex, Syntax> simplePostfixNode = postfixNode.children.get(1);
+                    String postfix;
+
+                    if (simplePostfixNode.token != null)
+                        postfix = simplePostfixNode.token.str;
+                    else
+                        postfix = simplePostfixNode.children.get(1).token.str;
                     exprInfo = new ExprInfo(name, postfix);
                     break;
                 case ComplexPostfix:
@@ -81,7 +87,7 @@ class ExprString {
                     Map<String, String> complexPostfixMap = new HashMap<>();
 
                     // size小于3表示start和end是紧挨着的，即postfix为空
-                    for (SyntaxTreeNode<Lex, Syntax> postfixFieldUnit : postfixUnit.children.get(1).children) {
+                    for (SyntaxTreeNode<Lex, Syntax> postfixFieldUnit : postfixNode.children.get(1).children) {
                         if (postfixFieldUnit.type != Syntax.ComplexPostfixField)
                             continue;
 
@@ -94,7 +100,7 @@ class ExprString {
                     exprInfo = new ExprInfo(name, complexPostfixMap);
                     break;
                 default:
-                    throw new UnsupportedOperationException("postfix type " + postfixUnit.type);
+                    throw new UnsupportedOperationException("postfix type " + postfixNode.type);
             }
 
             result.add(exprInfo);
@@ -180,10 +186,6 @@ class ExprString {
          * 表达式的简单后缀的开始标志
          */
         SimplePostfixDelimiter("\\."),
-        /**
-         * 表达式的简单后缀
-         */
-        SimplePostfix("\\w+"),
 
         /**
          * 表达式的复杂后缀的开始标志
@@ -253,7 +255,9 @@ class ExprString {
         SimplePostfix(
                 seq(
                         lex(Lex.SimplePostfixDelimiter),
-                        lex(Lex.SimplePostfix))),
+                        or(
+                                lex(Lex.Identifier),
+                                ref(String)))),
         ComplexPostfix(
                 seq(
                         lex(Lex.ComplexPostfixStart),

@@ -81,7 +81,7 @@ public abstract class KyouItem {
      * @param handler
      *            追溯到每个父节点时采取的动作
      */
-    protected void traceAncestor(AncestorTraceHandler handler) {
+    private void traceAncestor(AncestorTraceHandler handler) {
         KyouContainer parent = this.parent;
         while (parent != null && parent != parent.parent()) {
             handler.onAncestor(parent);
@@ -90,14 +90,14 @@ public abstract class KyouItem {
     }
 
     /**
-     * 只有一个入参的回调函数
+     * 向祖先遍历时的回调函数
      * 
      * @author ng
      * 
      * @param <T>
      *            参数类型
      */
-    protected static interface AncestorTraceHandler {
+    private static interface AncestorTraceHandler {
         public void onAncestor(KyouContainer container);
     }
 

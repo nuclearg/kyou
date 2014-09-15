@@ -4,11 +4,6 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.nuclearg.kyou.Kyou;
-import net.nuclearg.kyou.dom.KyouDocument;
-import net.nuclearg.kyou.pack.KyouPackStyle;
-import net.nuclearg.kyou.util.ByteOutputStream;
-
 import org.junit.Assert;
 import org.junit.runner.Description;
 import org.junit.runner.RunWith;
@@ -16,6 +11,11 @@ import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.ParentRunner;
 import org.junit.runners.model.InitializationError;
 import org.junit.runners.model.Statement;
+
+import com.github.nuclearg.kyou.Kyou;
+import com.github.nuclearg.kyou.dom.KyouDocument;
+import com.github.nuclearg.kyou.pack.KyouPackStyle;
+import com.github.nuclearg.kyou.util.ByteOutputStream;
 
 @RunWith(PackTests.class)
 public class PackTests extends ParentRunner<PackTestData> {

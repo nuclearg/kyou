@@ -44,7 +44,7 @@ class SequenceRule<L extends LexDefinition> extends SyntaxRule<L> {
 
     @Override
     public String toString() {
-        return StringUtils.join(this.elements, " ");
+        return StringUtils.join(this.elements.toArray(), " ");
     }
 
 }

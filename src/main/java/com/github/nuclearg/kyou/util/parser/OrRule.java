@@ -35,6 +35,6 @@ class OrRule<L extends LexDefinition> extends SyntaxRule<L> {
 
     @Override
     public String toString() {
-        return "(" + StringUtils.join(this.conditions, " | ") + ")";
+        return "(" + StringUtils.join(this.conditions.toArray(), " | ") + ")";
     }
 }

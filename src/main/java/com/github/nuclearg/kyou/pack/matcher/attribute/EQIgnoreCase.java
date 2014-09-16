@@ -16,8 +16,8 @@ package com.github.nuclearg.kyou.pack.matcher.attribute;
 class EQIgnoreCase extends Operator {
 
     @Override
-    boolean matches(String value, String attr) {
-        return value.equalsIgnoreCase(attr);
+    boolean matches(String exprValue, String attrValue) {
+        return exprValue.equalsIgnoreCase(attrValue);
     }
 
 }

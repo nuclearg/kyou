@@ -18,11 +18,11 @@ package com.github.nuclearg.kyou.pack.matcher.attribute;
 class NEQ extends Operator {
 
     @Override
-    boolean matches(String value, String attr) {
-        if (attr == null)
+    boolean matches(String exprValue, String attrValue) {
+        if (attrValue == null)
             return false;
 
-        return !value.equals(attr);
+        return !exprValue.equals(attrValue);
     }
 
 }

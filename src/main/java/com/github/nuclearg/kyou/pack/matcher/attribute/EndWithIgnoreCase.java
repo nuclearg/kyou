@@ -18,11 +18,11 @@ import org.apache.commons.lang.StringUtils;
 class EndWithIgnoreCase extends Operator {
 
     @Override
-    boolean matches(String value, String attr) {
-        if (StringUtils.isEmpty(attr))
+    boolean matches(String exprValue, String attrValue) {
+        if (StringUtils.isEmpty(attrValue))
             return false;
 
-        return StringUtils.endsWithIgnoreCase(attr, value);
+        return attrValue.toLowerCase().endsWith(exprValue.toLowerCase());
     }
 
 }

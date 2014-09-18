@@ -20,8 +20,8 @@ import org.apache.commons.lang.StringUtils;
 class Exists extends Operator {
 
     @Override
-    boolean matches(String value, String attr) {
-        return StringUtils.isNotEmpty(attr);
+    boolean matches(String exprValue, String attrValue) {
+        return StringUtils.isNotEmpty(attrValue);
     }
 
 }

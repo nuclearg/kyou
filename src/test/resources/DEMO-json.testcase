@@ -1,0 +1,91 @@
+[[DOC]]
+<?xml version="1.0"?>
+<document>
+    <field name="aaa">a</field>
+    <field name="bbb">b</field>
+    <array name="ccc">
+        <prototype>
+            <field name="__prototype" />
+        </prototype>
+        <field name="0">111</field>
+        <field name="1">222</field>
+    </array>
+    <struct name="ddd">
+        <field name="eee">e</field>
+        <field name="fff">f</field>
+        <struct name="ggg">
+            <field name="hhh">h</field>
+        </struct>
+    </struct>
+    <array name="iii">
+        <prototype>
+            <struct name="__prototype">
+                <field name="jjj"/>
+                <field name="kkk"/>
+            </struct>
+        </prototype>
+        <struct name="0">
+            <field name="jjj">j1</field>
+            <field name="kkk">k1</field>
+        </struct>
+        <struct name="1">
+            <field name="jjj">j2</field>
+            <field name="kkk">k2</field>
+        </struct>
+        <struct name="2">
+            <field name="jjj">j3</field>
+            <field name="kkk">k3</field>
+        </struct>
+    </array>
+</document>
+
+
+[[STYLE]]
+<?xml version="1.0"?>
+<pack>
+    <config>
+        <encoding>utf8</encoding>
+    </config>
+
+    <style match="#">
+        <format>{%%}</format>
+        <param>m</param>
+        <param>bk 1</param>
+    </style>
+    
+    <style match="array">
+        <format>"%":[%%],</format>
+        <param>s2b n</param>
+        <param>m</param>
+        <param>bk 1</param>
+    </style>   
+
+    <style match="array>field">
+        <format>"%",</format>
+        <param>s2b v</param>
+    </style>
+    
+    <style match="array>struct">
+        <format>{%%},</format>
+        <param>m</param>
+        <param>bk 1</param>
+    </style>
+    
+    <style match="field">
+        <format>"%":"%",</format>
+        <param>s2b jsonencode n</param>
+        <param>s2b jsonencode v</param>
+    </style>
+
+    <style match="struct">
+        <format>"%":{%%},</format>
+        <param>s2b jsonencode n</param>
+        <param>m</param>
+        <param>bk 1</param>
+    </style>
+</pack>
+
+
+
+[[EXPECTED]]
+{"aaa":"a","bbb":"b","ccc":["111","222"],"ddd":{"eee":"e","fff":"f","ggg":{"hhh":"h"}},"iii":[{"jjj":"j1","kkk":"k1"},{"jjj":"j2","kkk":"k2"},{"jjj":"j3","kkk":"k3"}]}

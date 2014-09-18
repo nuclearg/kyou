@@ -16,8 +16,8 @@ package com.github.nuclearg.kyou.pack.matcher.attribute;
 class EQ extends Operator {
 
     @Override
-    boolean matches(String value, String attr) {
-        return value.equals(attr);
+    boolean matches(String exprValue, String attrValue) {
+        return exprValue.equals(attrValue);
     }
 
 }

@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
 
 import com.github.nuclearg.kyou.util.lexer.LexDefinition;
 import com.github.nuclearg.kyou.util.parser.SyntaxDefinition;
@@ -55,7 +56,7 @@ class ExprString {
 
             // 判断是不是整数字面量，如果是的话要单独处理
             if (exprUnit.token != null) {
-                result.add(new ExprInfo(exprUnit.token.str, (String) null));
+                result.add(new ExprInfo(exprUnit.token.str, (ExprPostfixValueInfo) null));
                 continue;
             }
 
@@ -69,22 +70,26 @@ class ExprString {
             switch (postfixNode.type) {
                 case NoPostfix:
                     // 无后缀
-                    exprInfo = new ExprInfo(name, (String) null);
+                    exprInfo = new ExprInfo(name, (ExprPostfixValueInfo) null);
                     break;
                 case SimplePostfix:
                     // 简单后缀
                     SyntaxTreeNode<Lex, Syntax> simplePostfixNode = postfixNode.children.get(1);
-                    String postfix;
+                    ExprPostfixValueInfo postfix;
 
-                    if (simplePostfixNode.token != null)
-                        postfix = simplePostfixNode.token.str;
+                    if (simplePostfixNode.token != null) // lex(Identifier)
+                        postfix = new ExprPostfixValueInfo(simplePostfixNode.token.str);
+                    else if (simplePostfixNode.type == Syntax.String)
+                        postfix = new ExprPostfixValueInfo(simplePostfixNode.children.get(1).token.str);
                     else
-                        postfix = simplePostfixNode.children.get(1).token.str;
+                        // RefParamPostfixValue
+                        postfix = new ExprPostfixValueInfo(NumberUtils.toInt(simplePostfixNode.children.get(1).token.str));
+
                     exprInfo = new ExprInfo(name, postfix);
                     break;
                 case ComplexPostfix:
                     // 解析复杂后缀
-                    Map<String, String> complexPostfixMap = new HashMap<>();
+                    Map<String, ExprPostfixValueInfo> complexPostfixMap = new HashMap<>();
 
                     // size小于3表示start和end是紧挨着的，即postfix为空
                     for (SyntaxTreeNode<Lex, Syntax> postfixFieldUnit : postfixNode.children.get(1).children) {
@@ -92,7 +97,13 @@ class ExprString {
                             continue;
 
                         String k = postfixFieldUnit.children.get(0).token.str;
-                        String v = postfixFieldUnit.children.get(2).children.get(1).token.str;
+                        ExprPostfixValueInfo v;
+
+                        SyntaxTreeNode<Lex, Syntax> postfixFieldValueNode = postfixFieldUnit.children.get(2);
+                        if (postfixFieldValueNode.type == Syntax.String)
+                            v = new ExprPostfixValueInfo(postfixFieldValueNode.children.get(1).token.str);
+                        else
+                            v = new ExprPostfixValueInfo(NumberUtils.toInt(postfixFieldValueNode.children.get(1).token.str));
 
                         complexPostfixMap.put(k, v);
                     }
@@ -128,22 +139,49 @@ class ExprString {
         /**
          * 简单后缀
          */
-        final String postfix;
+        final ExprPostfixValueInfo postfix;
         /**
          * 复杂后缀
          */
-        final Map<String, String> complexPostfix;
+        final Map<String, ExprPostfixValueInfo> complexPostfix;
 
-        ExprInfo(String name, String postfix) {
+        ExprInfo(String name, ExprPostfixValueInfo postfix) {
             this.name = name;
             this.postfix = postfix;
             this.complexPostfix = null;
         }
 
-        ExprInfo(String name, Map<String, String> complexPostfix) {
+        ExprInfo(String name, Map<String, ExprPostfixValueInfo> complexPostfix) {
             this.name = name;
             this.postfix = null;
             this.complexPostfix = complexPostfix;
+        }
+    }
+
+    /**
+     * 表达式后缀值
+     * 
+     * @author ng
+     * 
+     */
+    static class ExprPostfixValueInfo {
+        /**
+         * 后缀项的值，如果ref不为0报错
+         */
+        final String value;
+        /**
+         * 引用的参数下标，如果为-1表示无引用，使用值
+         */
+        final int ref;
+
+        private ExprPostfixValueInfo(String value) {
+            this.value = value;
+            this.ref = -1;
+        }
+
+        private ExprPostfixValueInfo(int ref) {
+            this.value = null;
+            this.ref = ref;
         }
     }
 
@@ -204,7 +242,10 @@ class ExprString {
          */
         ComplexPostfixEnd("\\s*\\]"),
 
-        ;
+        /**
+         * 一个百分号
+         */
+        PercentToken("%"), ;
 
         private final Pattern regex;
 
@@ -243,11 +284,19 @@ class ExprString {
         ExprName(
                 lex(Lex.Identifier)),
 
+        RefParamPostfixValue(
+                seq(
+                        lex(Lex.PercentToken),
+                        ref(Integer))),
+
         ComplexPostfixField(
                 seq(
                         lex(Lex.Identifier),
                         lex(Lex.ComplexPostfixNVDelimiter),
-                        ref(String),
+                        or(
+                                ref(String),
+                                ref(RefParamPostfixValue)
+                        ),
                         opt(lex(Lex.ComplexPostfixDelimiter)))),
 
         NoPostfix(
@@ -257,7 +306,8 @@ class ExprString {
                         lex(Lex.SimplePostfixDelimiter),
                         or(
                                 lex(Lex.Identifier),
-                                ref(String)))),
+                                ref(String),
+                                ref(RefParamPostfixValue)))),
         ComplexPostfix(
                 seq(
                         lex(Lex.ComplexPostfixStart),

@@ -44,7 +44,7 @@ abstract class AbstractEncodingSupportedExpr extends Expr {
 
         // 如果后缀不为空，则表示需要指定编码
         try {
-            this.encoding = Charset.forName(this.postfix);
+            this.encoding = Charset.forName(this.postfix.strValue);
         } catch (Exception ex) {
             throw new KyouException("encoding not found. encoding: " + encoding);
         }

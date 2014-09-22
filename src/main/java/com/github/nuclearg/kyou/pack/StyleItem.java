@@ -1,11 +1,14 @@
 package com.github.nuclearg.kyou.pack;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.w3c.dom.Element;
 
 import com.github.nuclearg.kyou.KyouException;
+import com.github.nuclearg.kyou.pack.StyleFormatSegment.ParamSegment;
 import com.github.nuclearg.kyou.pack.matcher.Matcher;
 import com.github.nuclearg.kyou.util.XmlUtils;
 
@@ -31,6 +34,10 @@ class StyleItem {
      * 段列表
      */
     final List<StyleFormatSegment> segments;
+    /**
+     * 参数段列表，为了加速参数引用的计算
+     */
+    final List<StyleFormatSegment> paramSegments;
 
     StyleItem(Element e, KyouPackStyle style) {
         this.style = style;
@@ -65,6 +72,12 @@ class StyleItem {
         // 初始化segments
         try {
             this.segments = StyleFormatSegment.parseFormatString(formatStr, style.config.encoding, params);
+
+            List<StyleFormatSegment> paramSegments = new ArrayList<>();
+            for (StyleFormatSegment segment : segments)
+                if (segment instanceof ParamSegment)
+                    paramSegments.add(segment);
+            this.paramSegments = Collections.unmodifiableList(paramSegments);
         } catch (Exception ex) {
             throw new KyouException("expr syntax error.  target: " + matchStr, ex);
         }

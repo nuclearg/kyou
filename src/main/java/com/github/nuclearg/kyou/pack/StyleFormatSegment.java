@@ -8,6 +8,7 @@ import com.github.nuclearg.kyou.KyouException;
 import com.github.nuclearg.kyou.pack.expr.Expr;
 import com.github.nuclearg.kyou.util.ByteOutputStream;
 import com.github.nuclearg.kyou.util.value.Value;
+import com.github.nuclearg.kyou.util.value.ValueType;
 
 /**
  * 组包片段，对应格式字符串{@link StyleFormatString}中的一段
@@ -26,8 +27,13 @@ abstract class StyleFormatSegment {
      *            组包上下文
      * @param os
      *            输出流
+     * @return 为了支持参数引用，参数段的输出并不一定必须是{@link ValueType#Bytes}类型的。
+     *         <ul>
+     *         <li>如果参数段的计算结果是{@link ValueType#Bytes}类型，则输出到os中</li>
+     *         <li>如果参数段的计算结果是其它类型，则返回该计算结果</li>
+     *         </ul>
      */
-    abstract void export(PackContext context, ByteOutputStream os);
+    abstract Value export(PackContext context, ByteOutputStream os);
 
     /**
      * 将格式字符串解析为多个组包段
@@ -73,7 +79,7 @@ abstract class StyleFormatSegment {
      * @author ng
      * 
      */
-    private static class BytesSegment extends StyleFormatSegment {
+    static class BytesSegment extends StyleFormatSegment {
         private final byte[] text;
 
         BytesSegment(byte[] text) {
@@ -81,8 +87,9 @@ abstract class StyleFormatSegment {
         }
 
         @Override
-        void export(PackContext context, ByteOutputStream os) {
+        Value export(PackContext context, ByteOutputStream os) {
             os.write(this.text);
+            return null;
         }
     }
 
@@ -92,7 +99,7 @@ abstract class StyleFormatSegment {
      * @author ng
      * 
      */
-    private static class ParamSegment extends StyleFormatSegment {
+    static class ParamSegment extends StyleFormatSegment {
         private final List<Expr> exprChain;
 
         ParamSegment(String paramStr) {
@@ -100,7 +107,7 @@ abstract class StyleFormatSegment {
         }
 
         @Override
-        void export(PackContext context, ByteOutputStream os) {
+        Value export(PackContext context, ByteOutputStream os) {
             // 向表达式链输入的最初的值是正被组包的当前报文节点
             Value value = new Value(context.item);
 
@@ -112,13 +119,13 @@ abstract class StyleFormatSegment {
                 case Bytes:
                     // 如果输出为Bytes，则输出
                     os.write(value.bytesValue);
-                    break;
+                    return value;
                 case Backspace:
                     // 如果输出为Backspace，则回退
                     os.backspace(value.intValue);
-                    break;
+                    return value;
                 default:
-                    throw new UnsupportedOperationException("unsupported value type: " + value.type);
+                    return value;
             }
         }
     }

@@ -15,6 +15,7 @@ import com.github.nuclearg.kyou.pack.PackContext;
 import com.github.nuclearg.kyou.pack.expr.ExprDescription.ComplexPostfixField;
 import com.github.nuclearg.kyou.pack.expr.ExprDescription.ExprPostfix;
 import com.github.nuclearg.kyou.pack.expr.ExprString.ExprInfo;
+import com.github.nuclearg.kyou.pack.expr.ExprString.ExprPostfixValueInfo;
 import com.github.nuclearg.kyou.util.ClassUtils;
 import com.github.nuclearg.kyou.util.ClassUtils.AnnotationNameParser;
 import com.github.nuclearg.kyou.util.value.Value;
@@ -54,15 +55,11 @@ public abstract class Expr {
     /**
      * 表达式的后缀 如果未提供后缀则为null
      */
-    protected String postfix;
-    /**
-     * 表达式的后缀，整数形式。如果未提供后缀，或后缀不是整形则为-1
-     */
-    protected int postfixi;
+    protected Value postfix;
     /**
      * 表达式的后缀，如果是{@link ExprPostfix#Complex}类型则将后缀解析为map，否则为null
      */
-    protected Map<String, Object> postfixMap;
+    protected Map<String, Value> postfixMap;
 
     /**
      * 计算该表达式
@@ -87,7 +84,7 @@ public abstract class Expr {
         // 检查自身的后缀是否有问题
         try {
             if (annotation.postfix() != ExprPostfix.Complex)
-                checkValue(this.postfix, this.postfixi, annotation.postfix());
+                checkPostfixValue(this.postfix, annotation.postfix());
             else
                 checkComplexPostfix(this.postfixMap, annotation);
         } catch (Exception ex) {
@@ -98,8 +95,14 @@ public abstract class Expr {
         if (prev == null) {
             if (annotation.typeIn() != ValueType.Dom && annotation.typeIn() != ValueType.Null)
                 throw new KyouException("expr requires input. expr: " + this);
-        } else if (annotation.typeIn() != prev.getClass().getAnnotation(ExprDescription.class).typeOut())
-            throw new KyouException("expr input type mismatch. expr: " + this + ", prev: " + prev);
+        } else {
+            ValueType prevType = prev.getClass().getAnnotation(ExprDescription.class).typeOut();
+            ValueType thisType = annotation.typeIn();
+
+            if (prevType != thisType)
+                // TODO 对Auto类型进行支持
+                throw new KyouException("expr input type mismatch. expr: " + this + ", prev: " + prev);
+        }
     }
 
     /**
@@ -109,20 +112,20 @@ public abstract class Expr {
      * @param type
      * @return 如果给定的值可以转为数字，则返回对应的数字，否则返回-1
      */
-    private static void checkValue(String value, int valuei, ExprPostfix type) {
+    private static void checkPostfixValue(Value value, ExprPostfix type) {
         switch (type) {
             case None:
                 ensure(value == null, "value must empty");
                 break;
             case Int:
                 ensure(value != null, "value must not empty");
-                ensure(valuei >= 0, "value must non negative integer");
+                ensure(value.type == ValueType.Integer && value.intValue >= 0, "value must non negative integer");
                 break;
             case String:
-                ensure(value != null, "value must not empty");
+                ensure(value != null && value.type == ValueType.String, "value must not empty");
                 break;
             case NoneOrInt:
-                ensure(value == null || valuei > 0, "value must empty or non negative integer");
+                ensure(value == null || (value.type == ValueType.Integer && value.intValue > 0), "value must empty or non negative integer");
                 break;
             case NoneOrString:
                 // 无需任何判断
@@ -135,19 +138,21 @@ public abstract class Expr {
     /**
      * 检查复杂后缀
      */
-    private static void checkComplexPostfix(Map<String, Object> map, ExprDescription desc) {
+    private static void checkComplexPostfix(Map<String, Value> map, ExprDescription desc) {
         for (ComplexPostfixField field : desc.complexPostfixFields()) {
-            String value = (String) map.get(field.name());
-            int valuei = NumberUtils.toInt(value, -1);
+            Value value = map.get(field.name());
+
+            if (field.type() == ExprPostfix.Int || field.type() == ExprPostfix.NoneOrInt) {
+                if (value != null)
+                    map.put(field.name(), value = new Value(NumberUtils.toInt(value.strValue)));
+            }
 
             try {
-                checkValue(value, valuei, field.type());
+                checkPostfixValue(value, field.type());
             } catch (Exception ex) {
                 throw new KyouException("postfix check fail. field: " + field.name() + ", type: " + field.type() + ", value: " + value, ex);
             }
 
-            if (field.type() == ExprPostfix.Int || field.type() == ExprPostfix.NoneOrInt)
-                map.put(field.name(), valuei);
         }
     }
 
@@ -223,16 +228,22 @@ public abstract class Expr {
             if (expr == null)
                 throw new KyouException("expression unsupported. name: " + exprInfo.name);
 
-            expr.postfix = exprInfo.postfix;
-            expr.postfixi = NumberUtils.toInt(expr.postfix, -1);
+            if (exprInfo.postfix == null)
+                expr.postfix = null;
+            else if (exprInfo.postfix.ref < 0)
+                expr.postfix = new Value(exprInfo.postfix.value);
+            else
+                expr.postfix = new Value(ValueType.RefParam, null, exprInfo.postfix.ref, null, null);
 
             if (exprInfo.complexPostfix == null)
                 return expr;
 
             expr.postfixMap = new HashMap<>();
-            for (Entry<String, String> entry : exprInfo.complexPostfix.entrySet())
-                expr.postfixMap.put(entry.getKey(), entry.getValue());
-
+            for (Entry<String, ExprPostfixValueInfo> entry : exprInfo.complexPostfix.entrySet())
+                if (entry.getValue().ref < 0)
+                    expr.postfixMap.put(entry.getKey(), new Value(entry.getValue().value));
+                else
+                    expr.postfixMap.put(entry.getKey(), new Value(ValueType.RefParam, null, entry.getValue().ref, null, null));
             return expr;
         } catch (Exception ex) {
             throw new KyouException("init expression fail. name: " + exprInfo.name, ex);

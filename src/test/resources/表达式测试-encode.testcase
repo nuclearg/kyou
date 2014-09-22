@@ -46,19 +46,19 @@
 
     <style match="#url field">
         <format>%</format>
-        <param>s2b lowercases urlencode v</param>
+        <param>s2b lowercases urlencodes v</param>
     </style>
     <style match="#url_gbk field">
         <format>%</format>
-        <param>s2b lowercases urlencode.gbk v</param>
+        <param>s2b lowercases urlencodes.gbk v</param>
     </style>
     <style match="#xml field">
         <format>%</format>
-        <param>s2b xmlencode v</param>
+        <param>s2b xmlencodes v</param>
     </style>
     <style match="#json field">
         <format>%</format>
-        <param>s2b jsonencode v</param>
+        <param>s2b jsonencodes v</param>
     </style>
     
     <style match="struct field">

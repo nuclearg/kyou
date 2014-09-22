@@ -37,9 +37,9 @@ class AlignString extends Expr {
 
     @Override
     public Value eval(Value input, PackContext context) {
-        String align = (String) this.postfixMap.get("align");
-        String padding = (String) this.postfixMap.get("padding");
-        int len = (Integer) this.postfixMap.get("len");
+        String align = this.postfixMap.get("align").strValue;
+        String padding = this.postfixMap.get("padding").strValue;
+        int len = this.postfixMap.get("len").intValue;
 
         String str = input.strValue;
 
@@ -90,11 +90,11 @@ class AlignString extends Expr {
     protected void check(Expr prev) {
         super.check(prev);
 
-        String align = (String) this.postfixMap.get("align");
+        String align = this.postfixMap.get("align").strValue;
         if (!align.equals("l") && !align.equals("r"))
             throw new KyouException("align must be 'l' or 'r'. align: " + align);
 
-        String padding = (String) this.postfixMap.get("padding");
+        String padding = this.postfixMap.get("padding").strValue;
         if (padding.isEmpty())
             throw new KyouException("padding is empty");
     }

@@ -26,14 +26,13 @@ import com.github.nuclearg.kyou.util.value.ValueType;
 class LiteralInteger extends Expr {
 
     public LiteralInteger(String value) {
-        super.postfix = value;
-        super.postfixi = NumberUtils.toInt(value);
+        super.postfix = new Value(NumberUtils.toInt(value));
         super.postfixMap = null;
     }
 
     @Override
     public Value eval(Value input, PackContext context) {
-        return new Value(this.postfixi);
+        return new Value(this.postfix.intValue);
     }
 
 }

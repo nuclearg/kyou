@@ -1,0 +1,36 @@
+[[DOC]]
+<?xml version="1.0"?>
+<document>
+    <field name="a" properties="len=3">1</field>
+    <field name="b" properties="ref=1">2</field>
+</document>
+
+
+[[STYLE]]
+<?xml version="1.0"?>
+<pack>
+    <config>
+        <encoding>utf8</encoding>
+    </config>
+
+    <style match="document">
+        <format>%</format>
+        <param>m</param>
+    </style>
+
+    <style match="#.a">
+        <format>%</format>
+        <param>s2b.gbk aligns[align='l',padding=' ',len=%1] v</param>
+        <param>s2i a.len</param>
+    </style>
+    <style match="#.b">
+        <format>%</format>
+        <param>r.1</param>
+        <param>s2b.gbk aligns[align='r',padding = '-',len='5'] v</param>
+    </style>
+</pack>
+
+
+
+[[EXPECTED]]
+1  ----2

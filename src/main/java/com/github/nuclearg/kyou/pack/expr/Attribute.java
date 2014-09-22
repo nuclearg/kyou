@@ -31,7 +31,7 @@ class Attribute extends Expr {
 
     @Override
     public Value eval(Value input, PackContext context) {
-        return new Value(input.domValue.attr(this.postfix, StringUtils.EMPTY));
+        return new Value(input.domValue.attr(this.postfix.strValue, StringUtils.EMPTY));
     }
 
 }

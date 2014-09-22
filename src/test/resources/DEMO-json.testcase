@@ -55,7 +55,7 @@
     
     <style match="array">
         <format>"%":[%%],</format>
-        <param>s2b n</param>
+        <param>s2b jsonencodes n</param>
         <param>m</param>
         <param>bk 1</param>
     </style>   
@@ -73,13 +73,13 @@
     
     <style match="field">
         <format>"%":"%",</format>
-        <param>s2b jsonencode n</param>
-        <param>s2b jsonencode v</param>
+        <param>s2b jsonencodes n</param>
+        <param>s2b jsonencodes v</param>
     </style>
 
     <style match="struct">
         <format>"%":{%%},</format>
-        <param>s2b jsonencode n</param>
+        <param>s2b jsonencodes n</param>
         <param>m</param>
         <param>bk 1</param>
     </style>

@@ -25,7 +25,7 @@ import com.github.nuclearg.kyou.util.value.ValueType;
  * @author ng
  * 
  */
-@ExprDescription(name = "urlencode", postfix = ExprPostfix.NoneOrString, typeIn = ValueType.String, typeOut = ValueType.String)
+@ExprDescription(name = "urlencodes", postfix = ExprPostfix.NoneOrString, typeIn = ValueType.String, typeOut = ValueType.String)
 public class EncodeUrl extends AbstractEncodingSupportedExpr {
 
     @Override

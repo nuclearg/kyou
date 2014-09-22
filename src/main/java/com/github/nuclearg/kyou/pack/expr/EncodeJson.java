@@ -16,7 +16,7 @@ import com.github.nuclearg.kyou.util.value.ValueType;
  * @author ng
  * 
  */
-@ExprDescription(name = "jsonencode", postfix = ExprPostfix.None, typeIn = ValueType.String, typeOut = ValueType.String)
+@ExprDescription(name = "jsonencodes", postfix = ExprPostfix.None, typeIn = ValueType.String, typeOut = ValueType.String)
 public class EncodeJson extends Expr {
 
     @Override

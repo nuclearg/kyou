@@ -16,7 +16,7 @@ import com.github.nuclearg.kyou.util.value.ValueType;
  * @author ng
  * 
  */
-@ExprDescription(name = "xmlencode", postfix = ExprPostfix.None, typeIn = ValueType.String, typeOut = ValueType.String)
+@ExprDescription(name = "xmlencodes", postfix = ExprPostfix.None, typeIn = ValueType.String, typeOut = ValueType.String)
 public class EncodeXml extends Expr {
 
     @Override

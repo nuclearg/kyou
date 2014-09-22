@@ -306,6 +306,7 @@ class ExprString {
                         lex(Lex.SimplePostfixDelimiter),
                         or(
                                 lex(Lex.Identifier),
+                                ref(Integer),
                                 ref(String),
                                 ref(RefParamPostfixValue)))),
         ComplexPostfix(

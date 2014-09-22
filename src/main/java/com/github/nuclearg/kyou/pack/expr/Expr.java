@@ -84,7 +84,7 @@ public abstract class Expr {
         // 检查自身的后缀是否有问题
         try {
             if (annotation.postfix() != ExprPostfix.Complex)
-                checkPostfixValue(this.postfix, annotation.postfix());
+                this.postfix = checkPostfixValue(this.postfix, annotation.postfix());
             else
                 checkComplexPostfix(this.postfixMap, annotation);
         } catch (Exception ex) {
@@ -110,9 +110,13 @@ public abstract class Expr {
      * 
      * @param value
      * @param type
-     * @return 如果给定的值可以转为数字，则返回对应的数字，否则返回-1
+     * @return 检查过的值，可能有字符串到数字的转换
      */
-    private static void checkPostfixValue(Value value, ExprPostfix type) {
+    private static Value checkPostfixValue(Value value, ExprPostfix type) {
+        if (type == ExprPostfix.Int || type == ExprPostfix.NoneOrInt)
+            if (value != null)
+                value = new Value(NumberUtils.toInt(value.strValue));
+
         switch (type) {
             case None:
                 ensure(value == null, "value must empty");
@@ -133,6 +137,8 @@ public abstract class Expr {
             default:
                 throw new UnsupportedOperationException("expr postfix type: " + type);
         }
+
+        return value;
     }
 
     /**
@@ -142,13 +148,9 @@ public abstract class Expr {
         for (ComplexPostfixField field : desc.complexPostfixFields()) {
             Value value = map.get(field.name());
 
-            if (field.type() == ExprPostfix.Int || field.type() == ExprPostfix.NoneOrInt) {
-                if (value != null)
-                    map.put(field.name(), value = new Value(NumberUtils.toInt(value.strValue)));
-            }
-
             try {
-                checkPostfixValue(value, field.type());
+                value = checkPostfixValue(value, field.type());
+                map.put(field.name(), value);
             } catch (Exception ex) {
                 throw new KyouException("postfix check fail. field: " + field.name() + ", type: " + field.type() + ", value: " + value, ex);
             }

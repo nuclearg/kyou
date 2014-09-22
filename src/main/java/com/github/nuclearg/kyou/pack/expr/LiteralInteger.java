@@ -1,7 +1,5 @@
 package com.github.nuclearg.kyou.pack.expr;
 
-import org.apache.commons.lang.math.NumberUtils;
-
 import com.github.nuclearg.kyou.pack.PackContext;
 import com.github.nuclearg.kyou.pack.expr.ExprDescription.ExprPostfix;
 import com.github.nuclearg.kyou.util.value.Value;
@@ -26,7 +24,7 @@ import com.github.nuclearg.kyou.util.value.ValueType;
 class LiteralInteger extends Expr {
 
     public LiteralInteger(String value) {
-        super.postfix = new Value(NumberUtils.toInt(value));
+        super.postfix = new Value(value);// 在构造函数里，postfix必须为String类型，在check()时会转成int
         super.postfixMap = null;
     }
 

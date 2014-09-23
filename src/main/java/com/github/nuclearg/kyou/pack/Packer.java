@@ -5,6 +5,7 @@ import com.github.nuclearg.kyou.dom.KyouContainer;
 import com.github.nuclearg.kyou.dom.KyouDocument;
 import com.github.nuclearg.kyou.dom.KyouItem;
 import com.github.nuclearg.kyou.util.ByteOutputStream;
+import com.github.nuclearg.kyou.util.value.Value;
 
 /**
  * 组包核心类 提供kyou的通用组包服务
@@ -24,7 +25,7 @@ public class Packer {
      */
     public byte[] packDocument(KyouDocument doc, KyouPackStyle style) {
         // 将doc作为一个item直接组包
-        PackContext context = new PackContext(doc, style, this);
+        PackContext context = new PackContext(doc, style, null, this);
         ByteOutputStream os = new ByteOutputStream();
         this.packItem(context, os);
         return os.export();
@@ -38,10 +39,12 @@ public class Packer {
      */
     public void packItem(PackContext context, ByteOutputStream os) {
         // 选择适合这个报文节点的style
-        StyleItem style = selectStyle(context);
+        StyleUnit style = selectStyle(context);
+
+        context = new PackContext(context.item, context.style, style, context.packer);
 
         // 处理style中的每一段，将处理结果作为报文体输出
-        for (StyleFormatSegment segment : style.segments)
+        for (StyleSegment segment : style.segments)
             segment.export(context, os);
     }
 
@@ -61,7 +64,7 @@ public class Packer {
         ByteOutputStream os = new ByteOutputStream();
 
         for (KyouItem item : container)
-            this.packItem(new PackContext(item, context.style, this), os);
+            this.packItem(new PackContext(item, context.style, null, this), os);
 
         return os.export();
     }
@@ -73,11 +76,24 @@ public class Packer {
      *            组包上下文
      * @return 适合当前组包上下文的样式单元
      */
-    private static StyleItem selectStyle(PackContext context) {
-        for (StyleItem style : context.style.styles)
+    private static StyleUnit selectStyle(PackContext context) {
+        for (StyleUnit style : context.style.styles)
             if (style.matcher.matches(context.item))
                 return style;
 
         throw new KyouException("no style suitable. path: " + context.item.path() + ", item: " + context.item);
+    }
+
+    /**
+     * 直接计算某个参数表达式应用到指定的报文节点上之后的结果，用以支持参数引用
+     * 
+     * @param paramIndex
+     *            参数的下标，从0开始计算
+     * @param context
+     *            组包上下文
+     * @return 这个参数计算出的结果
+     */
+    public Value calcParamValue(int paramIndex, PackContext context) {
+        return context.currentStyle.params.get(paramIndex).calc(context);
     }
 }

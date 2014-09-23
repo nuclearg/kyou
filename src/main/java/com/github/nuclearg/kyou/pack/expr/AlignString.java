@@ -1,5 +1,7 @@
 package com.github.nuclearg.kyou.pack.expr;
 
+import java.util.Map;
+
 import org.apache.commons.lang.StringUtils;
 
 import com.github.nuclearg.kyou.KyouException;
@@ -33,13 +35,20 @@ import com.github.nuclearg.kyou.util.value.ValueType;
                 @ComplexPostfixField(name = "align", type = ExprPostfix.String),
                 @ComplexPostfixField(name = "padding", type = ExprPostfix.String),
                 @ComplexPostfixField(name = "len", type = ExprPostfix.Int) })
-class AlignString extends Expr {
+class AlignString extends ComplexPostfixExpr {
 
     @Override
-    public Value eval(Value input, PackContext context) {
-        String align = (String) this.postfixMap.get("align");
-        String padding = (String) this.postfixMap.get("padding");
-        int len = (Integer) this.postfixMap.get("len");
+    public Value calc(Value input, PackContext context, Map<String, Value> postfixMap) {
+        // 取参数
+        String align = postfixMap.get("align").strValue;
+        String padding = postfixMap.get("padding").strValue;
+        int len = postfixMap.get("len").intValue;
+
+        // 检查
+        if (!align.equals("l") && !align.equals("r"))
+            throw new KyouException("align must be 'l' or 'r'. align: " + align);
+        if (padding.isEmpty())
+            throw new KyouException("padding is empty");
 
         String str = input.strValue;
 
@@ -84,19 +93,6 @@ class AlignString extends Expr {
         else
             // 如果长度小于期望则向左侧填补
             return StringUtils.leftPad(str, len, padding);
-    }
-
-    @Override
-    protected void check(Expr prev) {
-        super.check(prev);
-
-        String align = (String) this.postfixMap.get("align");
-        if (!align.equals("l") && !align.equals("r"))
-            throw new KyouException("align must be 'l' or 'r'. align: " + align);
-
-        String padding = (String) this.postfixMap.get("padding");
-        if (padding.isEmpty())
-            throw new KyouException("padding is empty");
     }
 
 }

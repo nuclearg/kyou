@@ -20,10 +20,10 @@ import com.github.nuclearg.kyou.util.value.ValueType;
  * @author ng
  */
 @ExprDescription(name = "m", postfix = ExprPostfix.None, typeIn = ValueType.Dom, typeOut = ValueType.Bytes)
-class Member extends Expr {
+class Member extends SimplePostfixExpr {
 
     @Override
-    public Value eval(Value input, PackContext context) {
+    public Value calc(Value input, PackContext context, Value postfix) {
         KyouItem item = input.domValue;
         if (!(item instanceof KyouContainer))
             throw new KyouException("KyouContainer expected. path: " + item.path());

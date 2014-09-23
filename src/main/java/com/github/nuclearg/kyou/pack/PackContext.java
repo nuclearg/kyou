@@ -23,9 +23,15 @@ public class PackContext {
      */
     public final Packer packer;
 
-    PackContext(KyouItem item, KyouPackStyle style, Packer packer) {
+    /**
+     * 当前正在使用的组包单元
+     */
+    public final StyleUnit currentStyle;
+
+    PackContext(KyouItem item, KyouPackStyle style, StyleUnit currentStyle, Packer packer) {
         this.item = item;
         this.style = style;
+        this.currentStyle = currentStyle;
         this.packer = packer;
     }
 

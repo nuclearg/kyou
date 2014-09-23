@@ -12,15 +12,20 @@ import com.github.nuclearg.kyou.util.value.Value;
  * @author ng
  * 
  */
-abstract class AbstractEncodingSupportedExpr extends Expr {
-    /**
-     * 使用的编码
-     */
-    private Charset encoding;
+abstract class AbstractEncodingSupportedExpr extends SimplePostfixExpr {
 
     @Override
-    public Value eval(Value input, PackContext context) {
-        Charset encoding = this.encoding == null ? context.style.config.encoding : this.encoding;
+    public Value calc(Value input, PackContext context, Value postfix) {
+        Charset encoding;
+
+        if (postfix == null)
+            encoding = context.style.config.encoding;
+        else
+            try {
+                encoding = Charset.forName(postfix.strValue);
+            } catch (Exception ex) {
+                throw new KyouException("encoding not found. encoding: " + postfix.strValue);
+            }
 
         return this.eval(input, context, encoding);
     }
@@ -35,18 +40,4 @@ abstract class AbstractEncodingSupportedExpr extends Expr {
      */
     protected abstract Value eval(Value input, PackContext context, Charset encoding);
 
-    protected void check(Expr prev) {
-        super.check(prev);
-
-        // 如果后缀为空则表示不指定编码，和整篇报文的编码保持一致
-        if (this.postfix == null)
-            return;
-
-        // 如果后缀不为空，则表示需要指定编码
-        try {
-            this.encoding = Charset.forName(this.postfix);
-        } catch (Exception ex) {
-            throw new KyouException("encoding not found. encoding: " + encoding);
-        }
-    }
 }

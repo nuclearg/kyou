@@ -16,11 +16,11 @@ import com.github.nuclearg.kyou.util.value.ValueType;
  * @author ng
  * 
  */
-@ExprDescription(name = "jsonencode", postfix = ExprPostfix.None, typeIn = ValueType.String, typeOut = ValueType.String)
-public class EncodeJson extends Expr {
+@ExprDescription(name = "jsonencodes", postfix = ExprPostfix.None, typeIn = ValueType.String, typeOut = ValueType.String)
+public class EncodeJson extends SimplePostfixExpr {
 
     @Override
-    public Value eval(Value input, PackContext context) {
+    public Value calc(Value input, PackContext context, Value postfix) {
         return new Value(StringEscapeUtils.escapeJavaScript(input.strValue));
     }
 }

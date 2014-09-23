@@ -5,9 +5,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.github.nuclearg.kyou.KyouException;
-import com.github.nuclearg.kyou.pack.expr.Expr;
 import com.github.nuclearg.kyou.util.ByteOutputStream;
 import com.github.nuclearg.kyou.util.value.Value;
+import com.github.nuclearg.kyou.util.value.ValueType;
 
 /**
  * 组包片段，对应格式字符串{@link StyleFormatString}中的一段
@@ -18,7 +18,7 @@ import com.github.nuclearg.kyou.util.value.Value;
  * @author ng
  * 
  */
-abstract class StyleFormatSegment {
+abstract class StyleSegment {
     /**
      * 将对应的字节输出到输出流中
      * 
@@ -26,8 +26,13 @@ abstract class StyleFormatSegment {
      *            组包上下文
      * @param os
      *            输出流
+     * @return 为了支持参数引用，参数段的输出并不一定必须是{@link ValueType#Bytes}类型的。
+     *         <ul>
+     *         <li>如果参数段的计算结果是{@link ValueType#Bytes}类型，则输出到os中</li>
+     *         <li>如果参数段的计算结果是其它类型，则返回该计算结果</li>
+     *         </ul>
      */
-    abstract void export(PackContext context, ByteOutputStream os);
+    abstract Value export(PackContext context, ByteOutputStream os);
 
     /**
      * 将格式字符串解析为多个组包段
@@ -40,10 +45,10 @@ abstract class StyleFormatSegment {
      *            参数列表
      * @return 这个格式字符串表示的多个组包段
      */
-    static List<StyleFormatSegment> parseFormatString(String formatStr, Charset encoding, List<String> params) {
+    static List<StyleSegment> parseFormatString(String formatStr, Charset encoding, List<StyleParam> params) {
         StyleFormatString format = new StyleFormatString(formatStr, encoding);
 
-        List<StyleFormatSegment> segments = new ArrayList<>();
+        List<StyleSegment> segments = new ArrayList<>();
         int paramId = 0;
         for (byte[] bytes : format)
             // 判断这个段的类型
@@ -55,13 +60,8 @@ abstract class StyleFormatSegment {
                 if (params.size() <= paramId)
                     throw new KyouException("insufficent params. format: " + formatStr + ", paramId: " + paramId);
 
-                String param = params.get(paramId);
-                try {
-                    segments.add(new ParamSegment(param));
-                    paramId++;
-                } catch (Exception ex) {
-                    throw new KyouException("parse param fail. format: " + formatStr + ", paramId: " + paramId + ", param: " + param, ex);
-                }
+                segments.add(new ParamSegment(params.get(paramId)));
+                paramId++;
             }
 
         return segments;
@@ -73,7 +73,7 @@ abstract class StyleFormatSegment {
      * @author ng
      * 
      */
-    private static class BytesSegment extends StyleFormatSegment {
+    static class BytesSegment extends StyleSegment {
         private final byte[] text;
 
         BytesSegment(byte[] text) {
@@ -81,8 +81,9 @@ abstract class StyleFormatSegment {
         }
 
         @Override
-        void export(PackContext context, ByteOutputStream os) {
+        Value export(PackContext context, ByteOutputStream os) {
             os.write(this.text);
+            return null;
         }
     }
 
@@ -92,33 +93,26 @@ abstract class StyleFormatSegment {
      * @author ng
      * 
      */
-    private static class ParamSegment extends StyleFormatSegment {
-        private final List<Expr> exprChain;
+    static class ParamSegment extends StyleSegment {
+        final StyleParam param;
 
-        ParamSegment(String paramStr) {
-            this.exprChain = Expr.parseExprList(paramStr);
+        ParamSegment(StyleParam param) {
+            this.param = param;
         }
 
         @Override
-        void export(PackContext context, ByteOutputStream os) {
-            // 向表达式链输入的最初的值是正被组包的当前报文节点
-            Value value = new Value(context.item);
-
-            // 沿着表达式链一直计算，最开始的输入为空，
-            for (Expr expr : this.exprChain)
-                value = expr.eval(value, context);
+        Value export(PackContext context, ByteOutputStream os) {
+            Value value = this.param.calc(context);
 
             switch (value.type) {
                 case Bytes:
-                    // 如果输出为Bytes，则输出
                     os.write(value.bytesValue);
-                    break;
+                    return value;
                 case Backspace:
-                    // 如果输出为Backspace，则回退
                     os.backspace(value.intValue);
-                    break;
+                    return value;
                 default:
-                    throw new UnsupportedOperationException("unsupported value type: " + value.type);
+                    return value;
             }
         }
     }

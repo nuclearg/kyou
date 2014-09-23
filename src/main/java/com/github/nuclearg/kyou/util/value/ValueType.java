@@ -8,10 +8,6 @@ package com.github.nuclearg.kyou.util.value;
  */
 public enum ValueType {
     /**
-     * 表示一个不应该存在的值类型
-     */
-    Null,
-    /**
      * 报文文档树的一部分
      */
     Dom,
@@ -27,8 +23,21 @@ public enum ValueType {
      * 字节数组
      */
     Bytes,
+
+    // ---- 从这里开始是kyou内部使用
+
+    /**
+     * 表示一个不应该存在的值类型
+     */
+    Null,
+
     /**
      * 回退
      */
     Backspace,
+
+    /**
+     * 引用其它参数
+     */
+    RefParam,
 }

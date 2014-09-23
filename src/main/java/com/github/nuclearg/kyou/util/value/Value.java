@@ -62,4 +62,26 @@ public class Value {
         this.strValue = strValue;
         this.bytesValue = bytesValue;
     }
+
+    @Override
+    public String toString() {
+        switch (this.type) {
+            case Dom:
+                return "[D]" + this.domValue;
+            case Bytes:
+                return "[B]" + this.bytesValue;
+            case Integer:
+                return "[I]" + this.intValue;
+            case String:
+                return "[S]" + this.strValue;
+            case Backspace:
+                return "[BackSpace]" + this.intValue;
+            case Null:
+                return "[Null]null";
+            case RefParam:
+                return "[Ref]" + this.intValue;
+            default:
+                throw new UnsupportedOperationException("value type " + this.type);
+        }
+    }
 }

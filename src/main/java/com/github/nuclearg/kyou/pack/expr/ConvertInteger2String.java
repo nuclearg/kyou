@@ -1,6 +1,5 @@
 package com.github.nuclearg.kyou.pack.expr;
 
-import com.github.nuclearg.kyou.KyouException;
 import com.github.nuclearg.kyou.pack.PackContext;
 import com.github.nuclearg.kyou.pack.expr.ExprDescription.ExprPostfix;
 import com.github.nuclearg.kyou.util.value.Value;
@@ -17,23 +16,11 @@ import com.github.nuclearg.kyou.util.value.ValueType;
  * 
  */
 @ExprDescription(name = "i2s", postfix = ExprPostfix.NoneOrInt, typeIn = ValueType.Integer, typeOut = ValueType.String)
-class ConvertInteger2String extends Expr {
-    @Override
-    public Value eval(Value input, PackContext context) {
-        return new Value(Long.toString(input.intValue, this.postfixi));
-    }
+class ConvertInteger2String extends AbstractRadixSupportedExpr {
 
     @Override
-    protected void check(Expr prev) {
-        super.check(prev);
-
-        if (this.postfixi < Character.MIN_RADIX)
-            throw new KyouException("radix < " + Character.MIN_RADIX);
-        if (this.postfixi > Character.MAX_RADIX)
-            throw new KyouException("radix > " + Character.MAX_RADIX);
-
-        if (this.postfixi < 0)
-            this.postfixi = 10;
+    protected Value eval(Value input, PackContext context, int radix) {
+        return new Value(Long.toString(input.intValue, radix));
     }
 
 }

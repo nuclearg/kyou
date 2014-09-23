@@ -5,10 +5,11 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import com.github.nuclearg.kyou.pack.StyleExpr;
 import com.github.nuclearg.kyou.util.value.ValueType;
 
 /**
- * 标记在{@link Expr}的实现类上，为{@link Expr}的实现类提供一些静态信息。
+ * 标记在{@link StyleExpr}的实现类上，为{@link StyleExpr}的实现类提供一些静态信息。
  * 
  * @author ng
  */

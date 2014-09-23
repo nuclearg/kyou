@@ -22,18 +22,22 @@ import com.github.nuclearg.kyou.util.value.ValueType;
  * @author ng
  * 
  */
-@ExprDescription(name = "<literal integer>", postfix = ExprPostfix.Int, typeIn = ValueType.Null, typeOut = ValueType.Integer)
-class LiteralInteger extends Expr {
+@ExprDescription(name = "<literal_integer>", postfix = ExprPostfix.None, typeIn = ValueType.Null, typeOut = ValueType.Integer)
+public class LiteralInteger extends SimplePostfixExpr {
+    private final int value;
 
     public LiteralInteger(String value) {
-        super.postfix = value;
-        super.postfixi = NumberUtils.toInt(value);
-        super.postfixMap = null;
+        this.value = NumberUtils.toInt(value);
     }
 
     @Override
-    public Value eval(Value input, PackContext context) {
-        return new Value(this.postfixi);
+    public Value calc(Value input, PackContext context, Value postfix) {
+        return new Value(this.value);
+    }
+
+    @Override
+    public String toString() {
+        return "" + this.value;
     }
 
 }

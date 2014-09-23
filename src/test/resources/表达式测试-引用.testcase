@@ -1,8 +1,8 @@
 [[DOC]]
 <?xml version="1.0"?>
 <document>
-    <field name="a" properties="len=3">1</field>
-    <field name="b" properties="ref=1">2</field>
+    <field name="a" attributes="len=3">1</field>
+    <field name="b" attributes="ref=1">2</field>
 </document>
 
 
@@ -25,7 +25,7 @@
     </style>
     <style match="#.b">
         <format>%</format>
-        <param>r.1</param>
+        <param>r 1</param>
         <param>s2b.gbk aligns[align='r',padding = '-',len='5'] v</param>
     </style>
 </pack>

@@ -15,10 +15,10 @@ import com.github.nuclearg.kyou.util.value.ValueType;
  * 
  */
 @ExprDescription(name = "lowercases", postfix = ExprPostfix.NoneOrString, typeIn = ValueType.String, typeOut = ValueType.String)
-class StringLowerCase extends Expr {
+class StringLowerCase extends SimplePostfixExpr {
 
     @Override
-    public Value calc(Value input, PackContext context) {
+    public Value calc(Value input, PackContext context, Value postfix) {
         return new Value(input.strValue.toLowerCase());
     }
 

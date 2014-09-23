@@ -1,4 +1,4 @@
-package com.github.nuclearg.kyou.pack.expr;
+package com.github.nuclearg.kyou.pack;
 
 import static com.github.nuclearg.kyou.util.parser.SyntaxRule.lex;
 import static com.github.nuclearg.kyou.util.parser.SyntaxRule.nul;
@@ -29,13 +29,13 @@ import com.github.nuclearg.kyou.util.parser.SyntaxTreeNode;
  * @author ng
  * 
  */
-class ExprString {
+class StyleExprString {
     /**
      * 原始的字符串
      */
     private final String str;
 
-    ExprString(String str) {
+    StyleExprString(String str) {
         this.str = str;
     }
 

@@ -27,11 +27,11 @@ import com.github.nuclearg.kyou.util.value.ValueType;
  * 
  */
 @ExprDescription(name = "a", postfix = ExprPostfix.String, typeIn = ValueType.Dom, typeOut = ValueType.String)
-class Attribute extends Expr {
+class Attribute extends SimplePostfixExpr {
 
     @Override
-    public Value calc(Value input, PackContext context) {
-        return new Value(input.domValue.attr(this.postfix.strValue, StringUtils.EMPTY));
+    public Value calc(Value input, PackContext context, Value postfix) {
+        return new Value(input.domValue.attr(postfix.strValue, StringUtils.EMPTY));
     }
 
 }

@@ -1,22 +1,21 @@
-package com.github.nuclearg.kyou.pack.expr;
+package com.github.nuclearg.kyou.pack;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.math.NumberUtils;
 
 import com.github.nuclearg.kyou.KyouException;
-import com.github.nuclearg.kyou.pack.PackContext;
-import com.github.nuclearg.kyou.pack.StyleUnit;
-import com.github.nuclearg.kyou.pack.expr.ExprDescription.ComplexPostfixField;
+import com.github.nuclearg.kyou.pack.StyleExprString.ExprInfo;
+import com.github.nuclearg.kyou.pack.StyleExprString.ExprPostfixValueInfo;
+import com.github.nuclearg.kyou.pack.expr.ExprDescription;
 import com.github.nuclearg.kyou.pack.expr.ExprDescription.ExprPostfix;
-import com.github.nuclearg.kyou.pack.expr.ExprString.ExprInfo;
-import com.github.nuclearg.kyou.pack.expr.ExprString.ExprPostfixValueInfo;
+import com.github.nuclearg.kyou.pack.expr.LiteralInteger;
 import com.github.nuclearg.kyou.util.ClassUtils;
 import com.github.nuclearg.kyou.util.ClassUtils.AnnotationNameParser;
 import com.github.nuclearg.kyou.util.value.Value;
@@ -44,8 +43,8 @@ import com.github.nuclearg.kyou.util.value.ValueType;
  * 
  * @author ng
  */
-public abstract class Expr {
-    private static final Map<String, Class<? extends Expr>> EXPR_CLASSES = ClassUtils.buildAnnotatedClassMap(ExprDescription.class, Expr.class, new AnnotationNameParser<ExprDescription>() {
+public abstract class StyleExpr {
+    private static final Map<String, Class<? extends StyleExpr>> EXPR_CLASSES = ClassUtils.buildAnnotatedClassMap(ExprDescription.class, StyleExpr.class, new AnnotationNameParser<ExprDescription>() {
 
         @Override
         public String parseName(ExprDescription annotation) {
@@ -56,11 +55,11 @@ public abstract class Expr {
     /**
      * 表达式的后缀 如果未提供后缀则为null
      */
-    protected Value postfix;
+    Value postfix;
     /**
      * 表达式的后缀，如果是{@link ExprPostfix#Complex}类型则将后缀解析为map，否则为null
      */
-    protected Map<String, Value> postfixMap;
+    Map<String, Value> postfixMap;
 
     /**
      * 计算该表达式
@@ -71,43 +70,56 @@ public abstract class Expr {
      *            组包上下文
      * @return 表达式的计算结果
      */
-    public abstract Value calc(Value input, PackContext context);
+    Value calc(Value input, PackContext context) {
+        if (this.postfixMap == null) { // 简单后缀
+            Value postfix = this.postfix;
 
-    /**
-     * 检查当前表达式是否存在问题，以及和前一个表达式之间的衔接是否有问题
-     * 
-     * @param prev
-     *            前一个表达式，即输出结果将作为当前表达式的输入的表达式
-     * @param styleUnit
-     *            组包样式单元
-     */
-    public void check(Expr prev, StyleUnit styleUnit) {
-        ExprDescription annotation = this.getClass().getAnnotation(ExprDescription.class);
+            // 解析引用
+            if (postfix != null && postfix.type == ValueType.RefParam)
+                postfix = context.packer.calcParamValue(postfix.intValue, context);
 
-        // 检查自身的后缀是否有问题
-        try {
-            if (annotation.postfix() != ExprPostfix.Complex)
-                this.postfix = checkPostfixValue(this.postfix, annotation.postfix());
-            else
-                checkComplexPostfix(this.postfixMap, annotation);
-        } catch (Exception ex) {
-            throw new KyouException("expr postfix syntax error. expr: " + this, ex);
-        }
-
-        // 检查和前一环节的表达式之间的衔接是否有问题
-        if (prev == null) {
-            if (annotation.typeIn() != ValueType.Dom && annotation.typeIn() != ValueType.Null)
-                throw new KyouException("expr requires input. expr: " + this);
+            // 执行计算
+            return this.calc(input, context, postfix);
         } else {
-            ValueType prevType = prev.getClass().getAnnotation(ExprDescription.class).typeOut();
-            ValueType thisType = annotation.typeIn();
+            Map<String, Value> postfixMap = new LinkedHashMap<>();
 
-            if (prevType == ValueType.RefParam)
-                prevType = styleUnit.getParamType(this.postfix.intValue);
-            if (prevType != thisType)
-                throw new KyouException("expr input type mismatch. expr: " + this + ", prev: " + prev);
+            // 解析引用
+            for (Entry<String, Value> entry : this.postfixMap.entrySet())
+                if (entry.getValue() != null && entry.getValue().type == ValueType.RefParam)
+                    postfixMap.put(entry.getKey(), context.packer.calcParamValue(entry.getValue().intValue, context));
+                else
+                    postfixMap.put(entry.getKey(), entry.getValue());
+
+            // 执行计算
+            return this.calc(input, context, postfixMap);
         }
     }
+
+    /**
+     * 计算表达式
+     * 
+     * @param input
+     *            输入值
+     * @param context
+     *            组包上下文
+     * @param postfix
+     *            简单后缀
+     * @return 计算结果
+     */
+    protected abstract Value calc(Value input, PackContext context, Value postfix);
+
+    /**
+     * 计算表达式
+     * 
+     * @param input
+     *            输入值
+     * @param context
+     *            组包上下文
+     * @param postfixMap
+     *            复杂后缀
+     * @return 计算结果
+     */
+    protected abstract Value calc(Value input, PackContext context, Map<String, Value> postfixMap);
 
     @Override
     public String toString() {
@@ -127,14 +139,14 @@ public abstract class Expr {
      *            参数字符串
      * @return 解析出来的表达式链
      */
-    public static List<Expr> parseExprList(String str) {
+    static List<StyleExpr> parseExprList(String str) {
         if (StringUtils.isBlank(str))
             throw new KyouException("param is blank");
 
-        List<Expr> exprChain = new ArrayList<>();
+        List<StyleExpr> exprChain = new ArrayList<>();
 
         // 解析参数字符串
-        ExprString paramStr = new ExprString(str);
+        StyleExprString paramStr = new StyleExprString(str);
         for (ExprInfo exprInfo : paramStr.parseExprInfo()) {
             // 判断是否是整数字面量
             if (StringUtils.isNumeric(exprInfo.name)) {
@@ -144,7 +156,7 @@ public abstract class Expr {
 
             // 创建expr实例
             try {
-                Expr expr = ClassUtils.newInstance(EXPR_CLASSES, exprInfo.name);
+                StyleExpr expr = ClassUtils.newInstance(EXPR_CLASSES, exprInfo.name);
                 if (expr == null)
                     throw new KyouException("expression unsupported. name: " + exprInfo.name);
 
@@ -177,67 +189,6 @@ public abstract class Expr {
         Collections.reverse(exprChain);
 
         return Collections.unmodifiableList(exprChain);
-    }
-
-    /**
-     * 检查给定的值是否满足类型的要求
-     * 
-     * @param value
-     * @param type
-     * @return 检查过的值，可能有字符串到数字的转换
-     */
-    private static Value checkPostfixValue(Value value, ExprPostfix type) {
-        if (type == ExprPostfix.Int || type == ExprPostfix.NoneOrInt)
-            if (value != null)
-                value = new Value(NumberUtils.toInt(value.strValue));
-
-        switch (type) {
-            case None:
-                ensure(value == null, "value must empty");
-                break;
-            case Int:
-                ensure(value != null, "value must not empty");
-                ensure(value.type == ValueType.Integer && value.intValue >= 0, "value must non negative integer");
-                break;
-            case String:
-                ensure(value != null && value.type == ValueType.String, "value must not empty");
-                break;
-            case NoneOrInt:
-                ensure(value == null || (value.type == ValueType.Integer && value.intValue > 0), "value must empty or non negative integer");
-                break;
-            case NoneOrString:
-                // 无需任何判断
-                break;
-            default:
-                throw new UnsupportedOperationException("expr postfix type: " + type);
-        }
-
-        return value;
-    }
-
-    /**
-     * 检查复杂后缀
-     */
-    private static void checkComplexPostfix(Map<String, Value> map, ExprDescription desc) {
-        for (ComplexPostfixField field : desc.complexPostfixFields()) {
-            Value value = map.get(field.name());
-
-            try {
-                value = checkPostfixValue(value, field.type());
-                map.put(field.name(), value);
-            } catch (Exception ex) {
-                throw new KyouException("postfix check fail. field: " + field.name() + ", type: " + field.type() + ", value: " + value, ex);
-            }
-
-        }
-    }
-
-    /**
-     * 工具方法，不满足条件就抛异常
-     */
-    private static void ensure(boolean result, String err) {
-        if (!result)
-            throw new KyouException(err);
     }
 
 }

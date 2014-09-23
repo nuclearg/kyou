@@ -14,10 +14,10 @@ import com.github.nuclearg.kyou.util.value.ValueType;
  * @author ng
  */
 @ExprDescription(name = "n", postfix = ExprPostfix.None, typeIn = ValueType.Dom, typeOut = ValueType.String)
-class Name extends Expr {
+class Name extends SimplePostfixExpr {
 
     @Override
-    public Value calc(Value input, PackContext context) {
+    public Value calc(Value input, PackContext context, Value postfix) {
         return new Value(input.domValue.name());
     }
 }

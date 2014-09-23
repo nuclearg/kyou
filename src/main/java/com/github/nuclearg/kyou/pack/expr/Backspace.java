@@ -22,10 +22,10 @@ import com.github.nuclearg.kyou.util.value.ValueType;
  * 
  */
 @ExprDescription(name = "bk", postfix = ExprPostfix.None, typeIn = ValueType.Integer, typeOut = ValueType.Backspace)
-class Backspace extends Expr {
+class Backspace extends SimplePostfixExpr {
 
     @Override
-    public Value calc(Value input, PackContext context) {
+    public Value calc(Value input, PackContext context, Value postfix) {
         return new Value(ValueType.Backspace, null, input.intValue, null, null);
     }
 

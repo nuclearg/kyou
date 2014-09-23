@@ -17,10 +17,10 @@ import com.github.nuclearg.kyou.util.value.ValueType;
  * 
  */
 @ExprDescription(name = "xmlencodes", postfix = ExprPostfix.None, typeIn = ValueType.String, typeOut = ValueType.String)
-public class EncodeXml extends Expr {
+public class EncodeXml extends SimplePostfixExpr {
 
     @Override
-    public Value calc(Value input, PackContext context) {
+    public Value calc(Value input, PackContext context, Value postfix) {
         return new Value(StringEscapeUtils.escapeXml(input.strValue));
     }
 }

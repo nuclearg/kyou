@@ -15,10 +15,10 @@ import com.github.nuclearg.kyou.util.value.ValueType;
  * 
  */
 @ExprDescription(name = "lens", postfix = ExprPostfix.None, typeIn = ValueType.String, typeOut = ValueType.Integer)
-class LenString extends Expr {
+class LenString extends SimplePostfixExpr {
 
     @Override
-    public Value calc(Value input, PackContext context) {
+    public Value calc(Value input, PackContext context, Value postfix) {
         return new Value(input.strValue.length());
     }
 

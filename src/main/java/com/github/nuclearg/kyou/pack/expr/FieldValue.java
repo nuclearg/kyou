@@ -19,10 +19,10 @@ import com.github.nuclearg.kyou.util.value.ValueType;
  * 
  */
 @ExprDescription(name = "v", postfix = ExprPostfix.None, typeIn = ValueType.Dom, typeOut = ValueType.String)
-class FieldValue extends Expr {
+class FieldValue extends SimplePostfixExpr {
 
     @Override
-    public Value calc(Value input, PackContext context) {
+    public Value calc(Value input, PackContext context, Value postfix) {
         if (!(input.domValue instanceof KyouField))
             throw new KyouException("KyouField expected. path: " + input.domValue.path());
 

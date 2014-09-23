@@ -87,16 +87,13 @@ public class Packer {
     /**
      * 直接计算某个参数表达式应用到指定的报文节点上之后的结果，用以支持参数引用
      * 
-     * @param item
-     *            被组包的节点
-     * @param style
-     *            选中的组包样式
      * @param paramIndex
      *            参数的下标，从0开始计算
+     * @param context
+     *            组包上下文
      * @return 这个参数计算出的结果
      */
-    public Value calcParamValue(KyouItem item, PackContext context, StyleUnit style, int paramIndex) {
-        context = new PackContext(item, context.style, style, context.packer);
-        return style.params.get(paramIndex).calc(context);
+    public Value calcParamValue(int paramIndex, PackContext context) {
+        return context.currentStyle.params.get(paramIndex).calc(context);
     }
 }

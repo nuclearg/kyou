@@ -17,10 +17,10 @@ import com.github.nuclearg.kyou.util.value.ValueType;
  * 
  */
 @ExprDescription(name = "p", postfix = ExprPostfix.None, typeIn = ValueType.Dom, typeOut = ValueType.Dom)
-class Parent extends Expr {
+class Parent extends SimplePostfixExpr {
 
     @Override
-    public Value calc(Value input, PackContext context) {
+    public Value calc(Value input, PackContext context, Value postfix) {
         KyouContainer parent = input.domValue.parent();
 
         if (parent == null || parent == input.domValue)

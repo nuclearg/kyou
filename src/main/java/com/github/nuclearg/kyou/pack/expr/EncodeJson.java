@@ -20,7 +20,7 @@ import com.github.nuclearg.kyou.util.value.ValueType;
 public class EncodeJson extends Expr {
 
     @Override
-    public Value eval(Value input, PackContext context) {
+    public Value calc(Value input, PackContext context) {
         return new Value(StringEscapeUtils.escapeJavaScript(input.strValue));
     }
 }

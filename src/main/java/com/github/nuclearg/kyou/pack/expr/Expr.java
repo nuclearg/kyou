@@ -12,6 +12,7 @@ import org.apache.commons.lang.math.NumberUtils;
 
 import com.github.nuclearg.kyou.KyouException;
 import com.github.nuclearg.kyou.pack.PackContext;
+import com.github.nuclearg.kyou.pack.StyleUnit;
 import com.github.nuclearg.kyou.pack.expr.ExprDescription.ComplexPostfixField;
 import com.github.nuclearg.kyou.pack.expr.ExprDescription.ExprPostfix;
 import com.github.nuclearg.kyou.pack.expr.ExprString.ExprInfo;
@@ -70,15 +71,17 @@ public abstract class Expr {
      *            组包上下文
      * @return 表达式的计算结果
      */
-    public abstract Value eval(Value input, PackContext context);
+    public abstract Value calc(Value input, PackContext context);
 
     /**
      * 检查当前表达式是否存在问题，以及和前一个表达式之间的衔接是否有问题
      * 
      * @param prev
      *            前一个表达式，即输出结果将作为当前表达式的输入的表达式
+     * @param styleUnit
+     *            组包样式单元
      */
-    protected void check(Expr prev) {
+    public void check(Expr prev, StyleUnit styleUnit) {
         ExprDescription annotation = this.getClass().getAnnotation(ExprDescription.class);
 
         // 检查自身的后缀是否有问题
@@ -99,10 +102,81 @@ public abstract class Expr {
             ValueType prevType = prev.getClass().getAnnotation(ExprDescription.class).typeOut();
             ValueType thisType = annotation.typeIn();
 
+            if (prevType == ValueType.RefParam)
+                prevType = styleUnit.getParamType(this.postfix.intValue);
             if (prevType != thisType)
-                // TODO 对Auto类型进行支持
                 throw new KyouException("expr input type mismatch. expr: " + this + ", prev: " + prev);
         }
+    }
+
+    @Override
+    public String toString() {
+        String name = this.getClass().getAnnotation(ExprDescription.class).name();
+        if (this.postfixMap != null)
+            return name + this.postfixMap;
+        else if (this.postfix == null)
+            return name;
+        else
+            return name + "." + this.postfix;
+    }
+
+    /**
+     * 解析参数字符串并创建一系列表达式
+     * 
+     * @param str
+     *            参数字符串
+     * @return 解析出来的表达式链
+     */
+    public static List<Expr> parseExprList(String str) {
+        if (StringUtils.isBlank(str))
+            throw new KyouException("param is blank");
+
+        List<Expr> exprChain = new ArrayList<>();
+
+        // 解析参数字符串
+        ExprString paramStr = new ExprString(str);
+        for (ExprInfo exprInfo : paramStr.parseExprInfo()) {
+            // 判断是否是整数字面量
+            if (StringUtils.isNumeric(exprInfo.name)) {
+                exprChain.add(new LiteralInteger(exprInfo.name));
+                continue;
+            }
+
+            // 创建expr实例
+            try {
+                Expr expr = ClassUtils.newInstance(EXPR_CLASSES, exprInfo.name);
+                if (expr == null)
+                    throw new KyouException("expression unsupported. name: " + exprInfo.name);
+
+                if (exprInfo.postfix == null)
+                    expr.postfix = null;
+                else if (exprInfo.postfix.ref < 0)
+                    expr.postfix = new Value(exprInfo.postfix.value);
+                else
+                    expr.postfix = new Value(ValueType.RefParam, null, exprInfo.postfix.ref, null, null);
+
+                if (exprInfo.complexPostfix == null) {
+                    exprChain.add(expr);
+                    continue;
+                }
+
+                expr.postfixMap = new HashMap<>();
+                for (Entry<String, ExprPostfixValueInfo> entry : exprInfo.complexPostfix.entrySet())
+                    if (entry.getValue().ref < 0)
+                        expr.postfixMap.put(entry.getKey(), new Value(entry.getValue().value));
+                    else
+                        expr.postfixMap.put(entry.getKey(), new Value(ValueType.RefParam, null, entry.getValue().ref, null, null));
+
+                exprChain.add(expr);
+            } catch (Exception ex) {
+                throw new KyouException("init expression fail. name: " + exprInfo.name, ex);
+            }
+        }
+
+        // 因为在实际组包时，是从最后一个表达式开始计算的，为省事现在在这里直接先倒序一下
+        Collections.reverse(exprChain);
+
+        return Collections.unmodifiableList(exprChain);
     }
 
     /**
@@ -164,92 +238,6 @@ public abstract class Expr {
     private static void ensure(boolean result, String err) {
         if (!result)
             throw new KyouException(err);
-    }
-
-    @Override
-    public String toString() {
-        String name = this.getClass().getAnnotation(ExprDescription.class).name();
-        if (this.postfix == null)
-            return name;
-        else
-            return name + "." + this.postfix;
-    }
-
-    /**
-     * 解析参数字符串并创建一系列表达式
-     * 
-     * @param str
-     *            参数字符串
-     * @return 解析出来的表达式列表
-     */
-    public static List<Expr> parseExprList(String str) {
-        if (StringUtils.isBlank(str))
-            throw new KyouException("param is blank");
-
-        List<Expr> exprChain = new ArrayList<>();
-
-        // 解析参数字符串
-        ExprString paramStr = new ExprString(str);
-        for (ExprInfo exprInfo : paramStr.parseExprInfo())
-            exprChain.add(Expr.buildExpr(exprInfo));
-
-        // 因为在实际组包时，是从最后一个表达式开始计算的，为省事现在在这里直接先倒序一下
-        Collections.reverse(exprChain);
-
-        // 检查各个表达式的正确性，以及与前一个表达式的衔接是否有问题
-        for (int i = 0; i < exprChain.size(); i++) {
-            Expr expr = exprChain.get(i);
-            Expr prev = i > 0 ? exprChain.get(i - 1) : null;
-
-            expr.check(prev);
-        }
-        // 检查最后一个表达式的输出是不是字节数组或Backspace
-        Expr last = exprChain.get(exprChain.size() - 1);
-        ValueType lastOutput = last.getClass().getAnnotation(ExprDescription.class).typeOut();
-        if (lastOutput != ValueType.Bytes && lastOutput != ValueType.Backspace)
-            throw new KyouException("last expr must return Bytes or Backspace but " + lastOutput);
-
-        return Collections.unmodifiableList(exprChain);
-    }
-
-    /**
-     * 根据本体的字符串形式构建一个表达式实例
-     * 
-     * @param exprInfo
-     *            表达式信息
-     * @return 表达式实例
-     */
-    static Expr buildExpr(ExprInfo exprInfo) {
-        // 判断是否是整数字面量
-        if (StringUtils.isNumeric(exprInfo.name))
-            return new LiteralInteger(exprInfo.name);
-
-        // 创建expr实例
-        try {
-            Expr expr = ClassUtils.newInstance(EXPR_CLASSES, exprInfo.name);
-            if (expr == null)
-                throw new KyouException("expression unsupported. name: " + exprInfo.name);
-
-            if (exprInfo.postfix == null)
-                expr.postfix = null;
-            else if (exprInfo.postfix.ref < 0)
-                expr.postfix = new Value(exprInfo.postfix.value);
-            else
-                expr.postfix = new Value(ValueType.RefParam, null, exprInfo.postfix.ref, null, null);
-
-            if (exprInfo.complexPostfix == null)
-                return expr;
-
-            expr.postfixMap = new HashMap<>();
-            for (Entry<String, ExprPostfixValueInfo> entry : exprInfo.complexPostfix.entrySet())
-                if (entry.getValue().ref < 0)
-                    expr.postfixMap.put(entry.getKey(), new Value(entry.getValue().value));
-                else
-                    expr.postfixMap.put(entry.getKey(), new Value(ValueType.RefParam, null, entry.getValue().ref, null, null));
-            return expr;
-        } catch (Exception ex) {
-            throw new KyouException("init expression fail. name: " + exprInfo.name, ex);
-        }
     }
 
 }

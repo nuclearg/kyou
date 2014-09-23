@@ -12,6 +12,7 @@ public class ExprListStringTest {
     public void test() {
         test("s2b.'gbk' a.'我人有的和\\‘主产不为这'");
         test("s2b.gbk aligns[align='r',padding='\\'',len='5'] v");
+        test("s2b aligns[align='r',padding=' ',len=%2] v");
     }
 
     private void test(String str) {

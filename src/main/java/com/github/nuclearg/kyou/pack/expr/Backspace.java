@@ -25,7 +25,7 @@ import com.github.nuclearg.kyou.util.value.ValueType;
 class Backspace extends Expr {
 
     @Override
-    public Value eval(Value input, PackContext context) {
+    public Value calc(Value input, PackContext context) {
         return new Value(ValueType.Backspace, null, input.intValue, null, null);
     }
 

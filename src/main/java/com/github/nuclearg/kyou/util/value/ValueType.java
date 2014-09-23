@@ -37,11 +37,6 @@ public enum ValueType {
     Backspace,
 
     /**
-     * 自动推断
-     */
-    Auto,
-    
-    /**
      * 引用其它参数
      */
     RefParam,

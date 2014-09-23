@@ -4,6 +4,7 @@ import org.apache.commons.lang.StringUtils;
 
 import com.github.nuclearg.kyou.KyouException;
 import com.github.nuclearg.kyou.pack.PackContext;
+import com.github.nuclearg.kyou.pack.StyleUnit;
 import com.github.nuclearg.kyou.pack.expr.ExprDescription.ComplexPostfixField;
 import com.github.nuclearg.kyou.pack.expr.ExprDescription.ExprPostfix;
 import com.github.nuclearg.kyou.util.value.Value;
@@ -36,7 +37,7 @@ import com.github.nuclearg.kyou.util.value.ValueType;
 class AlignString extends Expr {
 
     @Override
-    public Value eval(Value input, PackContext context) {
+    public Value calc(Value input, PackContext context) {
         String align = this.postfixMap.get("align").strValue;
         String padding = this.postfixMap.get("padding").strValue;
         int len = this.postfixMap.get("len").intValue;
@@ -87,8 +88,8 @@ class AlignString extends Expr {
     }
 
     @Override
-    protected void check(Expr prev) {
-        super.check(prev);
+    public void check(Expr prev, StyleUnit styleUnit) {
+        super.check(prev, styleUnit);
 
         String align = this.postfixMap.get("align").strValue;
         if (!align.equals("l") && !align.equals("r"))

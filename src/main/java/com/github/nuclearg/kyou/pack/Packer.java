@@ -39,12 +39,12 @@ public class Packer {
      */
     public void packItem(PackContext context, ByteOutputStream os) {
         // 选择适合这个报文节点的style
-        StyleItem style = selectStyle(context);
+        StyleUnit style = selectStyle(context);
 
         context = new PackContext(context.item, context.style, style, context.packer);
 
         // 处理style中的每一段，将处理结果作为报文体输出
-        for (StyleFormatSegment segment : style.segments)
+        for (StyleSegment segment : style.segments)
             segment.export(context, os);
     }
 
@@ -76,8 +76,8 @@ public class Packer {
      *            组包上下文
      * @return 适合当前组包上下文的样式单元
      */
-    private static StyleItem selectStyle(PackContext context) {
-        for (StyleItem style : context.style.styles)
+    private static StyleUnit selectStyle(PackContext context) {
+        for (StyleUnit style : context.style.styles)
             if (style.matcher.matches(context.item))
                 return style;
 
@@ -95,8 +95,8 @@ public class Packer {
      *            参数的下标，从0开始计算
      * @return 这个参数计算出的结果
      */
-    public Value calcParamValue(KyouItem item, PackContext context, StyleItem style, int paramIndex) {
+    public Value calcParamValue(KyouItem item, PackContext context, StyleUnit style, int paramIndex) {
         context = new PackContext(item, context.style, style, context.packer);
-        return style.paramSegments.get(paramIndex).export(context, new ByteOutputStream());
+        return style.params.get(paramIndex).calc(context);
     }
 }

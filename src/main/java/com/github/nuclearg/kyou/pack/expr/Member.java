@@ -23,7 +23,7 @@ import com.github.nuclearg.kyou.util.value.ValueType;
 class Member extends Expr {
 
     @Override
-    public Value eval(Value input, PackContext context) {
+    public Value calc(Value input, PackContext context) {
         KyouItem item = input.domValue;
         if (!(item instanceof KyouContainer))
             throw new KyouException("KyouContainer expected. path: " + item.path());

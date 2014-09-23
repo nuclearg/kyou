@@ -5,11 +5,11 @@ import com.github.nuclearg.kyou.pack.expr.ExprDescription.ExprPostfix;
 import com.github.nuclearg.kyou.util.value.Value;
 import com.github.nuclearg.kyou.util.value.ValueType;
 
-@ExprDescription(name = "r", postfix = ExprPostfix.Int, typeIn = ValueType.Null, typeOut = ValueType.Auto)
+@ExprDescription(name = "r", postfix = ExprPostfix.Int, typeIn = ValueType.Null, typeOut = ValueType.RefParam)
 class RefExpr extends Expr {
 
     @Override
-    public Value eval(Value input, PackContext context) {
+    public Value calc(Value input, PackContext context) {
         return context.packer.calcParamValue(context.item, context, context.currentStyle, this.postfix.intValue);
     }
 

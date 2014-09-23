@@ -2,6 +2,7 @@ package com.github.nuclearg.kyou.pack.expr;
 
 import com.github.nuclearg.kyou.KyouException;
 import com.github.nuclearg.kyou.pack.PackContext;
+import com.github.nuclearg.kyou.pack.StyleUnit;
 import com.github.nuclearg.kyou.util.value.Value;
 
 /**
@@ -17,7 +18,7 @@ abstract class AbstractRadixSupportedExpr extends Expr {
     private int radix;
 
     @Override
-    public Value eval(Value input, PackContext context) {
+    public Value calc(Value input, PackContext context) {
         return this.eval(input, context, this.radix);
     }
 
@@ -32,8 +33,8 @@ abstract class AbstractRadixSupportedExpr extends Expr {
     protected abstract Value eval(Value input, PackContext context, int radix);
 
     @Override
-    protected void check(Expr prev) {
-        super.check(prev);
+    public void check(Expr prev, StyleUnit styleUnit) {
+        super.check(prev, styleUnit);
 
         this.radix = this.postfix == null ? 10 : this.postfix.intValue;
 

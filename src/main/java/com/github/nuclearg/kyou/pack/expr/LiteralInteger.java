@@ -29,7 +29,7 @@ class LiteralInteger extends Expr {
     }
 
     @Override
-    public Value eval(Value input, PackContext context) {
+    public Value calc(Value input, PackContext context) {
         return new Value(this.postfix.intValue);
     }
 

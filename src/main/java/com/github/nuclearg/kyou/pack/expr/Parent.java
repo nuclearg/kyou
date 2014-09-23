@@ -20,7 +20,7 @@ import com.github.nuclearg.kyou.util.value.ValueType;
 class Parent extends Expr {
 
     @Override
-    public Value eval(Value input, PackContext context) {
+    public Value calc(Value input, PackContext context) {
         KyouContainer parent = input.domValue.parent();
 
         if (parent == null || parent == input.domValue)

@@ -4,6 +4,7 @@ import java.nio.charset.Charset;
 
 import com.github.nuclearg.kyou.KyouException;
 import com.github.nuclearg.kyou.pack.PackContext;
+import com.github.nuclearg.kyou.pack.StyleUnit;
 import com.github.nuclearg.kyou.util.value.Value;
 
 /**
@@ -19,7 +20,7 @@ abstract class AbstractEncodingSupportedExpr extends Expr {
     private Charset encoding;
 
     @Override
-    public Value eval(Value input, PackContext context) {
+    public Value calc(Value input, PackContext context) {
         Charset encoding = this.encoding == null ? context.style.config.encoding : this.encoding;
 
         return this.eval(input, context, encoding);
@@ -35,8 +36,9 @@ abstract class AbstractEncodingSupportedExpr extends Expr {
      */
     protected abstract Value eval(Value input, PackContext context, Charset encoding);
 
-    protected void check(Expr prev) {
-        super.check(prev);
+    @Override
+    public void check(Expr prev, StyleUnit styleUnit) {
+        super.check(prev, styleUnit);
 
         // 如果后缀为空则表示不指定编码，和整篇报文的编码保持一致
         if (this.postfix == null)

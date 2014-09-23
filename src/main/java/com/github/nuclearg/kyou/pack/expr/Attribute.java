@@ -30,7 +30,7 @@ import com.github.nuclearg.kyou.util.value.ValueType;
 class Attribute extends Expr {
 
     @Override
-    public Value eval(Value input, PackContext context) {
+    public Value calc(Value input, PackContext context) {
         return new Value(input.domValue.attr(this.postfix.strValue, StringUtils.EMPTY));
     }
 

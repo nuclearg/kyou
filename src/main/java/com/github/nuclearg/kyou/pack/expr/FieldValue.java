@@ -22,7 +22,7 @@ import com.github.nuclearg.kyou.util.value.ValueType;
 class FieldValue extends Expr {
 
     @Override
-    public Value eval(Value input, PackContext context) {
+    public Value calc(Value input, PackContext context) {
         if (!(input.domValue instanceof KyouField))
             throw new KyouException("KyouField expected. path: " + input.domValue.path());
 
